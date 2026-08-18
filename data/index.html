@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ESP32 图片控制</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+  h1 { color: #333; }
+  .card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  input[type=file] { margin: 10px 0; }
+  button { background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+  button:hover { background: #45a049; }
+  .btn-delete { background: #f44336; margin-left: 10px; padding: 5px 10px; font-size: 12px; }
+  .btn-delete:hover { background: #d32f2f; }
+  .img-list { list-style: none; padding: 0; }
+  .img-list li { padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .img-list li:hover { background: #e8f5e9; }
+  .img-name { flex: 1; }
+  .status { color: #666; margin-top: 10px; }
+</style>
+</head>
+<body>
+  <h1>ESP32 图片显示控制</h1>
+
+  <div class="card">
+    <h2>上传图片</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+      <input type="file" id="fileInput" name="file" accept=".jpg,.jpeg">
+      <button type="submit">上传并显示</button>
+    </form>
+    <div class="status" id="uploadStatus"></div>
+  </div>
+
+  <div class="card">
+    <h2>选择已有图片</h2>
+    <ul class="img-list" id="imgList"></ul>
+    <div class="status" id="listStatus"></div>
+  </div>
+
+  <script>
+    // 上传图片
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var file = document.getElementById('fileInput').files[0];
+      if (!file) { alert('请选择文件'); return; }
+      var formData = new FormData();
+      formData.append('file', file);
+      var status = document.getElementById('uploadStatus');
+      status.textContent = '上传中...';
+      fetch('/upload', { method: 'POST', body: formData })
+        .then(r => r.text())
+        .then(msg => { status.textContent = msg; loadImages(); })
+        .catch(err => { status.textContent = '上传失败: ' + err; });
+    });
+
+    // 加载图片列表
+    function loadImages() {
+      fetch('/list')
+        .then(r => r.json())
+        .then(data => {
+          var list = document.getElementById('imgList');
+          list.innerHTML = '';
+          data.forEach(function(img) {
+            var li = document.createElement('li');
+            var nameSpan = document.createElement('span');
+            nameSpan.className = 'img-name';
+            nameSpan.textContent = img;
+            nameSpan.onclick = function() { displayImage(img); };
+            li.appendChild(nameSpan);
+
+            var delBtn = document.createElement('button');
+            delBtn.className = 'btn-delete';
+            delBtn.textContent = '删除';
+            delBtn.onclick = function(e) {
+              e.stopPropagation();
+              deleteImage(img);
+            };
+            li.appendChild(delBtn);
+
+            list.appendChild(li);
+          });
+        })
+        .catch(err => { document.getElementById('listStatus').textContent = '加载列表失败'; });
+    }
+
+    // 显示图片
+    function displayImage(name) {
+      fetch('/display?img=' + encodeURIComponent(name))
+        .then(r => r.text())
+        .then(msg => { document.getElementById('listStatus').textContent = msg; });
+    }
+
+    // 删除图片
+    function deleteImage(name) {
+      if (!confirm('确定要删除图片 ' + name + ' 吗？')) return;
+      fetch('/delete?img=' + encodeURIComponent(name), { method: 'POST' })
+        .then(r => r.text())
+        .then(msg => {
+          document.getElementById('listStatus').textContent = msg;
+          loadImages();
+        })
+        .catch(err => { document.getElementById('listStatus').textContent = '删除失败: ' + err; });
+    }
+
+    loadImages();
+  </script>
+</body>
+</html>
