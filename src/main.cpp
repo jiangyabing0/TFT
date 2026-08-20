@@ -10,7 +10,7 @@
 #include <AsyncTCP.h>
 #include "soc/soc.h"       // 禁用欠压检测器
 #include "soc/rtc_cntl_reg.h" // 禁用欠压检测器
-
+#include <ESPAsync_WiFiManager.h>
 
 // 触摸引脚（确保与 User_Setup.h 或实际接线一致）
 #define TOUCH_CS  21
@@ -29,13 +29,17 @@ XPT2046_Touchscreen ts(TOUCH_CS, TOUCH_IRQ);
 
 // 异步 Web 服务器（端口 80）
 AsyncWebServer server(80);
+AsyncDNSServer dnsServer;      // DNS 服务器（配网门户需要）
+ESPAsync_WiFiManager wifiManager(&server, &dnsServer);  // 创建 WiFiManager 实例
 
 // --- 2. 图片配置 ---
-#define MAX_IMAGES 5 // 根据你 data 里的图片数量修改
-const char* imageFiles[MAX_IMAGES] = {"/1.jpg", "/2.jpg", "/3.jpg", "/4.jpg", "/5.jpg"};
+#define MAX_IMAGES 20 // 最多支持 20 张图片（实际数量在 setup 中动态统计）
+String imageFiles[MAX_IMAGES];
+int imageCount = 0;      // 实际图片数量
 int currentImageIndex = 0;
 // 当前显示的图片文件名
-String currentImage = "/1.jpg";
+String currentImage = "";
+
 
 // --- 缩放配置 ---
 // 缩放倍率列表（0.5 倍 ~ 3 倍）
@@ -100,6 +104,8 @@ void drawButtons() {
 
 
 // 显示图片（支持缩放）
+// 采用“先按 JPG 缩放因子解码到内存，再做最终缩放”的方式，
+// 内存占用只与目标显示尺寸有关，不会因原图过大而失败。
 void displayImage(String filename) {
   tft.fillScreen(TFT_BLACK);
   if (LittleFS.exists(filename)) {
@@ -107,15 +113,14 @@ void displayImage(String filename) {
     uint16_t imgW, imgH;
     TJpgDec.getFsJpgSize(&imgW, &imgH, filename, LittleFS);
 
-    // 计算缩放后的尺寸
+    // 计算缩放后的目标尺寸
     float zf = zoomLevels[currentZoomIndex];
     int scaledW = (int)(imgW * zf);
     int scaledH = (int)(imgH * zf);
 
-    // 图片显示区域（底部按钮栏以上），使用实际屏幕宽度
+    // 图片显示区域（底部按钮栏以上）
     int displayW = tft.width();
     int displayH = BUTTON_BAR_Y;
-
 
     // 如果缩放后超出显示区域，则限制为显示区域大小（保持比例）
     if (scaledW > displayW || scaledH > displayH) {
@@ -123,43 +128,62 @@ void displayImage(String filename) {
       scaledW = (int)(scaledW * ratio);
       scaledH = (int)(scaledH * ratio);
     }
+    // 至少 1 像素，避免除零
+    if (scaledW < 1) scaledW = 1;
+    if (scaledH < 1) scaledH = 1;
 
     // 居中显示
     int x = (displayW - scaledW) / 2;
     int y = (displayH - scaledH) / 2;
 
-    // 释放上一次的缓冲
-    if (imgBuffer) { free(imgBuffer); imgBuffer = NULL; }
+    // 选择一个 JPG 解码缩放因子(1/2/4/8)，使解码后的缓冲尺寸 >= 目标尺寸，
+    // 这样既能保证画质，又能把内存占用控制在目标尺寸附近。
+    int jpgScale = 1;
+    while (jpgScale < 8) {
+      int next = jpgScale * 2;
+      if ((imgW / next) < scaledW || (imgH / next) < scaledH) break;
+      jpgScale = next;
+    }
+    int decW = imgW / jpgScale;
+    int decH = imgH / jpgScale;
+    if (decW < 1) decW = 1;
+    if (decH < 1) decH = 1;
 
-    // 分配完整图片缓冲（16位色，每像素2字节）
-    size_t bufSize = (size_t)imgW * imgH * 2;
-    imgBuffer = (uint16_t*)malloc(bufSize);
-    if (imgBuffer) {
-      imgBufW = imgW;
-      imgBufH = imgH;
-      // 用捕获回调把图片完整解码到内存
+    // 分配解码缓冲（16位色，每像素2字节）
+    size_t bufSize = (size_t)decW * decH * 2;
+    uint16_t* buf = (uint16_t*)malloc(bufSize);
+    if (buf) {
+      imgBuffer = buf;
+      imgBufW = decW;
+      imgBufH = decH;
+
+      // 按选定的缩放因子解码到内存
+      TJpgDec.setJpgScale(jpgScale);
       TJpgDec.setCallback(capture_output);
       TJpgDec.drawFsJpg(0, 0, filename, LittleFS);
       TJpgDec.setCallback(tft_output);
+      TJpgDec.setJpgScale(1);
 
-      // 从缓冲缩放并绘制到屏幕（逐行处理，节省内存）
+      // 从解码缓冲做最终缩放并逐行绘制
       uint16_t* rowBuf = (uint16_t*)malloc(scaledW * 2);
       if (rowBuf) {
         for (int ty = 0; ty < scaledH; ty++) {
-          int sy = ty * imgH / scaledH;
+          int sy = ty * decH / scaledH;
           for (int tx = 0; tx < scaledW; tx++) {
-            int sx = tx * imgW / scaledW;
-            rowBuf[tx] = imgBuffer[sy * imgW + sx];
+            int sx = tx * decW / scaledW;
+            rowBuf[tx] = buf[sy * decW + sx];
           }
           tft.pushImage(x, y + ty, scaledW, 1, rowBuf);
         }
         free(rowBuf);
       }
-      free(imgBuffer);
+      free(buf);
       imgBuffer = NULL;
     } else {
-      // 内存不足时退回原始尺寸绘制
+      // 内存仍不足时，直接用 JPG 解码器按缩放因子绘制（不居中）
+      TJpgDec.setJpgScale(jpgScale);
       TJpgDec.drawFsJpg(0, 0, filename, LittleFS);
+      TJpgDec.setJpgScale(1);
     }
 
     currentImage = filename;
@@ -173,13 +197,16 @@ void displayImage(String filename) {
 }
 
 
+
 // 切换图片（上一页/下一页）
 void changePage(int delta) {
+  if (imageCount <= 0) return; // 没有图片则忽略
   currentImageIndex += delta;
-  if (currentImageIndex < 0) currentImageIndex = MAX_IMAGES - 1;
-  if (currentImageIndex >= MAX_IMAGES) currentImageIndex = 0;
+  if (currentImageIndex < 0) currentImageIndex = imageCount - 1;
+  if (currentImageIndex >= imageCount) currentImageIndex = 0;
   displayImage(imageFiles[currentImageIndex]);
 }
+
 
 // 缩放图片
 void changeZoom(int delta) {
@@ -298,22 +325,64 @@ void setup() {
   TJpgDec.setJpgScale(1); // 缩放比例 1/2/4/8
   TJpgDec.setCallback(tft_output); // 指定渲染回调函数
 
-  // 1. 连 WiFi（带超时机制，防止卡死）
-  WiFi.begin(ssid, password);
-  tft.drawString("Connecting WiFi...", 10, 10, 2);
-  int retries = 0;
-  while (WiFi.status() != WL_CONNECTED && retries < 20) { // 最多等10秒
-    delay(500);
-    Serial.print(".");
-    retries++;
+  // 扫描 LittleFS 中所有图片，动态填充 imageFiles 列表
+  imageCount = 0;
+  {
+    File root = LittleFS.open("/");
+    File file = root.openNextFile();
+    while (file && imageCount < MAX_IMAGES) {
+      String name = file.name();
+      if (name.endsWith(".jpg") || name.endsWith(".jpeg")) {
+        imageFiles[imageCount++] = name;
+        Serial.printf("发现图片: %s\n", name.c_str());
+      }
+      file = root.openNextFile();
+    }
   }
-  Serial.println();
-  tft.fillScreen(TFT_BLACK);
+  Serial.printf("共发现 %d 张图片\n", imageCount);
 
-  // 显示默认图片（如果存在）
-  if (LittleFS.exists("/1.jpg")) {
-    displayImage("/1.jpg");
+  // 1. 设置屏幕配网提示
+  // ==========================================
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_YELLOW);
+  tft.drawString("正在尝试连接 WiFi...", 10, 10, 2);
+  tft.setTextColor(TFT_WHITE);
+  tft.drawString("若失败将自动创建", 10, 35, 2);
+  tft.setTextColor(TFT_GREEN);
+  tft.drawString("热点: ESP32_Photo", 10, 60, 2);
+
+  // ==========================================
+  // 2. 核心：自动连接/配网逻辑
+  // ==========================================
+  // 关键：直接将外部创建的 AsyncWebServer 对象传给 WiFiManager
+  // (wifiManager 已在全局创建，这里直接使用)
+  
+  // 给配网界面设置一个名字 (ESP32_Photo) 和一个密码 (可选，设为空就是无密码)
+  bool res = wifiManager.autoConnect("ESP32_Photo", "12345678"); 
+  
+  if (!res) {
+    // 如果连不上，且配网也失败，重启 ESP32
+    tft.fillScreen(TFT_RED);
+    tft.drawString("配网失败，重启中...", 10, 10, 2);
+    delay(3000);
+    ESP.restart();
   }
+
+  // 连上 WiFi 了！
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_CYAN);
+  tft.drawString("Wi-Fi 连接成功!", 10, 10, 2);
+  tft.drawString("IP: " + WiFi.localIP().toString(), 10, 40, 2);
+  delay(1500);
+  // ==========================================
+
+
+  // 显示第一张图片（如果存在）
+  if (imageCount > 0) {
+    currentImageIndex = 0;
+    displayImage(imageFiles[0]);
+  }
+
 
   // 2. 初始化 NTP 时间
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
@@ -324,6 +393,11 @@ void setup() {
   server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send(200, "text/html", getControlPage());
   });
+  server.on("/resetWifi", HTTP_GET, [](AsyncWebServerRequest *request){
+    wifiManager.resetSettings(); // 擦除保存的 WiFi 密码
+    ESP.restart();               // 重启，让设备重新进入配网模式
+    request->send(200, "text/plain", "已重置，设备将重启");
+  });
 
   // 显示指定图片：/display?img=xxx.jpg
   server.on("/display", HTTP_GET, [](AsyncWebServerRequest* request) {
@@ -333,6 +407,10 @@ void setup() {
       if (!img.startsWith("/")) img = "/" + img;
       if (LittleFS.exists(img)) {
         displayImage(img);
+        // 同步当前图片索引，保证上下页切换正确
+        for (int i = 0; i < imageCount; i++) {
+          if (imageFiles[i] == img) { currentImageIndex = i; break; }
+        }
         request->send(200, "text/plain", "已显示: " + img);
       } else {
         request->send(404, "text/plain", "图片不存在: " + img);
@@ -341,6 +419,7 @@ void setup() {
       request->send(400, "text/plain", "缺少 img 参数");
     }
   });
+
 
   // 列出 LittleFS 中的图片
   server.on("/list", HTTP_GET, [](AsyncWebServerRequest* request) {
@@ -375,6 +454,15 @@ void setup() {
       if (LittleFS.exists(img)) {
         if (LittleFS.remove(img)) {
           Serial.println("已删除图片: " + img);
+          // 从图片列表中移除
+          for (int i = 0; i < imageCount; i++) {
+            if (imageFiles[i] == img) {
+              for (int j = i; j < imageCount - 1; j++) imageFiles[j] = imageFiles[j + 1];
+              imageCount--;
+              if (currentImageIndex >= imageCount) currentImageIndex = imageCount - 1;
+              break;
+            }
+          }
           // 如果删除的是当前显示的图片，清屏
           if (img == currentImage) {
             tft.fillScreen(TFT_BLACK);
@@ -387,6 +475,7 @@ void setup() {
       } else {
         request->send(404, "text/plain", "图片不存在: " + img);
       }
+
     } else {
       request->send(400, "text/plain", "缺少 img 参数");
     }
@@ -423,10 +512,20 @@ void setup() {
         Serial.println("上传完成: " + filename);
         // 上传完成后自动显示
         String path = "/" + filename;
+        // 把新图片加入列表（如果还没在列表中）
+        bool found = false;
+        for (int i = 0; i < imageCount; i++) {
+          if (imageFiles[i] == path) { found = true; currentImageIndex = i; break; }
+        }
+        if (!found && imageCount < MAX_IMAGES) {
+          imageFiles[imageCount++] = path;
+          currentImageIndex = imageCount - 1;
+        }
         displayImage(path);
       }
     }
   });
+
 
   // 启动服务器
   server.begin();
@@ -443,9 +542,11 @@ void loop() {
         // 压力值过滤（防止悬空误触）
         if (p.z > 100) {  // 根据实际调整阈值
             // 将 ADC 值映射到屏幕像素
+            // 横屏(rotation 1)时：屏幕宽 TFT_WIDTH=320，高 TFT_HEIGHT=240
             // x 对应屏幕横向(0~320)，y 对应屏幕纵向(0~240)
             uint16_t x = map(p.x, 0, 4095, 0, TFT_HEIGHT);
             uint16_t y = map(p.y, 0, 4095, 0, TFT_WIDTH);
+
 
 
             // 判断是否点击了底部按钮
