@@ -37,6 +37,23 @@ int currentImageIndex = 0;
 // 当前显示的图片文件名
 String currentImage = "/1.jpg";
 
+// --- 缩放配置 ---
+// 缩放倍率列表（0.5 倍 ~ 3 倍）
+const float zoomLevels[] = {0.5, 0.75, 1.0, 1.5, 2.0, 3.0};
+const int zoomLevelCount = sizeof(zoomLevels) / sizeof(zoomLevels[0]);
+int currentZoomIndex = 2; // 默认 1.0 倍
+
+// --- 底部按钮区域配置 ---
+// 屏幕为横屏 320x240（rotation 1），底部 40 像素留给按钮
+#define BUTTON_BAR_Y 200
+#define BUTTON_BAR_H 40
+#define BUTTON_COUNT 4
+int buttonW = 0;  // 每个按钮的宽度，在 setup 中根据实际屏幕宽度计算
+
+// 按钮文字
+const char* buttonLabels[BUTTON_COUNT] = {"上一页", "下一页", "放大", "缩小"};
+
+
 // 拍照显示函数 (和之前一样)
 bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
   if ( y >= tft.height() ) return 0;
@@ -44,17 +61,132 @@ bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) 
   return 1;
 }
 
+// --- 缩放用内存缓冲 ---
+uint16_t* imgBuffer = NULL;   // 存放解码后的完整图片
+uint16_t imgBufW = 0, imgBufH = 0;
+
+// 用于把解码结果捕获到内存缓冲的回调
+bool capture_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
+  for (int j = 0; j < h; j++) {
+    for (int i = 0; i < w; i++) {
+      int px = x + i;
+      int py = y + j;
+      if (px < imgBufW && py < imgBufH) {
+        imgBuffer[py * imgBufW + px] = bitmap[j * w + i];
+      }
+    }
+  }
+  return 1;
+}
+
+// 绘制底部按钮栏
+void drawButtons() {
+  for (int i = 0; i < BUTTON_COUNT; i++) {
+    int x = i * buttonW;
+    // 绘制按钮背景
+    tft.fillRect(x, BUTTON_BAR_Y, buttonW, BUTTON_BAR_H, TFT_NAVY);
+    // 绘制按钮边框
+    tft.drawRect(x, BUTTON_BAR_Y, buttonW, BUTTON_BAR_H, TFT_WHITE);
+    // 绘制按钮文字（居中）
+    tft.setTextColor(TFT_WHITE, TFT_NAVY);
+    tft.setTextSize(1);
+    // 计算文字居中位置
+    int textW = tft.textWidth(buttonLabels[i], 2);
+    int textX = x + (buttonW - textW) / 2;
+    int textY = BUTTON_BAR_Y + (BUTTON_BAR_H - 16) / 2;
+    tft.drawString(buttonLabels[i], textX, textY, 2);
+  }
+}
+
+
+// 显示图片（支持缩放）
 void displayImage(String filename) {
   tft.fillScreen(TFT_BLACK);
   if (LittleFS.exists(filename)) {
-    // 关键：必须指定使用 LittleFS，因为 TJpgDec.drawJpg 默认使用 SPIFFS
-    TJpgDec.drawFsJpg(0, 0, filename, LittleFS);
+    // 获取图片原始尺寸
+    uint16_t imgW, imgH;
+    TJpgDec.getFsJpgSize(&imgW, &imgH, filename, LittleFS);
+
+    // 计算缩放后的尺寸
+    float zf = zoomLevels[currentZoomIndex];
+    int scaledW = (int)(imgW * zf);
+    int scaledH = (int)(imgH * zf);
+
+    // 图片显示区域（底部按钮栏以上），使用实际屏幕宽度
+    int displayW = tft.width();
+    int displayH = BUTTON_BAR_Y;
+
+
+    // 如果缩放后超出显示区域，则限制为显示区域大小（保持比例）
+    if (scaledW > displayW || scaledH > displayH) {
+      float ratio = min((float)displayW / scaledW, (float)displayH / scaledH);
+      scaledW = (int)(scaledW * ratio);
+      scaledH = (int)(scaledH * ratio);
+    }
+
+    // 居中显示
+    int x = (displayW - scaledW) / 2;
+    int y = (displayH - scaledH) / 2;
+
+    // 释放上一次的缓冲
+    if (imgBuffer) { free(imgBuffer); imgBuffer = NULL; }
+
+    // 分配完整图片缓冲（16位色，每像素2字节）
+    size_t bufSize = (size_t)imgW * imgH * 2;
+    imgBuffer = (uint16_t*)malloc(bufSize);
+    if (imgBuffer) {
+      imgBufW = imgW;
+      imgBufH = imgH;
+      // 用捕获回调把图片完整解码到内存
+      TJpgDec.setCallback(capture_output);
+      TJpgDec.drawFsJpg(0, 0, filename, LittleFS);
+      TJpgDec.setCallback(tft_output);
+
+      // 从缓冲缩放并绘制到屏幕（逐行处理，节省内存）
+      uint16_t* rowBuf = (uint16_t*)malloc(scaledW * 2);
+      if (rowBuf) {
+        for (int ty = 0; ty < scaledH; ty++) {
+          int sy = ty * imgH / scaledH;
+          for (int tx = 0; tx < scaledW; tx++) {
+            int sx = tx * imgW / scaledW;
+            rowBuf[tx] = imgBuffer[sy * imgW + sx];
+          }
+          tft.pushImage(x, y + ty, scaledW, 1, rowBuf);
+        }
+        free(rowBuf);
+      }
+      free(imgBuffer);
+      imgBuffer = NULL;
+    } else {
+      // 内存不足时退回原始尺寸绘制
+      TJpgDec.drawFsJpg(0, 0, filename, LittleFS);
+    }
+
     currentImage = filename;
-    Serial.printf("已切换到图片: %s\n", filename.c_str());
+    Serial.printf("已切换到图片: %s (缩放 %.2f 倍, %dx%d)\n", filename.c_str(), zf, scaledW, scaledH);
   } else {
     tft.setTextColor(TFT_WHITE);
     tft.drawString("图片丢失", 10, 10, 2);
   }
+  // 重绘按钮栏
+  drawButtons();
+}
+
+
+// 切换图片（上一页/下一页）
+void changePage(int delta) {
+  currentImageIndex += delta;
+  if (currentImageIndex < 0) currentImageIndex = MAX_IMAGES - 1;
+  if (currentImageIndex >= MAX_IMAGES) currentImageIndex = 0;
+  displayImage(imageFiles[currentImageIndex]);
+}
+
+// 缩放图片
+void changeZoom(int delta) {
+  currentZoomIndex += delta;
+  if (currentZoomIndex < 0) currentZoomIndex = 0;
+  if (currentZoomIndex >= zoomLevelCount) currentZoomIndex = zoomLevelCount - 1;
+  displayImage(currentImage);
 }
 
 // 时间显示区域（避免闪烁的关键：只更新变化的区域）
@@ -133,9 +265,13 @@ void setup() {
   tft.setRotation(1); 
   tft.fillScreen(TFT_BLACK);
 
+  // 根据实际屏幕宽度计算每个按钮的宽度（横屏时 tft.width()=320）
+  buttonW = tft.width() / BUTTON_COUNT;
+
   // 初始化触摸屏
   ts.begin();
   ts.setRotation(2); // 与屏幕旋转方向一致
+
 /*
       // 2. 初始化触摸
     bool touchOk = ts.begin();
@@ -307,19 +443,42 @@ void loop() {
         // 压力值过滤（防止悬空误触）
         if (p.z > 100) {  // 根据实际调整阈值
             // 将 ADC 值映射到屏幕像素
+            // x 对应屏幕横向(0~320)，y 对应屏幕纵向(0~240)
             uint16_t x = map(p.x, 0, 4095, 0, TFT_HEIGHT);
             uint16_t y = map(p.y, 0, 4095, 0, TFT_WIDTH);
 
-            // 在触摸位置画一个亮绿色的圆点
-            tft.fillCircle(x, y, 8, TFT_GREEN);
-            // 显示坐标文字（方便看清）
-            tft.setTextColor(TFT_WHITE, TFT_BLACK);
-            tft.setTextSize(1);
-            tft.setCursor(10, TFT_HEIGHT - 20);
-            tft.printf("X:%3d Y:%3d  Z:%4d  ", x, y, p.z);
 
-            // 串口输出
-            Serial.printf("Touch: X=%d, Y=%d, Pressure=%d\n", x, y, p.z);
+            // 判断是否点击了底部按钮
+            if (y >= BUTTON_BAR_Y) {
+              int btnIndex = x / buttonW;
+
+              if (btnIndex >= 0 && btnIndex < BUTTON_COUNT) {
+                // 按钮按下反馈（高亮）
+                int bx = btnIndex * buttonW;
+                tft.fillRect(bx, BUTTON_BAR_Y, buttonW, BUTTON_BAR_H, TFT_BLUE);
+                tft.drawRect(bx, BUTTON_BAR_Y, buttonW, BUTTON_BAR_H, TFT_WHITE);
+                tft.setTextColor(TFT_WHITE, TFT_BLUE);
+                int textW = tft.textWidth(buttonLabels[btnIndex], 2);
+                tft.drawString(buttonLabels[btnIndex], bx + (buttonW - textW) / 2, BUTTON_BAR_Y + (BUTTON_BAR_H - 16) / 2, 2);
+
+
+                switch (btnIndex) {
+                  case 0: changePage(-1); break;  // 上一页
+                  case 1: changePage(1);  break;  // 下一页
+                  case 2: changeZoom(1);  break;  // 放大
+                  case 3: changeZoom(-1); break;  // 缩小
+                }
+                Serial.printf("按钮 %d (%s) 被按下\n", btnIndex, buttonLabels[btnIndex]);
+              }
+            } else {
+              // 在图片区域触摸，显示坐标（调试用）
+              tft.setTextColor(TFT_WHITE, TFT_BLACK);
+              tft.setTextSize(1);
+              tft.setCursor(10, TFT_HEIGHT - 20);
+              tft.printf("X:%3d Y:%3d  Z:%4d  ", x, y, p.z);
+              Serial.printf("Touch: X=%d, Y=%d, Pressure=%d\n", x, y, p.z);
+            }
+
 
             // 防抖
             delay(100);
