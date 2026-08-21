@@ -12,6 +12,8 @@
 #include "soc/rtc_cntl_reg.h" // 禁用欠压检测器
 #include <ESPAsync_WiFiManager.h>
 
+
+
 // 触摸引脚（确保与 User_Setup.h 或实际接线一致）
 #define TOUCH_CS  21
 #define TOUCH_IRQ -1   // 不用可设为 -1
@@ -30,7 +32,14 @@ XPT2046_Touchscreen ts(TOUCH_CS, TOUCH_IRQ);
 // 异步 Web 服务器（端口 80）
 AsyncWebServer server(80);
 AsyncDNSServer dnsServer;      // DNS 服务器（配网门户需要）
-ESPAsync_WiFiManager wifiManager(&server, &dnsServer);  // 创建 WiFiManager 实例
+// 注意：ESPAsync_WiFiManager 的构造函数会调用 WiFi.mode()，
+// 不能在全局构造阶段创建（此时 WiFi 子系统尚未初始化），
+// 否则会导致 RTCWDT_RTC_RESET 看门狗复位（启动死循环）。
+// 因此这里只声明指针，在 setup() 中创建。
+ESPAsync_WiFiManager* wifiManager = nullptr;
+
+
+
 
 // --- 2. 图片配置 ---
 #define MAX_IMAGES 20 // 最多支持 20 张图片（实际数量在 setup 中动态统计）
@@ -107,11 +116,15 @@ void drawButtons() {
 // 采用“先按 JPG 缩放因子解码到内存，再做最终缩放”的方式，
 // 内存占用只与目标显示尺寸有关，不会因原图过大而失败。
 void displayImage(String filename) {
+  // 确保文件名以 "/" 开头（LittleFS 需要绝对路径）
+  if (!filename.startsWith("/")) filename = "/" + filename;
+
   tft.fillScreen(TFT_BLACK);
   if (LittleFS.exists(filename)) {
     // 获取图片原始尺寸
     uint16_t imgW, imgH;
     TJpgDec.getFsJpgSize(&imgW, &imgH, filename, LittleFS);
+    Serial.printf("图片尺寸: %dx%d\n", imgW, imgH);
 
     // 计算缩放后的目标尺寸
     float zf = zoomLevels[currentZoomIndex];
@@ -149,6 +162,8 @@ void displayImage(String filename) {
     if (decW < 1) decW = 1;
     if (decH < 1) decH = 1;
 
+    Serial.printf("缩放: %.2f, 目标: %dx%d, 解码: %dx%d (jpgScale=%d)\n", zf, scaledW, scaledH, decW, decH, jpgScale);
+
     // 分配解码缓冲（16位色，每像素2字节）
     size_t bufSize = (size_t)decW * decH * 2;
     uint16_t* buf = (uint16_t*)malloc(bufSize);
@@ -181,6 +196,7 @@ void displayImage(String filename) {
       imgBuffer = NULL;
     } else {
       // 内存仍不足时，直接用 JPG 解码器按缩放因子绘制（不居中）
+      Serial.println("内存不足，使用直接解码绘制");
       TJpgDec.setJpgScale(jpgScale);
       TJpgDec.drawFsJpg(0, 0, filename, LittleFS);
       TJpgDec.setJpgScale(1);
@@ -189,6 +205,7 @@ void displayImage(String filename) {
     currentImage = filename;
     Serial.printf("已切换到图片: %s (缩放 %.2f 倍, %dx%d)\n", filename.c_str(), zf, scaledW, scaledH);
   } else {
+    Serial.printf("图片不存在: %s\n", filename.c_str());
     tft.setTextColor(TFT_WHITE);
     tft.drawString("图片丢失", 10, 10, 2);
   }
@@ -217,10 +234,11 @@ void changeZoom(int delta) {
 }
 
 // 时间显示区域（避免闪烁的关键：只更新变化的区域）
-#define DATE_X 10
-#define DATE_Y 10
-#define TIME_X 10
-#define TIME_Y 40
+// 时间显示在屏幕右上角，避免与图片重叠
+#define DATE_X 200
+#define DATE_Y 5
+#define TIME_X 200
+#define TIME_Y 25
 
 
 void printLocalTime() {
@@ -299,20 +317,6 @@ void setup() {
   ts.begin();
   ts.setRotation(2); // 与屏幕旋转方向一致
 
-/*
-      // 2. 初始化触摸
-    bool touchOk = ts.begin();
-    if (!touchOk) {
-        Serial.println("触摸芯片初始化失败！请检查 SPI 接线和 CS 引脚。");
-        tft.fillScreen(TFT_RED);
-        tft.setTextColor(TFT_WHITE, TFT_RED);
-        tft.drawString("TOUCH ERROR", 10, 10, 4);
-        while (1) delay(100);  // 死循环，提示错误
-    }
-    // 如果触摸芯片支持，设置旋转
-    ts.setRotation(1);
-    Serial.println("触摸芯片初始化成功！");
-*/
   // 初始化 LittleFS 文件系统（存放图片）
   if (!LittleFS.begin()) {
     Serial.println("LittleFS 初始化失败！");
@@ -332,6 +336,8 @@ void setup() {
     File file = root.openNextFile();
     while (file && imageCount < MAX_IMAGES) {
       String name = file.name();
+      // 确保文件名以 "/" 开头
+      if (!name.startsWith("/")) name = "/" + name;
       if (name.endsWith(".jpg") || name.endsWith(".jpeg")) {
         imageFiles[imageCount++] = name;
         Serial.printf("发现图片: %s\n", name.c_str());
@@ -354,11 +360,21 @@ void setup() {
   // ==========================================
   // 2. 核心：自动连接/配网逻辑
   // ==========================================
-  // 关键：直接将外部创建的 AsyncWebServer 对象传给 WiFiManager
-  // (wifiManager 已在全局创建，这里直接使用)
+  // 使用 ESPAsync_WiFiManager 库（khoih-prog）
+  // 它会先尝试连接已保存的 WiFi，失败则自动创建配网热点
+  
+  // 在 setup() 中创建 WiFiManager 实例（不能在全局构造阶段创建，
+  // 因为其构造函数会调用 WiFi.mode()，此时 WiFi 子系统尚未初始化）
+  wifiManager = new ESPAsync_WiFiManager(&server, &dnsServer);
+  
+  // 设置配网超时（秒），防止长时间阻塞触发看门狗复位
+  wifiManager->setConfigPortalTimeout(120);
   
   // 给配网界面设置一个名字 (ESP32_Photo) 和一个密码 (可选，设为空就是无密码)
-  bool res = wifiManager.autoConnect("ESP32_Photo", "12345678"); 
+  bool res = wifiManager->autoConnect("ESP32_Photo", "12345678"); 
+
+
+
   
   if (!res) {
     // 如果连不上，且配网也失败，重启 ESP32
@@ -394,10 +410,13 @@ void setup() {
     request->send(200, "text/html", getControlPage());
   });
   server.on("/resetWifi", HTTP_GET, [](AsyncWebServerRequest *request){
-    wifiManager.resetSettings(); // 擦除保存的 WiFi 密码
+    if (wifiManager) {
+      wifiManager->resetSettings(); // 擦除保存的 WiFi 密码
+    }
     ESP.restart();               // 重启，让设备重新进入配网模式
     request->send(200, "text/plain", "已重置，设备将重启");
   });
+
 
   // 显示指定图片：/display?img=xxx.jpg
   server.on("/display", HTTP_GET, [](AsyncWebServerRequest* request) {
