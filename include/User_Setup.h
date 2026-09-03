@@ -12,7 +12,12 @@
 #define LOAD_FONT2  // 字体 2（drawString 第4个参数为 2 时使用）
 
 
-
+#define INMP441_SCK_PIN   25 // BCLK
+#define INMP441_WS_PIN    26 // LRCLK
+#define INMP441_SD_PIN    13 // DOUT
+#define MAX98357_BCLK_PIN 27 // BCLK
+#define MAX98357_LRC_PIN  14 // LRCLK
+#define MAX98357_DIN_PIN  22 // DIN
 
 
 #define TFT_MISO 19

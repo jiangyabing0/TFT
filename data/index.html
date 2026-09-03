@@ -38,6 +38,12 @@
     <div class="status" id="listStatus"></div>
   </div>
 
+  <div class="card">
+  <h2>系统设置</h2>
+  <button onclick="if(confirm('确定要重置WiFi吗？设备将断开连接并重启进入配网模式！')) window.location.href='/resetWifi'">♻️ 重置 WiFi 配置</button>
+  <div class="status" id="resetStatus"></div>
+  </div>
+
   <script>
     // 上传图片
     document.getElementById('uploadForm').addEventListener('submit', function(e) {

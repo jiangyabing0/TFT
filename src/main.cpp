@@ -11,7 +11,8 @@
 #include "soc/soc.h"       // 禁用欠压检测器
 #include "soc/rtc_cntl_reg.h" // 禁用欠压检测器
 #include <ESPAsync_WiFiManager.h>
-
+#include <driver/i2s.h>
+#include <Wire.h>
 
 
 // 触摸引脚（确保与 User_Setup.h 或实际接线一致）
@@ -25,6 +26,8 @@ const char* password = "jiangyabing";
 const char* ntpServer = "ntp.aliyun.com";
 const long  gmtOffset_sec = 8 * 3600; // 中国时区 UTC+8
 const int   daylightOffset_sec = 0;   // 无夏令时
+const int sample_rate = 16000;
+const int bits_per_sample = 16;
 
 TFT_eSPI tft = TFT_eSPI();
 XPT2046_Touchscreen ts(TOUCH_CS, TOUCH_IRQ);
@@ -545,6 +548,46 @@ void setup() {
     }
   });
 
+  // 初始化 I2S 输入（麦克风）
+  i2s_config_t i2s_in_config = {
+    .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
+    .sample_rate = sample_rate,
+    .bits_per_sample = i2s_bits_per_sample_t(bits_per_sample),
+    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
+    .dma_buf_count = 8,
+    .dma_buf_len = 1024
+  };
+  i2s_pin_config_t in_pins = {
+    .bck_io_num = INMP441_SCK_PIN,
+    .ws_io_num = INMP441_WS_PIN,
+    .data_out_num = -1,
+    .data_in_num = INMP441_SD_PIN
+  };
+  i2s_driver_install(I2S_NUM_0, &i2s_in_config, 0, NULL);
+  i2s_set_pin(I2S_NUM_0, &in_pins);
+
+  // 初始化 I2S 输出（功放）
+  i2s_config_t i2s_out_config = {
+    .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_TX),
+    .sample_rate = sample_rate,
+    .bits_per_sample = i2s_bits_per_sample_t(bits_per_sample),
+    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
+    .dma_buf_count = 8,
+    .dma_buf_len = 1024
+  };
+  i2s_pin_config_t out_pins = {
+    .bck_io_num = MAX98357_BCLK_PIN,
+    .ws_io_num = MAX98357_LRC_PIN,
+    .data_out_num = MAX98357_DIN_PIN,
+    .data_in_num = -1
+  };
+  i2s_driver_install(I2S_NUM_1, &i2s_out_config, 0, NULL);
+  i2s_set_pin(I2S_NUM_1, &out_pins);
+
 
   // 启动服务器
   server.begin();
@@ -612,5 +655,10 @@ void loop() {
     lastUpdate = millis();
   }
   
-
+  size_t bytes_read;
+  int16_t buffer[1024];
+  // 读取麦克风数据
+  i2s_read(I2S_NUM_0, buffer, sizeof(buffer), &bytes_read, portMAX_DELAY);
+  // 将数据写入功放（如听到回声说明通道全通）
+  i2s_write(I2S_NUM_1, buffer, bytes_read, &bytes_read, portMAX_DELAY); 
 }
