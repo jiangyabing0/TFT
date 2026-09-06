@@ -10,10 +10,11 @@
 #include <AsyncTCP.h>
 #include "soc/soc.h"       // 禁用欠压检测器
 #include "soc/rtc_cntl_reg.h" // 禁用欠压检测器
+#include "esp_system.h"    // esp_reset_reason(): 读取上次复位原因
 #include <ESPAsync_WiFiManager.h>
 #include <driver/i2s.h>
 #include <Wire.h>
-
+#include <AsyncWebSocket.h>
 
 // 触摸引脚（确保与 User_Setup.h 或实际接线一致）
 #define TOUCH_CS  21
@@ -40,6 +41,10 @@ AsyncDNSServer dnsServer;      // DNS 服务器（配网门户需要）
 // 否则会导致 RTCWDT_RTC_RESET 看门狗复位（启动死循环）。
 // 因此这里只声明指针，在 setup() 中创建。
 ESPAsync_WiFiManager* wifiManager = nullptr;
+
+// TFT/SPI 互斥锁：Web 服务器任务（/display、/upload、/delete 等路由）与 Arduino loop 任务
+// 都会绘制屏幕，而 TFT_eSPI 不是线程安全的，必须串行化访问，防止 SPI 并发冲突导致崩溃/掉线
+SemaphoreHandle_t tftMutex = NULL;
 
 
 
@@ -121,6 +126,10 @@ void drawButtons() {
 void displayImage(String filename) {
   // 确保文件名以 "/" 开头（LittleFS 需要绝对路径）
   if (!filename.startsWith("/")) filename = "/" + filename;
+
+  // 本函数可能由 Web 服务器任务(/display、/upload)或 loop 任务(触摸翻页)调用，
+  // 与 printLocalTime()/触摸绘制并发操作屏幕时必须互斥（TFT_eSPI 非线程安全）
+  xSemaphoreTake(tftMutex, portMAX_DELAY);
 
   tft.fillScreen(TFT_BLACK);
   if (LittleFS.exists(filename)) {
@@ -214,6 +223,9 @@ void displayImage(String filename) {
   }
   // 重绘按钮栏
   drawButtons();
+
+  // 释放 TFT 互斥锁
+  xSemaphoreGive(tftMutex);
 }
 
 
@@ -270,6 +282,9 @@ void printLocalTime() {
     return; // 时间和日期都没变，不重绘
   }
   
+  // 需要刷新屏幕区域：加 TFT 互斥锁（防止与 Web 任务中的 displayImage 并发绘制）
+  xSemaphoreTake(tftMutex, portMAX_DELAY);
+
   // 日期变化时才更新日期
   if (dateChanged) {
     strcpy(lastDateStr, dateStr);
@@ -286,6 +301,9 @@ void printLocalTime() {
     tft.drawString(timeStr, TIME_X, TIME_Y, 2);
     tft.setTextSize(1); // 恢复字号
   }
+
+  // 释放 TFT 互斥锁
+  xSemaphoreGive(tftMutex);
 }
 
 // 从 LittleFS 读取控制网页（HTML）
@@ -302,12 +320,52 @@ String getControlPage() {
   return html;
 }
 
+AsyncWebSocket wsAudio("/audio");
+
+void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, 
+               AwsEventType type, void *arg, uint8_t *data, size_t len) {
+    if (type == WS_EVT_DATA) {
+        // 处理浏览器传来的音频数据，并将其转交给 MAX98357A 功放播放
+        if (wsAudio.count() > 0) {   // 该版本库 hasClient() 需要传入客户端 id，这里改用 count()
+            wsAudio.textAll(data, len);
+        }
+    }
+}
+
+void setupAudio() {
+    wsAudio.onEvent(onWsEvent);
+    server.addHandler(&wsAudio);
+  
+}
+
+// 打印上次复位原因，用于区分“手机访问导致断网”是单纯 WiFi 掉线还是芯片复位重启
+void printResetReason() {
+  esp_reset_reason_t r = esp_reset_reason();
+  const char* reasonStr = "未知";
+  switch (r) {
+    case ESP_RST_POWERON:  reasonStr = "上电复位"; break;
+    case ESP_RST_SW:       reasonStr = "软件复位(ESP.restart)"; break;
+    case ESP_RST_PANIC:    reasonStr = "程序异常崩溃复位"; break;
+    case ESP_RST_INT_WDT:  reasonStr = "中断看门狗复位"; break;
+    case ESP_RST_TASK_WDT: reasonStr = "任务看门狗复位(任务卡死超时)"; break;
+    case ESP_RST_WDT:      reasonStr = "其他看门狗复位"; break;
+    case ESP_RST_BROWNOUT: reasonStr = "欠压复位(供电不足!)"; break;
+    default: break;
+  }
+  Serial.printf("[启动] 上次复位原因=%d (%s)\n", (int)r, reasonStr);
+}
 
 void setup() {
   // 禁用欠压检测器（Brownout Detector），防止供电不足时芯片复位
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
   
   Serial.begin(115200);
+
+  // 打印上次复位原因（配合串口监视器判断“断网”是单纯掉线还是芯片复位重启）
+  printResetReason();
+
+  // 创建 TFT/SPI 访问互斥锁（Web 服务器任务与 loop 任务共享屏幕）
+  tftMutex = xSemaphoreCreateMutex();
   tft.init();
 
   tft.setRotation(1); 
@@ -393,6 +451,39 @@ void setup() {
   tft.drawString("Wi-Fi 连接成功!", 10, 10, 2);
   tft.drawString("IP: " + WiFi.localIP().toString(), 10, 40, 2);
   delay(1500);
+
+  // ---- WiFi 稳定性优化：解决“手机访问页面导致 ESP32 断网”的问题 ----
+  // ① 关闭 modem sleep（ESP32 默认开启）：让 WiFi 射频保持常开，
+  //    避免省电休眠时漏收路由器 beacon 被判“AP 丢失”而主动断开。
+  //    —— 手机靠近 ESP32 时发射功率大会压制其接收，这一步是首选修复
+  WiFi.setSleep(false);
+
+  // ② 断线自动重连，并在串口打印断开原因码，方便排查
+  //    reason 含义：2=AUTH_EXPIRE  4=ASSOC_EXPIRE  15=握手超时(路由器侧)
+  //                 200=BEACON_TIMEOUT  201=NO_AP_FOUND  203=ASSOC_FAIL(收不到beacon/信号弱)
+  //                 205=AUTH_FAIL(密码错误)
+  WiFi.setAutoReconnect(true);
+  WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info) {
+    if (event == ARDUINO_EVENT_WIFI_STA_DISCONNECTED) {
+      uint8_t reason = info.wifi_sta_disconnected.reason;
+      const char* desc = "其他";
+      if (reason == 2)        desc = "AUTH_EXPIRE";
+      else if (reason == 4)   desc = "ASSOC_EXPIRE";
+      else if (reason == 15)  desc = "4WAY_HANDSHAKE_TIMEOUT(路由器问题)";
+      else if (reason == 200) desc = "BEACON_TIMEOUT(收不到beacon)";
+      else if (reason == 201) desc = "NO_AP_FOUND(找不到路由器)";
+      else if (reason == 203) desc = "ASSOC_FAIL(信号弱/被手机压制)";
+      else if (reason == 205) desc = "AUTH_FAIL(密码错误)";
+      Serial.printf("[WiFi] 连接断开! reason=%u (%s)\n", (unsigned)reason, desc);
+      WiFi.reconnect(); // 保险起见主动重连（setAutoReconnect 也会自动处理）
+    }
+  }, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+
+  // ③ 降低 WiFi 发射功率（默认最大 20.5dBm → 11dBm）：
+  //    减小发射瞬间的峰值电流（缓解供电不足/欠压），并减轻对同频手机信号的压制；
+  //    局域网内访问控制网页，11dBm 覆盖完全足够
+  WiFi.setTxPower(WIFI_POWER_11dBm);
+  Serial.println("[WiFi] 稳定性优化已启用: setSleep(false)/autoReconnect/TX=11dBm");
   // ==========================================
 
 
@@ -411,6 +502,11 @@ void setup() {
   // 控制网页
   server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
     request->send(200, "text/html", getControlPage());
+  });
+  // 浏览器(尤其是手机浏览器)会自动请求 /favicon.ico，直接返回 204 No Content，
+  // 减少额外的并发请求处理，降低服务器与 WiFi 负担
+  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest* request) {
+    request->send(204);
   });
   server.on("/resetWifi", HTTP_GET, [](AsyncWebServerRequest *request){
     if (wifiManager) {
@@ -487,7 +583,10 @@ void setup() {
           }
           // 如果删除的是当前显示的图片，清屏
           if (img == currentImage) {
+            // 删除当前显示的图片时清屏，加锁防止与 loop 任务绘制冲突
+            xSemaphoreTake(tftMutex, portMAX_DELAY);
             tft.fillScreen(TFT_BLACK);
+            xSemaphoreGive(tftMutex);
             currentImage = "";
           }
           request->send(200, "text/plain", "已删除: " + img);
@@ -588,6 +687,7 @@ void setup() {
   i2s_driver_install(I2S_NUM_1, &i2s_out_config, 0, NULL);
   i2s_set_pin(I2S_NUM_1, &out_pins);
 
+setupAudio();
 
   // 启动服务器
   server.begin();
@@ -616,13 +716,15 @@ void loop() {
               int btnIndex = x / buttonW;
 
               if (btnIndex >= 0 && btnIndex < BUTTON_COUNT) {
-                // 按钮按下反馈（高亮）
+                // 按钮按下反馈（高亮）—— 加 TFT 互斥锁
+                xSemaphoreTake(tftMutex, portMAX_DELAY);
                 int bx = btnIndex * buttonW;
                 tft.fillRect(bx, BUTTON_BAR_Y, buttonW, BUTTON_BAR_H, TFT_BLUE);
                 tft.drawRect(bx, BUTTON_BAR_Y, buttonW, BUTTON_BAR_H, TFT_WHITE);
                 tft.setTextColor(TFT_WHITE, TFT_BLUE);
                 int textW = tft.textWidth(buttonLabels[btnIndex], 2);
                 tft.drawString(buttonLabels[btnIndex], bx + (buttonW - textW) / 2, BUTTON_BAR_Y + (BUTTON_BAR_H - 16) / 2, 2);
+                xSemaphoreGive(tftMutex);
 
 
                 switch (btnIndex) {
@@ -634,11 +736,13 @@ void loop() {
                 Serial.printf("按钮 %d (%s) 被按下\n", btnIndex, buttonLabels[btnIndex]);
               }
             } else {
-              // 在图片区域触摸，显示坐标（调试用）
+              // 在图片区域触摸，显示坐标（调试用）—— 加 TFT 互斥锁
+              xSemaphoreTake(tftMutex, portMAX_DELAY);
               tft.setTextColor(TFT_WHITE, TFT_BLACK);
               tft.setTextSize(1);
               tft.setCursor(10, TFT_HEIGHT - 20);
               tft.printf("X:%3d Y:%3d  Z:%4d  ", x, y, p.z);
+              xSemaphoreGive(tftMutex);
               Serial.printf("Touch: X=%d, Y=%d, Pressure=%d\n", x, y, p.z);
             }
 

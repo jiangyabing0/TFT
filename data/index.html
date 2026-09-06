@@ -43,6 +43,12 @@
   <button onclick="if(confirm('确定要重置WiFi吗？设备将断开连接并重启进入配网模式！')) window.location.href='/resetWifi'">♻️ 重置 WiFi 配置</button>
   <div class="status" id="resetStatus"></div>
   </div>
+  <!-- 语音对话区域 -->
+  <div class="card">
+  <h2>语音助手</h2>
+  <button id="voiceBtn">🔴 开始语音对话</button>
+  <div class="status" id="voiceStatus">未连接</div>
+  </div>
 
   <script>
     // 上传图片
@@ -110,6 +116,69 @@
     }
 
     loadImages();
+      // === 语音对话逻辑 ===
+const voiceBtn = document.getElementById('voiceBtn');
+const voiceStatus = document.getElementById('voiceStatus');
+let wsAudio = null;
+let audioCtx = null;
+
+voiceBtn.addEventListener('click', async () => {
+  if (!wsAudio || wsAudio.readyState !== WebSocket.OPEN) {
+    // 初始化 WebSocket 连接到 ESP32
+    wsAudio = new WebSocket(`ws://${window.location.host}/audio`);
+    
+    wsAudio.onopen = () => {
+      voiceStatus.textContent = '已连接，点击开始说话';
+      voiceBtn.textContent = '停止';
+    };
+
+    wsAudio.onmessage = (event) => {
+      // 收到 ESP32 返回的音频数据（假设是二进制）
+      if (audioCtx && event.data instanceof ArrayBuffer) {
+        audioCtx.decodeAudioData(event.data).then(buffer => {
+          const source = audioCtx.createBufferSource();
+          source.buffer = buffer;
+          source.connect(audioCtx.destination);
+          source.start();
+        });
+      }
+    };
+
+    // 获取麦克风权限并开始录音
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+      const source = audioCtx.createMediaStreamSource(stream);
+      
+      // 定时把麦克风数据发送给 ESP32
+      const processor = audioCtx.createScriptProcessor(4096, 1, 1);
+      processor.onaudioprocess = (e) => {
+        if (wsAudio && wsAudio.readyState === WebSocket.OPEN) {
+          // 将 Float32 转换为 16-bit PCM 并发送
+          const input = e.inputBuffer.getChannelData(0);
+          const buf = new ArrayBuffer(input.length * 2);
+          const view = new DataView(buf);
+          for (let i = 0; i < input.length; i++) {
+            view.setInt16(i * 2, input[i] * 0x7FFF, true);
+          }
+          wsAudio.send(buf);
+        }
+      };
+      source.connect(processor);
+      processor.connect(audioCtx.destination);
+
+    } catch (err) {
+      voiceStatus.textContent = '麦克风权限被拒绝';
+    }
+  } else {
+    // 停止对话
+    wsAudio.close();
+    wsAudio = null;
+    if (audioCtx) audioCtx.close();
+    voiceStatus.textContent = '已断开';
+    voiceBtn.textContent = '🔴 开始语音对话';
+  }
+});
   </script>
 </body>
 </html>
