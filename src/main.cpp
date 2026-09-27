@@ -3,6 +3,7 @@
 #include <TFT_eSPI.h>
 #include <XPT2046_Touchscreen.h>
 #include <LittleFS.h>
+#include <SD.h>
 #include <TJpg_Decoder.h>
 #include <WiFi.h>         // 核心WiFi库
 #include <time.h>          // 时间库
@@ -18,8 +19,15 @@
 #include <freertos/stream_buffer.h>  // 音频播放缓冲 (StreamBuffer)
 
 // 触摸引脚（确保与 User_Setup.h 或实际接线一致）
+// 说明：platformio.ini 用 "-include include/User_Setup.h" 强制包含了 User_Setup.h，
+// 那里的 TOUCH_CS / SD_CS 才是权威定义；这里只是兜底，用 #ifndef 防止两处定义不一致。
+#ifndef TOUCH_CS
 #define TOUCH_CS  21
+#endif
 #define TOUCH_IRQ -1   // 不用可设为 -1
+#ifndef SD_CS
+#define SD_CS 32
+#endif
 
 // 你家的 Wi-Fi 账号密码
 const char* ssid = "CMCC-402";
@@ -47,207 +55,198 @@ ESPAsync_WiFiManager* wifiManager = nullptr;
 // 都会绘制屏幕，而 TFT_eSPI 不是线程安全的，必须串行化访问，防止 SPI 并发冲突导致崩溃/掉线
 SemaphoreHandle_t tftMutex = NULL;
 
+// ================= 全局变量与状态 =================
+#define MAX_IMAGES 50    // 限制最大扫描数量，防止内存溢出
+String imageList[MAX_IMAGES];
+int imageCount = 0;
+int currentSelectedIndex = -1; // 当前查看的图片索引
 
+enum ViewMode { MODE_LIST, MODE_IMAGE };
+ViewMode currentView = MODE_LIST; // 当前界面模式
 
+// ================= 1. SD卡基础读写功能 =================
+// SD 卡和 TFT/触摸共用同一条 SPI 总线（VSPI: SCK=18, MISO=19, MOSI=23），
+// 靠各自的 CS 分时复用，所以这里只能复用同一个 SPI 对象，不能再 begin 一条新总线。
+//
+// 挂载失败常见原因（按出现概率排序）：
+//   ① 卡的文件系统不是 FAT16/FAT32 —— ESP32 的 FatFs 没有开 exFAT（FF_FS_EXFAT=0），
+//      64GB 以上的 SDXC 卡默认就是 exFAT，必须重新格式化成 FAT32；
+//   ② SPI 速率太高 —— 20MHz 在杜邦线/面包板上很容易失败；
+//   ③ 接线不对（CS=32 / SCK=18 / MISO=19 / MOSI=23 / 3V3 / GND，MISO 必须接回 ESP32）；
+//   ④ 供电不足 —— 卡初始化瞬间电流可达 100mA+，要和 TFT 共用稳定的 3.3V。
+//
+// 因此下面按 20 → 10 → 4 → 1 MHz 逐档降速重试，并把驱动内部的报错打印出来
+// （需要 platformio.ini 里的 -DCORE_DEBUG_LEVEL=2，否则 sd_diskio 的 log_e/log_w 不会输出）。
+static const uint32_t SD_SPI_SPEEDS[] = {20000000, 10000000, 4000000, 1000000};
+static const int SD_SPI_SPEED_COUNT = sizeof(SD_SPI_SPEEDS) / sizeof(SD_SPI_SPEEDS[0]);
 
-// --- 2. 图片配置 ---
-#define MAX_IMAGES 20 // 最多支持 20 张图片（实际数量在 setup 中动态统计）
-String imageFiles[MAX_IMAGES];
-int imageCount = 0;      // 实际图片数量
-int currentImageIndex = 0;
-// 当前显示的图片文件名
-String currentImage = "";
-
-
-// --- 缩放配置 ---
-// 缩放倍率列表（0.5 倍 ~ 3 倍）
-const float zoomLevels[] = {0.5, 0.75, 1.0, 1.5, 2.0, 3.0};
-const int zoomLevelCount = sizeof(zoomLevels) / sizeof(zoomLevels[0]);
-int currentZoomIndex = 2; // 默认 1.0 倍
-
-// --- 底部按钮区域配置 ---
-// 屏幕为横屏 320x240（rotation 1），底部 40 像素留给按钮
-#define BUTTON_BAR_Y 200
-#define BUTTON_BAR_H 40
-#define BUTTON_COUNT 4
-int buttonW = 0;  // 每个按钮的宽度，在 setup 中根据实际屏幕宽度计算
-
-// 按钮文字
-const char* buttonLabels[BUTTON_COUNT] = {"上一页", "下一页", "放大", "缩小"};
-
-
-// 拍照显示函数 (和之前一样)
-bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
-  if ( y >= tft.height() ) return 0;
-  tft.pushImage(x, y, w, h, bitmap);
-  return 1;
+// 卡类型名字，方便在串口里区分是 MMC / 标准 SD / 高容量卡
+static const char* sdCardTypeName(sdcard_type_t type) {
+  switch (type) {
+    case CARD_MMC:  return "MMC";
+    case CARD_SD:   return "SDSC";
+    case CARD_SDHC: return "SDHC/SDXC";
+    default:        return "UNKNOWN";
+  }
 }
 
-// --- 缩放用内存缓冲 ---
-uint16_t* imgBuffer = NULL;   // 存放解码后的完整图片
-uint16_t imgBufW = 0, imgBufH = 0;
+bool initSDCard() {
+  // 拉高其他设备的 CS 引脚，防止总线冲突
+  pinMode(TFT_CS, OUTPUT); digitalWrite(TFT_CS, HIGH); 
+  pinMode(TOUCH_CS, OUTPUT); digitalWrite(TOUCH_CS, HIGH); 
 
-// 用于把解码结果捕获到内存缓冲的回调
-bool capture_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
-  for (int j = 0; j < h; j++) {
-    for (int i = 0; i < w; i++) {
-      int px = x + i;
-      int py = y + j;
-      if (px < imgBufW && py < imgBufH) {
-        imgBuffer[py * imgBufW + px] = bitmap[j * w + i];
-      }
+  // SD 卡的 CS 也要先置为输出并拉高，和 TFT/触摸的 CS 一起保证总线空闲
+  pinMode(SD_CS, OUTPUT); digitalWrite(SD_CS, HIGH);
+
+  Serial.printf("[SD] SPI 引脚: SCK=%d MISO=%d MOSI=%d CS=%d\n", TFT_SCLK, TFT_MISO, TFT_MOSI, SD_CS);
+
+  for (int i = 0; i < SD_SPI_SPEED_COUNT; i++) {
+    uint32_t hz = SD_SPI_SPEEDS[i];
+
+    // 上一次失败可能已经在驱动内部注册了卷/挂载点，先彻底卸载再重试
+    SD.end();
+    delay(50);
+
+    if (!SD.begin(SD_CS, SPI, hz)) {
+      Serial.printf("[SD] %u MHz 挂载失败，自动降速重试\n", (unsigned)(hz / 1000000));
+      continue;
     }
+
+    sdcard_type_t type = SD.cardType();
+    uint64_t sizeMB = SD.cardSize() / (1024ULL * 1024ULL);
+    if (type == CARD_NONE || sizeMB == 0) {
+      // begin() 返回 true 但卡信息读不到，视为失败，继续降速
+      Serial.printf("[SD] %u MHz 挂载后卡信息异常，继续降速重试\n", (unsigned)(hz / 1000000));
+      SD.end();
+      delay(50);
+      continue;
+    }
+
+    Serial.printf("[SD] 挂载成功：速率=%u MHz 类型=%s 容量=%llu MB\n",
+                  (unsigned)(hz / 1000000), sdCardTypeName(type), sizeMB);
+    return true;
   }
-  return 1;
+
+  // 所有速率都失败：把排查方向直接打印出来，省得来回猜
+  Serial.println("[SD] 所有速率均挂载失败！请依次检查：");
+  Serial.println("     ① 卡格式：必须是 FAT16/FAT32（用 SD Card Formatter 格式化，Windows 里选 FAT32）；64G 以上 SDXC 默认 exFAT，ESP32 不支持");
+  Serial.println("     ② 接线：CS->GPIO32, SCK->GPIO18, MISO->GPIO19, MOSI->GPIO23, VCC->3V3, GND->GND（MISO 必须接回 ESP32）");
+  Serial.println("     ③ 供电：卡初始化瞬时电流大，3V3 就近加 100uF 电容；纯 3.3V 模块不要接 5V");
+  Serial.println("     ④ 看上面驱动打印：[E][sd_diskio.cpp] Card Failed!/GO_IDLE_STATE failed = 卡没应答(接线/供电/坏卡)；f_mount failed:(13) = 文件系统不对");
+  return false;
 }
 
-// 绘制底部按钮栏
-void drawButtons() {
-  for (int i = 0; i < BUTTON_COUNT; i++) {
-    int x = i * buttonW;
-    // 绘制按钮背景
-    tft.fillRect(x, BUTTON_BAR_Y, buttonW, BUTTON_BAR_H, TFT_NAVY);
-    // 绘制按钮边框
-    tft.drawRect(x, BUTTON_BAR_Y, buttonW, BUTTON_BAR_H, TFT_WHITE);
-    // 绘制按钮文字（居中）
-    tft.setTextColor(TFT_WHITE, TFT_NAVY);
-    tft.setTextSize(1);
-    // 计算文字居中位置
-    int textW = tft.textWidth(buttonLabels[i], 2);
-    int textX = x + (buttonW - textW) / 2;
-    int textY = BUTTON_BAR_Y + (BUTTON_BAR_H - 16) / 2;
-    tft.drawString(buttonLabels[i], textX, textY, 2);
+void writeFile(const char *path, const char *message) {
+  File file = SD.open(path, FILE_WRITE);
+  if (file) { file.print(message); file.close(); Serial.println("写入成功"); }
+}
+
+void appendFile(const char *path, const char *message) {
+  File file = SD.open(path, FILE_APPEND);
+  if (file) { file.print(message); file.close(); Serial.println("追加成功"); }
+}
+
+void readFile(const char *path) {
+  File file = SD.open(path);
+  if (file) {
+    while (file.available()) Serial.write(file.read());
+    file.close();
   }
 }
 
+void deleteFile(const char *path) {
+  if (SD.remove(path)) Serial.println("删除成功");
+}
 
-// 显示图片（支持缩放）
-// 采用“先按 JPG 缩放因子解码到内存，再做最终缩放”的方式，
-// 内存占用只与目标显示尺寸有关，不会因原图过大而失败。
-void displayImage(String filename) {
-  // 确保文件名以 "/" 开头（LittleFS 需要绝对路径）
-  if (!filename.startsWith("/")) filename = "/" + filename;
+// ================= 2. 相册列表逻辑 =================
+void scanSDCard() {
+  imageCount = 0;
+  File root = SD.open("/");
+  if (!root) return;
 
-  // 本函数可能由 Web 服务器任务(/display、/upload)或 loop 任务(触摸翻页)调用，
-  // 与 printLocalTime()/触摸绘制并发操作屏幕时必须互斥（TFT_eSPI 非线程安全）
-  xSemaphoreTake(tftMutex, portMAX_DELAY);
+  File file = root.openNextFile();
+  while (file && imageCount < MAX_IMAGES) {
+    String fileName = file.name();
+    String lowerName = fileName; lowerName.toLowerCase();
+    // 过滤出图片文件，并跳过 macOS 自带的 _ 开头隐藏文件
+    if (!file.isDirectory() && (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg")) && !lowerName.startsWith("_")) {
+      imageList[imageCount] = fileName;
+      imageCount++;
+    }
+    file = root.openNextFile();
+  }
+  file.close();
+  Serial.printf("扫描到 %d 张图片\n", imageCount);
+}
 
+void drawImageList() {
   tft.fillScreen(TFT_BLACK);
-  if (LittleFS.exists(filename)) {
-    // 获取图片原始尺寸
-    uint16_t imgW, imgH;
-    TJpgDec.getFsJpgSize(&imgW, &imgH, filename, LittleFS);
-    Serial.printf("图片尺寸: %dx%d\n", imgW, imgH);
+  tft.setTextColor(TFT_CYAN, TFT_BLACK);
+  tft.setTextSize(2);
+  tft.drawString("SD Photo Album", 10, 10);
+  tft.drawLine(0, 35, 240, 35, TFT_WHITE);
 
-    // 计算缩放后的目标尺寸
-    float zf = zoomLevels[currentZoomIndex];
-    int scaledW = (int)(imgW * zf);
-    int scaledH = (int)(imgH * zf);
-
-    // 图片显示区域（底部按钮栏以上）
-    int displayW = tft.width();
-    int displayH = BUTTON_BAR_Y;
-
-    // 如果缩放后超出显示区域，则限制为显示区域大小（保持比例）
-    if (scaledW > displayW || scaledH > displayH) {
-      float ratio = min((float)displayW / scaledW, (float)displayH / scaledH);
-      scaledW = (int)(scaledW * ratio);
-      scaledH = (int)(scaledH * ratio);
-    }
-    // 至少 1 像素，避免除零
-    if (scaledW < 1) scaledW = 1;
-    if (scaledH < 1) scaledH = 1;
-
-    // 居中显示
-    int x = (displayW - scaledW) / 2;
-    int y = (displayH - scaledH) / 2;
-
-    // 选择一个 JPG 解码缩放因子(1/2/4/8)，使解码后的缓冲尺寸 >= 目标尺寸，
-    // 这样既能保证画质，又能把内存占用控制在目标尺寸附近。
-    int jpgScale = 1;
-    while (jpgScale < 8) {
-      int next = jpgScale * 2;
-      if ((imgW / next) < scaledW || (imgH / next) < scaledH) break;
-      jpgScale = next;
-    }
-    int decW = imgW / jpgScale;
-    int decH = imgH / jpgScale;
-    if (decW < 1) decW = 1;
-    if (decH < 1) decH = 1;
-
-    Serial.printf("缩放: %.2f, 目标: %dx%d, 解码: %dx%d (jpgScale=%d)\n", zf, scaledW, scaledH, decW, decH, jpgScale);
-
-    // 分配解码缓冲（16位色，每像素2字节）
-    size_t bufSize = (size_t)decW * decH * 2;
-    uint16_t* buf = (uint16_t*)malloc(bufSize);
-    if (buf) {
-      imgBuffer = buf;
-      imgBufW = decW;
-      imgBufH = decH;
-
-      // 按选定的缩放因子解码到内存
-      TJpgDec.setJpgScale(jpgScale);
-      TJpgDec.setCallback(capture_output);
-      TJpgDec.drawFsJpg(0, 0, filename, LittleFS);
-      TJpgDec.setCallback(tft_output);
-      TJpgDec.setJpgScale(1);
-
-      // 从解码缓冲做最终缩放并逐行绘制
-      uint16_t* rowBuf = (uint16_t*)malloc(scaledW * 2);
-      if (rowBuf) {
-        for (int ty = 0; ty < scaledH; ty++) {
-          int sy = ty * decH / scaledH;
-          for (int tx = 0; tx < scaledW; tx++) {
-            int sx = tx * decW / scaledW;
-            rowBuf[tx] = buf[sy * decW + sx];
-          }
-          tft.pushImage(x, y + ty, scaledW, 1, rowBuf);
-        }
-        free(rowBuf);
-      }
-      free(buf);
-      imgBuffer = NULL;
-    } else {
-      // 内存仍不足时，直接用 JPG 解码器按缩放因子绘制（不居中）
-      Serial.println("内存不足，使用直接解码绘制");
-      TJpgDec.setJpgScale(jpgScale);
-      TJpgDec.drawFsJpg(0, 0, filename, LittleFS);
-      TJpgDec.setJpgScale(1);
-    }
-
-    currentImage = filename;
-    Serial.printf("已切换到图片: %s (缩放 %.2f 倍, %dx%d)\n", filename.c_str(), zf, scaledW, scaledH);
-  } else {
-    Serial.printf("图片不存在: %s\n", filename.c_str());
-    tft.setTextColor(TFT_WHITE);
-    tft.drawString("图片丢失", 10, 10, 2);
+  tft.setTextSize(1);
+  int itemsPerPage = 15; // 一页最多显示 15 行
+  for (int i = 0; i < imageCount && i < itemsPerPage; i++) {
+    int yPos = 45 + i * 18;
+    tft.setCursor(10, yPos);
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.print(i + 1); tft.print(". "); tft.print(imageList[i]);
   }
-  // 重绘按钮栏
-  drawButtons();
-
-  // 释放 TFT 互斥锁
-  xSemaphoreGive(tftMutex);
+  if (imageCount > 15) {
+    tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+    tft.drawString("... More files not shown", 10, 315);
+  }
 }
 
+void showSelectedImage(int index) {
+  if (index < 0 || index >= imageCount) return;
+  
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawString("Loading...", 10, 10, 2);
 
+  // 关键：给 SD 卡让出总线
+  digitalWrite(TFT_CS, HIGH); 
+  digitalWrite(TOUCH_CS, HIGH);
 
-// 切换图片（上一页/下一页）
-void changePage(int delta) {
-  if (imageCount <= 0) return; // 没有图片则忽略
-  currentImageIndex += delta;
-  if (currentImageIndex < 0) currentImageIndex = imageCount - 1;
-  if (currentImageIndex >= imageCount) currentImageIndex = 0;
-  displayImage(imageFiles[currentImageIndex]);
+  // 使用 TJpg_Decoder 从 SD 卡绘制图片
+  TJpgDec.drawSdJpg(0, 0, imageList[index]);
+
+  // 底部绘制返回提示
+  tft.fillRect(0, 290, 240, 30, TFT_DARKGREY);
+  tft.setTextColor(TFT_WHITE, TFT_DARKGREY);
+  tft.drawString("Tap HERE to return", 50, 300, 2);
 }
 
+// ================= 3. 触摸与状态机 =================
+void handleTouch() {
+  uint16_t touchX, touchY;
+  if (tft.getTouch(&touchX, &touchY, 600)) {
+    delay(200); // 简单防抖
 
-// 缩放图片
-void changeZoom(int delta) {
-  currentZoomIndex += delta;
-  if (currentZoomIndex < 0) currentZoomIndex = 0;
-  if (currentZoomIndex >= zoomLevelCount) currentZoomIndex = zoomLevelCount - 1;
-  displayImage(currentImage);
+    if (currentView == MODE_LIST) {
+      // 点击列表区域
+      if (touchY >= 45 && touchY < 45 + 15 * 18) {
+        int row = (touchY - 45) / 18;
+        if (row >= 0 && row < imageCount) {
+          currentSelectedIndex = row;
+          currentView = MODE_IMAGE;       // 切换到图片模式
+          showSelectedImage(row);         // 显示图片
+        }
+      }
+    } 
+    else if (currentView == MODE_IMAGE) {
+      // 点击底部区域返回
+      if (touchY > 280) {
+        currentView = MODE_LIST;
+        drawImageList();
+      }
+    }
+  }
 }
+
 
 // 时间显示区域（避免闪烁的关键：只更新变化的区域）
 // 时间显示在屏幕右上角，避免与图片重叠
@@ -531,9 +530,6 @@ void setup() {
   tft.setRotation(1); 
   tft.fillScreen(TFT_BLACK);
 
-  // 根据实际屏幕宽度计算每个按钮的宽度（横屏时 tft.width()=320）
-  buttonW = tft.width() / BUTTON_COUNT;
-
   // 初始化触摸屏
   ts.begin();
   ts.setRotation(2); // 与屏幕旋转方向一致
@@ -545,28 +541,26 @@ void setup() {
     Serial.println("LittleFS 初始化成功");
   }
 
-  // 配置 TJpg_Decoder
-  tft.setSwapBytes(true); // 交换颜色字节序（大小端）
-  TJpgDec.setJpgScale(1); // 缩放比例 1/2/4/8
-  TJpgDec.setCallback(tft_output); // 指定渲染回调函数
-
-  // 扫描 LittleFS 中所有图片，动态填充 imageFiles 列表
-  imageCount = 0;
-  {
-    File root = LittleFS.open("/");
-    File file = root.openNextFile();
-    while (file && imageCount < MAX_IMAGES) {
-      String name = file.name();
-      // 确保文件名以 "/" 开头
-      if (!name.startsWith("/")) name = "/" + name;
-      if (name.endsWith(".jpg") || name.endsWith(".jpeg")) {
-        imageFiles[imageCount++] = name;
-        Serial.printf("发现图片: %s\n", name.c_str());
-      }
-      file = root.openNextFile();
-    }
+    // 2. 初始化 SD 卡
+  if (initSDCard()) {
+    // 测试基础读写（可选择注释掉）
+    writeFile("/test.txt", "Hello ESP32 SD!\n");
+    appendFile("/test.txt", "Appended line.\n");
+    
+    // 3. 扫描并显示列表
+    scanSDCard();
+    drawImageList();
+  } else {
+    // 挂载失败：屏幕上给出三条最可能的排查线。
+    // 注意下面画 WiFi 提示时会 fillScreen(TFT_BLACK)，不 delay 的话这条信息一眨眼就被清掉了。
+    tft.setTextColor(TFT_RED, TFT_BLACK);
+    tft.drawString("SD Card Mount Failed!", 10, 10, 2);
+    tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+    tft.drawString("1) Format card as FAT32", 10, 45, 2);
+    tft.drawString("2) Check CS=32 / wiring", 10, 70, 2);
+    tft.drawString("3) Check 3.3V power", 10, 95, 2);
+    delay(1500);
   }
-  Serial.printf("共发现 %d 张图片\n", imageCount);
 
   // 1. 设置屏幕配网提示
   // ==========================================
@@ -593,8 +587,6 @@ void setup() {
   
   // 给配网界面设置一个名字 (ESP32_Photo) 和一个密码 (可选，设为空就是无密码)
   bool res = wifiManager->autoConnect("ESP32_Photo", "12345678"); 
-
-
 
   
   if (!res) {
@@ -647,12 +639,6 @@ void setup() {
   // ==========================================
 
 
-  // 显示第一张图片（如果存在）
-  if (imageCount > 0) {
-    currentImageIndex = 0;
-    displayImage(imageFiles[0]);
-  }
-
 
   // 2. 初始化 NTP 时间
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
@@ -677,135 +663,6 @@ void setup() {
   });
 
 
-  // 显示指定图片：/display?img=xxx.jpg
-  server.on("/display", HTTP_GET, [](AsyncWebServerRequest* request) {
-    if (request->hasParam("img")) {
-      String img = request->getParam("img")->value();
-      // 确保文件名以 "/" 开头
-      if (!img.startsWith("/")) img = "/" + img;
-      if (LittleFS.exists(img)) {
-        displayImage(img);
-        // 同步当前图片索引，保证上下页切换正确
-        for (int i = 0; i < imageCount; i++) {
-          if (imageFiles[i] == img) { currentImageIndex = i; break; }
-        }
-        request->send(200, "text/plain", "已显示: " + img);
-      } else {
-        request->send(404, "text/plain", "图片不存在: " + img);
-      }
-    } else {
-      request->send(400, "text/plain", "缺少 img 参数");
-    }
-  });
-
-
-  // 列出 LittleFS 中的图片
-  server.on("/list", HTTP_GET, [](AsyncWebServerRequest* request) {
-    String json = "[";
-    File root = LittleFS.open("/");
-    File file = root.openNextFile();
-    bool first = true;
-    while (file) {
-      String name = file.name();
-      if (name.endsWith(".jpg") || name.endsWith(".jpeg")) {
-        if (!first) json += ",";
-        json += "\"" + name + "\"";
-        first = false;
-      }
-      file = root.openNextFile();
-    }
-    json += "]";
-    request->send(200, "application/json", json);
-  });
-
-  // 删除图片：POST /delete?img=xxx.jpg
-  server.on("/delete", HTTP_POST, [](AsyncWebServerRequest* request) {
-    if (request->hasParam("img")) {
-      String img = request->getParam("img")->value();
-      // 确保文件名以 "/" 开头
-      if (!img.startsWith("/")) img = "/" + img;
-      // 防止删除 index.html 等非图片文件
-      if (!img.endsWith(".jpg") && !img.endsWith(".jpeg")) {
-        request->send(400, "text/plain", "只允许删除 JPG 图片");
-        return;
-      }
-      if (LittleFS.exists(img)) {
-        if (LittleFS.remove(img)) {
-          Serial.println("已删除图片: " + img);
-          // 从图片列表中移除
-          for (int i = 0; i < imageCount; i++) {
-            if (imageFiles[i] == img) {
-              for (int j = i; j < imageCount - 1; j++) imageFiles[j] = imageFiles[j + 1];
-              imageCount--;
-              if (currentImageIndex >= imageCount) currentImageIndex = imageCount - 1;
-              break;
-            }
-          }
-          // 如果删除的是当前显示的图片，清屏
-          if (img == currentImage) {
-            // 删除当前显示的图片时清屏，加锁防止与 loop 任务绘制冲突
-            xSemaphoreTake(tftMutex, portMAX_DELAY);
-            tft.fillScreen(TFT_BLACK);
-            xSemaphoreGive(tftMutex);
-            currentImage = "";
-          }
-          request->send(200, "text/plain", "已删除: " + img);
-        } else {
-          request->send(500, "text/plain", "删除失败: " + img);
-        }
-      } else {
-        request->send(404, "text/plain", "图片不存在: " + img);
-      }
-
-    } else {
-      request->send(400, "text/plain", "缺少 img 参数");
-    }
-  });
-
-  // 上传图片：POST /upload (multipart/form-data)
-  server.on("/upload", HTTP_POST, [](AsyncWebServerRequest* request) {
-
-    request->send(200, "text/plain", "上传完成");
-  }, [](AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final) {
-    // 处理文件上传数据
-    static File uploadFile;
-    if (!index) {
-      // 开始新文件
-      String path = "/" + filename;
-      // 只允许 jpg/jpeg 文件
-      if (!path.endsWith(".jpg") && !path.endsWith(".jpeg")) {
-        request->send(400, "text/plain", "只支持 JPG 图片");
-        return;
-      }
-      uploadFile = LittleFS.open(path, "w");
-      if (!uploadFile) {
-        request->send(500, "text/plain", "无法创建文件");
-        return;
-      }
-      Serial.println("开始上传: " + path);
-    }
-    if (uploadFile) {
-      uploadFile.write(data, len);
-    }
-    if (final) {
-      if (uploadFile) {
-        uploadFile.close();
-        Serial.println("上传完成: " + filename);
-        // 上传完成后自动显示
-        String path = "/" + filename;
-        // 把新图片加入列表（如果还没在列表中）
-        bool found = false;
-        for (int i = 0; i < imageCount; i++) {
-          if (imageFiles[i] == path) { found = true; currentImageIndex = i; break; }
-        }
-        if (!found && imageCount < MAX_IMAGES) {
-          imageFiles[imageCount++] = path;
-          currentImageIndex = imageCount - 1;
-        }
-        displayImage(path);
-      }
-    }
-  });
 
   // 1. 初始化功放静音引脚（先静音，避免上电“砰”的一声）
   pinMode(MUTE_PIN, OUTPUT);
@@ -841,6 +698,8 @@ void setup() {
 void loop() {
   
     static uint32_t lastPrint = 0;
+    // 处理触摸事件，状态机驱动
+    handleTouch();
     // 检测触摸
     if (ts.touched()) {
         TS_Point p = ts.getPoint();
@@ -851,44 +710,6 @@ void loop() {
             // x 对应屏幕横向(0~320)，y 对应屏幕纵向(0~240)
             uint16_t x = map(p.x, 0, 4095, 0, TFT_HEIGHT);
             uint16_t y = map(p.y, 0, 4095, 0, TFT_WIDTH);
-
-
-
-            // 判断是否点击了底部按钮
-            if (y >= BUTTON_BAR_Y) {
-              int btnIndex = x / buttonW;
-
-              if (btnIndex >= 0 && btnIndex < BUTTON_COUNT) {
-                // 按钮按下反馈（高亮）—— 加 TFT 互斥锁
-                xSemaphoreTake(tftMutex, portMAX_DELAY);
-                int bx = btnIndex * buttonW;
-                tft.fillRect(bx, BUTTON_BAR_Y, buttonW, BUTTON_BAR_H, TFT_BLUE);
-                tft.drawRect(bx, BUTTON_BAR_Y, buttonW, BUTTON_BAR_H, TFT_WHITE);
-                tft.setTextColor(TFT_WHITE, TFT_BLUE);
-                int textW = tft.textWidth(buttonLabels[btnIndex], 2);
-                tft.drawString(buttonLabels[btnIndex], bx + (buttonW - textW) / 2, BUTTON_BAR_Y + (BUTTON_BAR_H - 16) / 2, 2);
-                xSemaphoreGive(tftMutex);
-
-
-                switch (btnIndex) {
-                  case 0: changePage(-1); break;  // 上一页
-                  case 1: changePage(1);  break;  // 下一页
-                  case 2: changeZoom(1);  break;  // 放大
-                  case 3: changeZoom(-1); break;  // 缩小
-                }
-                Serial.printf("按钮 %d (%s) 被按下\n", btnIndex, buttonLabels[btnIndex]);
-              }
-            } else {
-              // 在图片区域触摸，显示坐标（调试用）—— 加 TFT 互斥锁
-              xSemaphoreTake(tftMutex, portMAX_DELAY);
-              tft.setTextColor(TFT_WHITE, TFT_BLACK);
-              tft.setTextSize(1);
-              tft.setCursor(10, TFT_HEIGHT - 20);
-              tft.printf("X:%3d Y:%3d  Z:%4d  ", x, y, p.z);
-              xSemaphoreGive(tftMutex);
-              Serial.printf("Touch: X=%d, Y=%d, Pressure=%d\n", x, y, p.z);
-            }
-
 
             // 防抖
             delay(100);

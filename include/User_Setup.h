@@ -35,5 +35,5 @@
 #define TOUCH_CS 21        // 触摸片选引脚 (T_CS)
 #define SPI_TOUCH_FREQUENCY  1000000  // XPT2046 触摸 SPI 频率 (建议 1-2.5MHz)
 
-
+#define SD_CS 32
 
