@@ -63,6 +63,29 @@ int currentSelectedIndex = -1; // 当前查看的图片索引
 
 enum ViewMode { MODE_LIST, MODE_IMAGE };
 ViewMode currentView = MODE_LIST; // 当前界面模式
+bool sdCardReady = false;         // SD 卡是否挂载成功
+
+// ================= 相册列表布局参数 =================
+// 屏幕 rotation=1（横屏）时 tft.width()=320、tft.height()=240。
+// 这几个常量同时被 drawImageList()（画列表）和 handleTouch()（判断手指点到了哪一行）使用，
+// 放在一起能保证两边永远一致，不会出现“看得见却点不中”。
+// 标题占 0~LIST_HEADER_H，列表从 LIST_HEADER_H 开始每行 LIST_ROW_H 像素，
+// 底部留 LIST_FOOTER_H 给“还有更多文件”的提示。
+#define LIST_HEADER_H 46
+#define LIST_FOOTER_H 16
+#define LIST_ROW_H    18
+
+// 一页最多显示几行（按屏幕实际高度算，换屏或改 rotation 都不用动别的代码）
+static int listRowsPerPage() {
+  int rows = (tft.height() - LIST_HEADER_H - LIST_FOOTER_H) / LIST_ROW_H;
+  if (rows < 1) rows = 1;
+  return rows;
+}
+
+// 去掉路径开头的 '/'，只留文件名（屏幕显示 / 网页列目录时用）
+static String fileNameOf(const String &path) {
+  return path.startsWith("/") ? path.substring(1) : path;
+}
 
 // ================= 1. SD卡基础读写功能 =================
 // SD 卡和 TFT/触摸共用同一条 SPI 总线（VSPI: SCK=18, MISO=19, MOSI=23），
@@ -159,50 +182,140 @@ void deleteFile(const char *path) {
 }
 
 // ================= 2. 相册列表逻辑 =================
+// 取出文件在 SD 卡里的完整路径（形如 "/1.jpg"）。
+// 这里必须用 path() 而不是 name()：
+//   name()  = pathToFileName(path())，只返回最后一段文件名 "1.jpg"，
+//             没有开头的 '/'；而 ESP32 的 SD 是基于 VFS 的，
+//             VFSImpl::open() 会直接拒绝不以 '/' 开头的路径（打日志
+//             "%s does not start with /"），于是 SD.open("1.jpg") 永远失败。
+//   结果就是：列表能列出来，但一点开就 "Jpeg file not found"（图片区域全黑）。
+String sdFilePath(File &file) {
+  String p = file.path();
+  if (!p.startsWith("/")) p = "/" + p;
+  return p;
+}
+
 void scanSDCard() {
   imageCount = 0;
+  currentSelectedIndex = -1;
+
   File root = SD.open("/");
-  if (!root) return;
+  if (!root) {
+    Serial.println("[SD] 打开根目录失败");
+    return;
+  }
 
   File file = root.openNextFile();
   while (file && imageCount < MAX_IMAGES) {
-    String fileName = file.name();
-    String lowerName = fileName; lowerName.toLowerCase();
-    // 过滤出图片文件，并跳过 macOS 自带的 _ 开头隐藏文件
-    if (!file.isDirectory() && (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg")) && !lowerName.startsWith("_")) {
-      imageList[imageCount] = fileName;
+    String path = sdFilePath(file);
+    String lowerPath = path; lowerPath.toLowerCase();
+    // 过滤出图片文件，并跳过 macOS 自带的 "._xxx.jpg" 隐藏文件
+    if (!file.isDirectory() &&
+        (lowerPath.endsWith(".jpg") || lowerPath.endsWith(".jpeg")) &&
+        !lowerPath.startsWith("/_")) {
+      imageList[imageCount] = path;
       imageCount++;
     }
+    // 及时关闭：SD 默认同时只能打开 5 个文件（max_files=5），
+    // 不关的话第 6 张图之后 openNextFile() 会直接返回空，扫描就断了
+    file.close();
     file = root.openNextFile();
   }
   file.close();
+  root.close();
+
   Serial.printf("扫描到 %d 张图片\n", imageCount);
+  for (int i = 0; i < imageCount; i++) {
+    Serial.printf("      [%d] %s\n", i, imageList[i].c_str());
+  }
+}
+
+// SD 卡挂载失败时屏幕上的排查提示（也要放在 setup() 最后画，否则同样会被 WiFi 提示擦掉）
+void drawSdErrorScreen() {
+  xSemaphoreTake(tftMutex, portMAX_DELAY);
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(2);
+  tft.setTextColor(TFT_RED, TFT_BLACK);
+  tft.drawString("SD Card Mount Failed!", 10, 10);
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+  tft.drawString("1) Format card as FAT32", 10, 45);
+  tft.drawString("2) Check CS=32 / wiring", 10, 70);
+  tft.drawString("3) Check 3.3V power", 10, 95);
+  xSemaphoreGive(tftMutex);
 }
 
 void drawImageList() {
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_CYAN, TFT_BLACK);
-  tft.setTextSize(2);
-  tft.drawString("SD Photo Album", 10, 10);
-  tft.drawLine(0, 35, 240, 35, TFT_WHITE);
+  // 画屏幕要和 Web 任务串行（TFT_eSPI 不是线程安全的）
+  xSemaphoreTake(tftMutex, portMAX_DELAY);
 
-  tft.setTextSize(1);
-  int itemsPerPage = 15; // 一页最多显示 15 行
-  for (int i = 0; i < imageCount && i < itemsPerPage; i++) {
-    int yPos = 45 + i * 18;
-    tft.setCursor(10, yPos);
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.print(i + 1); tft.print(". "); tft.print(imageList[i]);
-  }
-  if (imageCount > 15) {
+  const int rows = listRowsPerPage();
+  const int w = tft.width();
+
+  tft.fillScreen(TFT_BLACK);
+
+  // ---- 标题 ----
+  tft.setTextSize(2);
+  tft.setTextColor(TFT_CYAN, TFT_BLACK);
+  tft.drawString("SD Photo Album", 10, 8);
+  // 分隔线画在 y = LIST_HEADER_H - 2 = 44：
+  // 右上角的时间每秒都会用“带背景色”的方式重绘（y=25~41），
+  // 线画在 40 就会被时间文字的背景一个像素一个像素地啃掉一段。
+  tft.drawLine(0, LIST_HEADER_H - 2, w, LIST_HEADER_H - 2, TFT_WHITE);
+
+  // ---- 一张照片都没有 ----
+  if (imageCount == 0) {
     tft.setTextColor(TFT_YELLOW, TFT_BLACK);
-    tft.drawString("... More files not shown", 10, 315);
+    tft.drawString("No .jpg on SD card", 10, LIST_HEADER_H + 16);
+    tft.setTextSize(1);
+    xSemaphoreGive(tftMutex);
+    return;
   }
+
+  // ---- 文件列表：一行一个（行位置和 handleTouch() 用同一套常量算） ----
+  tft.setTextSize(1);
+  for (int i = 0; i < imageCount && i < rows; i++) {
+    tft.setCursor(10, LIST_HEADER_H + i * LIST_ROW_H);
+    // 当前正在看的 / 刚看过的用绿色标出来，方便一眼找到
+    tft.setTextColor(i == currentSelectedIndex ? TFT_GREEN : TFT_WHITE, TFT_BLACK);
+    tft.print(i + 1);
+    tft.print(". ");
+    tft.print(fileNameOf(imageList[i]));   // 只显示文件名，"1.jpg" 比 "/1.jpg" 清爽
+  }
+
+  if (imageCount > rows) {
+    tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+    tft.drawString("... more files not shown", 10, tft.height() - LIST_FOOTER_H);
+  }
+
+  xSemaphoreGive(tftMutex);
+}
+
+
+// ================= JPEG 渲染回调（TJpg_Decoder 的“画笔”） =================
+// TJpg_Decoder 本身【不】认识 TFT_eSPI：它只负责解码，每解出一块像素（MCU）就调用
+// 这个回调函数交给 sketch 自己往屏幕上画。这个回调必须用 TJpgDec.setCallback() 注册，
+// 因为库内部保存它的成员 tft_output 的初始值是 nullptr（见 TJpg_Decoder.h:121）；
+// 忘了注册就会在解出第一块像素时跳到地址 0 —— 串口打印
+// "Guru Meditation Error: Core 1 panic'ed (InstrFetchProhibited) PC=0x00000000"，
+// 然后芯片立刻重启。这正是“点击屏幕列表就崩溃复位”的原因。
+// 返回值：1 = 继续解码下一块；0 = 让解码器提前结束（drawSdJpg() 此时返回 JDR_INTR）。
+bool tftOutput(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
+  // 图片比屏幕还高时，从这一块开始已经跑到屏幕下方了，直接停止解码，省掉大量无用功
+  if (y >= tft.height()) return 0;
+
+  // pushImage() 会自动把超出屏幕的部分裁掉，这里不用自己做边界判断。
+  // 颜色字节序已经在解码时由 TJpgDec.setSwapBytes(true) 换好了（见 setup()）。
+  tft.pushImage(x, y, w, h, bitmap);
+
+  return 1; // 继续解码下一块
 }
 
 void showSelectedImage(int index) {
   if (index < 0 || index >= imageCount) return;
   
+  // 绘制屏幕必须和 Web 任务（/display、/delete）串行，否则 SPI 会互相打架
+  xSemaphoreTake(tftMutex, portMAX_DELAY);
+
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawString("Loading...", 10, 10, 2);
@@ -212,12 +325,25 @@ void showSelectedImage(int index) {
   digitalWrite(TOUCH_CS, HIGH);
 
   // 使用 TJpg_Decoder 从 SD 卡绘制图片
-  TJpgDec.drawSdJpg(0, 0, imageList[index]);
+  // imageList[] 里存的是带 '/' 的完整路径（如 "/1.jpg"），SD.open() 才能打开；
+  // 解码/打开失败时屏幕上给出提示，方便区分是文件问题还是接线问题
+  JRESULT jres = TJpgDec.drawSdJpg(0, 0, imageList[index]);
+  // JDR_INTR(1) 不是失败：图片比屏幕高时 tftOutput() 会返回 0 让解码提前结束，
+  // 此时图片已经画出来了，和 JDR_OK 一样算成功；只有其它返回值才是真的出错。
+  if (jres != JDR_OK && jres != JDR_INTR) {
+    Serial.printf("[图片] 打开/解码失败(%d): %s\n", (int)jres, imageList[index].c_str());
+    tft.setTextColor(TFT_RED, TFT_BLACK);
+    tft.drawString("Decode failed!", 10, 40, 2);
+  }
 
-  // 底部绘制返回提示
-  tft.fillRect(0, 290, 240, 30, TFT_DARKGREY);
+  // 底部绘制返回提示（按屏幕真实高度定位：横屏 320x240 时 y=290 已经在屏幕外了）
+  const int barH = 30;
+  const int barY = tft.height() - barH;
+  tft.fillRect(0, barY, tft.width(), barH, TFT_DARKGREY);
   tft.setTextColor(TFT_WHITE, TFT_DARKGREY);
-  tft.drawString("Tap HERE to return", 50, 300, 2);
+  tft.drawString("Tap HERE to return", 50, barY + 7, 2);
+
+  xSemaphoreGive(tftMutex);
 }
 
 // ================= 3. 触摸与状态机 =================
@@ -227,9 +353,11 @@ void handleTouch() {
     delay(200); // 简单防抖
 
     if (currentView == MODE_LIST) {
-      // 点击列表区域
-      if (touchY >= 45 && touchY < 45 + 15 * 18) {
-        int row = (touchY - 45) / 18;
+      // 点击列表区域（行位置/行数都用和 drawImageList() 相同的常量算，保证点得准）
+      int rows = listRowsPerPage();
+      if (rows > imageCount) rows = imageCount;
+      if (touchY >= LIST_HEADER_H && touchY < LIST_HEADER_H + rows * LIST_ROW_H) {
+        int row = (touchY - LIST_HEADER_H) / LIST_ROW_H;
         if (row >= 0 && row < imageCount) {
           currentSelectedIndex = row;
           currentView = MODE_IMAGE;       // 切换到图片模式
@@ -238,8 +366,8 @@ void handleTouch() {
       }
     } 
     else if (currentView == MODE_IMAGE) {
-      // 点击底部区域返回
-      if (touchY > 280) {
+      // 点击底部返回条返回列表
+      if (touchY > tft.height() - 30) {
         currentView = MODE_LIST;
         drawImageList();
       }
@@ -527,6 +655,16 @@ void setup() {
   tftMutex = xSemaphoreCreateMutex();
   tft.init();
 
+  // JPEG 解码器配置（两行都不能少）：
+  //   ① setCallback() 注册渲染回调 —— 库内部函数指针默认是 nullptr，
+  //      不注册的话一解码就跳转到地址 0，直接 Guru Meditation 重启（点击列表崩溃的元凶）；
+  //   ② setSwapBytes(true) —— 解码出来的是 RGB565，字节序和 SPI 送屏需要的相反，
+  //      不换的话颜色会红蓝对调（库在解码时就把两个字节换好，不用再动 tft）。
+  // 缩放倍数：默认 0 = 原尺寸 1:1（本屏 320x240 会显示照片左上角一块，最清晰）；
+  // 想让一屏看到更多内容可以改成 TJpgDec.setJpgScale(1) → 1/2、2 → 1/4、3 → 1/8。
+  TJpgDec.setCallback(tftOutput);
+  TJpgDec.setSwapBytes(true);
+
   tft.setRotation(1); 
   tft.fillScreen(TFT_BLACK);
 
@@ -541,26 +679,20 @@ void setup() {
     Serial.println("LittleFS 初始化成功");
   }
 
-    // 2. 初始化 SD 卡
-  if (initSDCard()) {
+  // 2. 初始化 SD 卡
+  sdCardReady = initSDCard();
+  if (sdCardReady) {
     // 测试基础读写（可选择注释掉）
     writeFile("/test.txt", "Hello ESP32 SD!\n");
     appendFile("/test.txt", "Appended line.\n");
-    
-    // 3. 扫描并显示列表
+
+    // 3. 扫描 SD 卡里的图片，把文件名读进内存。
+    //    注意这里【不】画列表：下面连接 WiFi 时会 fillScreen(TFT_BLACK)，
+    //    提前画出来的列表会被配网/连接提示擦掉，屏幕上最后只剩个时间。
+    //    列表统一放在 setup() 的最后一步画（见函数末尾）。
     scanSDCard();
-    drawImageList();
-  } else {
-    // 挂载失败：屏幕上给出三条最可能的排查线。
-    // 注意下面画 WiFi 提示时会 fillScreen(TFT_BLACK)，不 delay 的话这条信息一眨眼就被清掉了。
-    tft.setTextColor(TFT_RED, TFT_BLACK);
-    tft.drawString("SD Card Mount Failed!", 10, 10, 2);
-    tft.setTextColor(TFT_YELLOW, TFT_BLACK);
-    tft.drawString("1) Format card as FAT32", 10, 45, 2);
-    tft.drawString("2) Check CS=32 / wiring", 10, 70, 2);
-    tft.drawString("3) Check 3.3V power", 10, 95, 2);
-    delay(1500);
   }
+  if (!sdCardReady) Serial.println("[SD] 挂载失败，无法显示图片列表");
 
   // 1. 设置屏幕配网提示
   // ==========================================
@@ -590,10 +722,28 @@ void setup() {
 
   
   if (!res) {
-    // 如果连不上，且配网也失败，重启 ESP32
-    tft.fillScreen(TFT_RED);
-    tft.drawString("配网失败，重启中...", 10, 10, 2);
-    delay(3000);
+    // 连不上 WiFi、配网也超时了。
+    // 这里保留原来的“重启重试”逻辑（重启后又会重新开放 2 分钟配网热点，是唯一的重配途径），
+    // 但重启前【先把相册列表画出来】：没有网络时屏幕上也应该能列出 SD 卡里的照片，
+    // 否则相册功能在断网时完全不可见，看起来就像“SD 挂载成功但屏幕没有列表”。
+    Serial.println("[WiFi] 连接/配网失败：先显示相册列表，10 秒后重启重试");
+    if (sdCardReady) {
+      drawImageList();
+      xSemaphoreTake(tftMutex, portMAX_DELAY);
+      tft.fillRect(0, tft.height() - LIST_FOOTER_H, tft.width(), LIST_FOOTER_H, TFT_RED);
+      tft.setTextColor(TFT_WHITE, TFT_RED);
+      tft.drawString("WiFi failed - rebooting in 10s", 10, tft.height() - LIST_FOOTER_H + 3);
+      xSemaphoreGive(tftMutex);
+      // 这 10 秒里照样处理触摸，方便没网的时候也能点开照片看看
+      unsigned long t0 = millis();
+      while (millis() - t0 < 10000) {
+        handleTouch();
+        delay(20);
+      }
+    } else {
+      drawSdErrorScreen();
+      delay(3000);
+    }
     ESP.restart();
   }
 
@@ -662,6 +812,152 @@ void setup() {
     request->send(200, "text/plain", "已重置，设备将重启");
   });
 
+  // ---------- 图片相关路由（数据源统一换成 SD 卡） ----------
+  // 说明：原来这几条路由是给 LittleFS 用的，改到 SD 卡的那次改动把它们删掉了，
+  //       于是网页上的“上传/列表/显示/删除”四个按钮全部 404。这里按原协议补回来。
+
+  // 显示指定图片：GET /display?img=1.jpg
+  server.on("/display", HTTP_GET, [](AsyncWebServerRequest* request) {
+    if (!request->hasParam("img")) {
+      request->send(400, "text/plain", "缺少 img 参数");
+      return;
+    }
+    String img = request->getParam("img")->value();
+    if (!img.startsWith("/")) img = "/" + img;   // SD.open() 必须用 "/xxx.jpg"
+
+    // 先在启动时扫描出来的列表里找
+    int idx = -1;
+    for (int i = 0; i < imageCount; i++) {
+      if (imageList[i] == img) { idx = i; break; }
+    }
+    // 不在列表里（比如刚上传、还没重新扫描）：确认文件存在后补进列表
+    if (idx < 0) {
+      if (!SD.exists(img)) {
+        request->send(404, "text/plain", "图片不存在: " + img);
+        return;
+      }
+      if (imageCount >= MAX_IMAGES) {
+        request->send(507, "text/plain", "图片数量已达上限(" + String(MAX_IMAGES) + ")");
+        return;
+      }
+      imageList[imageCount] = img;
+      idx = imageCount;
+      imageCount++;
+    }
+
+    currentSelectedIndex = idx;
+    currentView = MODE_IMAGE;      // 屏幕切到图片模式，和触摸操作保持一致
+    showSelectedImage(idx);
+    request->send(200, "text/plain", "已显示: " + fileNameOf(img));
+  });
+
+  // 列出 SD 卡里的图片：GET /list
+  // 直接返回启动时扫描好的内存列表，避免在 Web 任务里再翻一次 SD 目录（少一次 SPI 争用）
+  server.on("/list", HTTP_GET, [](AsyncWebServerRequest* request) {
+    String json = "[";
+    for (int i = 0; i < imageCount; i++) {
+      if (i) json += ",";
+      json += "\"";
+      json += fileNameOf(imageList[i]);   // 返回文件名，和网页上传时用的名字对得上
+      json += "\"";
+    }
+    json += "]";
+    request->send(200, "application/json", json);
+  });
+
+  // 删除图片：POST /delete?img=1.jpg
+  server.on("/delete", HTTP_POST, [](AsyncWebServerRequest* request) {
+    if (!request->hasParam("img")) {
+      request->send(400, "text/plain", "缺少 img 参数");
+      return;
+    }
+    String img = request->getParam("img")->value();
+    if (!img.startsWith("/")) img = "/" + img;
+
+    // 只允许删图片，防止误删 index.html 之类的重要文件
+    String lower = img; lower.toLowerCase();
+    if (!lower.endsWith(".jpg") && !lower.endsWith(".jpeg")) {
+      request->send(400, "text/plain", "只允许删除 JPG 图片");
+      return;
+    }
+
+    // SD 和 TFT 共用一条 SPI 总线，而烧写/擦除会占用较长时间，加锁串行
+    xSemaphoreTake(tftMutex, portMAX_DELAY);
+    bool ok = SD.exists(img) && SD.remove(img);
+    xSemaphoreGive(tftMutex);
+
+    if (!ok) {
+      request->send(404, "text/plain", "删除失败（文件不存在？）: " + fileNameOf(img));
+      return;
+    }
+
+    // 同步移除内存列表里的这一项，保证屏幕列表和 SD 卡一致
+    for (int i = 0; i < imageCount; i++) {
+      if (imageList[i] == img) {
+        for (int j = i; j < imageCount - 1; j++) imageList[j] = imageList[j + 1];
+        imageCount--;
+        if (currentSelectedIndex >= imageCount) currentSelectedIndex = imageCount - 1;
+        break;
+      }
+    }
+    if (currentView == MODE_LIST) drawImageList();   // 正停在列表界面就立刻刷新
+    Serial.println("[SD] 已删除图片: " + img);
+    request->send(200, "text/plain", "已删除: " + fileNameOf(img));
+  });
+
+  // 上传图片：POST /upload (multipart/form-data)，字段名 img
+  server.on("/upload", HTTP_POST,
+    [](AsyncWebServerRequest* request) {
+      request->send(200, "text/plain", "上传完成");
+    },
+    [](AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final) {
+      static File uploadFile;
+      static String uploadPath;
+
+      if (!index) {                               // 收到新文件的第一个数据块
+        // 只保留文件名，挡掉 "../" 之类的路径穿越
+        int slash = filename.lastIndexOf('/');
+        if (slash >= 0) filename = filename.substring(slash + 1);
+        uploadPath = "/" + filename;
+
+        String lower = uploadPath; lower.toLowerCase();
+        if (!lower.endsWith(".jpg") && !lower.endsWith(".jpeg")) {
+          Serial.println("[上传] 只支持 JPG 图片，已忽略: " + filename);
+          return;                                 // uploadFile 保持无效，后面的块会被丢掉
+        }
+        uploadFile = SD.open(uploadPath, FILE_WRITE);
+        if (!uploadFile) {
+          Serial.println("[上传] 无法创建文件: " + uploadPath);
+          return;
+        }
+        Serial.println("[上传] 开始: " + uploadPath);
+      }
+
+      if (uploadFile) uploadFile.write(data, len);
+
+      if (final && uploadFile) {
+        uploadFile.close();
+        Serial.println("[上传] 完成: " + uploadPath);
+
+        // 补进内存列表（已存在就复用原索引），然后立刻显示在屏幕上
+        int idx = -1;
+        for (int i = 0; i < imageCount; i++) {
+          if (imageList[i] == uploadPath) { idx = i; break; }
+        }
+        if (idx < 0 && imageCount < MAX_IMAGES) {
+          imageList[imageCount] = uploadPath;
+          idx = imageCount;
+          imageCount++;
+        }
+        if (idx >= 0) {
+          currentSelectedIndex = idx;
+          currentView = MODE_IMAGE;
+          showSelectedImage(idx);
+        }
+      }
+    });
+
+
 
 
   // 1. 初始化功放静音引脚（先静音，避免上电“砰”的一声）
@@ -693,6 +989,15 @@ void setup() {
   server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
   server.begin();
   Serial.println("服务器已启动");
+
+  // 5. 所有初始化都做完了，最后才把相册列表画到屏幕上。
+  //    必须放在最后：前面配网/连接 WiFi 的提示都会 fillScreen(TFT_BLACK)，
+  //    提前画列表会被这些提示直接擦掉——这就是“SD 挂载成功但屏幕上没有照片列表”的原因。
+  if (sdCardReady) {
+    drawImageList();
+  } else {
+    drawSdErrorScreen();
+  }
 }
 
 void loop() {
@@ -700,21 +1005,10 @@ void loop() {
     static uint32_t lastPrint = 0;
     // 处理触摸事件，状态机驱动
     handleTouch();
-    // 检测触摸
-    if (ts.touched()) {
-        TS_Point p = ts.getPoint();
-        // 压力值过滤（防止悬空误触）
-        if (p.z > 100) {  // 根据实际调整阈值
-            // 将 ADC 值映射到屏幕像素
-            // 横屏(rotation 1)时：屏幕宽 TFT_WIDTH=320，高 TFT_HEIGHT=240
-            // x 对应屏幕横向(0~320)，y 对应屏幕纵向(0~240)
-            uint16_t x = map(p.x, 0, 4095, 0, TFT_HEIGHT);
-            uint16_t y = map(p.y, 0, 4095, 0, TFT_WIDTH);
-
-            // 防抖
-            delay(100);
-        }
-    }
+    // 触摸统一交给 TFT_eSPI 的 getTouch()（见 handleTouch()）。
+    // 这里原本还有一段 XPT2046_Touchscreen(ts) 的读取代码，但它算出来的 x/y
+    // 没有任何人使用（只剩一个 delay(100)），却会绕开互斥锁去操作 TFT/SD
+    // 共用的那条 SPI 总线，属于纯粹的风险点，已删除。
   
   // 用 millis() 替代 delay()，避免阻塞WiFi（避免断线重连）
   static unsigned long lastUpdate = 0;

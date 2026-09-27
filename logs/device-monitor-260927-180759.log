@@ -1,0 +1,3902 @@
+18:07:59.002 > �x��␀�␀x�ets Jul 29 2019 12:21:46
+18:07:59.005 > 
+18:07:59.005 > rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:07:59.010 > configsip: 0, SPIWP:0xee
+18:07:59.013 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:07:59.019 > mode:DIO, clock div:2
+18:07:59.022 > load:0x3fff0030,len:1184
+18:07:59.025 > load:0x40078000,len:13232
+18:07:59.028 > load:0x40080400,len:3028
+18:07:59.028 > entry 0x400805e4
+18:07:59.477 > [启动] 上次复位原因=1 (上电复位)
+18:08:00.150 > [   712][E][esp32-hal-cpu.c:110] addApbChangeCallback(): duplicate func=0x400ed11c arg=0x3ffbdc30
+18:08:00.161 > LittleFS 初始化成功
+18:08:00.162 > [SD] SPI 引脚: SCK=18 MISO=19 MOSI=23 CS=32
+18:08:00.230 > [   793][E][sd_diskio.cpp:806] sdcard_mount(): f_mount failed: (1) A hard error occurred in the low level disk I/O layer
+18:08:00.238 > [   805][W][sd_diskio.cpp:180] sdCommand(): crc error
+18:08:00.346 > [SD] 20 MHz 挂载失败，自动降速重试
+18:08:00.415 > [SD] 挂载成功：速率=10 MHz 类型=SDHC/SDXC 容量=7580 MB
+18:08:00.435 > 写入成功
+18:08:00.441 > 追加成功
+18:08:00.450 > 扫描到 1 张图片
+18:08:00.450 >       [0] /1.jpg
+18:08:00.549 > Guru Meditation Error: Core  0 panic'ed (IllegalInstruction). Exception was unhandled.
+18:08:00.555 > Memory dump at 0x4015faa8: 3ffc079a 210071be 7f35ef3f
+18:08:00.560 > Core  0 register dump:
+18:08:00.563 > PC      : 0x4015faac  PS      : 0x00060830  A0      : 0x8015dced  A1      : 0x3ffd58c0  
+18:08:00.571 > A2      : 0x3ffcd200  A3      : 0x00892018  A4      : 0x00000000  A5      : 0x00000000  
+18:08:00.577 > A6      : 0x00000005  A7      : 0x00000000  A8      : 0x8015d1af  A9      : 0x3ffd58a0  
+18:08:00.585 > A10     : 0x4000446c  A11     : 0x00000005  A12     : 0x00000120  A13     : 0x00000000  
+18:08:00.594 > A14     : 0x3ffae0c0  A15     : 0x00000046  SAR     : 0x00000020  EXCCAUSE: 0x00000000  
+18:08:00.603 > EXCVADDR: 0x00000000  LBEG    : 0x4008a3c4  LEND    : 0x4008a3da  LCOUNT  : 0x00000000  
+18:08:00.611 > 
+18:08:00.611 > 
+18:08:00.611 > Backtrace: 0x4015faa9:0x3ffd58c0 0x4015dcea:0x3ffd58e0 0x40129696:0x3ffd5910 0x40129719:0x3ffd5940 0x40104087:0x3ffd5960 0x401415da:0x3ffd5980 0x40141de9:0x3ffd59a0 0x40140218:0x3ffd59c0 0x4017b55d:0x3ffd59e0
+18:08:00.628 > 
+18:08:00.628 > 
+18:08:00.628 > 
+18:08:00.628 > 
+18:08:00.630 > ELF file SHA256: 4feedfc2f2c621bd
+18:08:00.633 > 
+18:08:00.633 > E (1464) esp_core_dump_flash: Failed to erase flash (261)!
+18:08:00.639 > E (1468) esp_core_dump_elf: Failed to prepare core dump storage (261)!
+18:08:00.644 > E (1474) esp_core_dump_common: Core dump write binary failed with error=261
+18:08:00.650 > Rebooting...
+18:08:00.653 > ets Jul 29 2019 12:21:46
+18:08:00.653 > 
+18:08:00.656 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:00.659 > configsip: 0, SPIWP:0xee
+18:08:00.661 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:00.666 > mode:DIO, clock div:2
+18:08:00.669 > load:0x3fff0030,len:1184
+18:08:00.672 > load:0x40078000,len:13232
+18:08:00.674 > load:0x40080400,len:3028
+18:08:00.677 > entry 0x400805e4
+18:08:01.116 > 
+18:08:01.116 > Brownout detector was triggered
+18:08:01.119 > 
+18:08:01.119 > ets Jul 29 2019 12:21:46
+18:08:01.119 > 
+18:08:01.122 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:01.124 > configsip: 0, SPIWP:0xee
+18:08:01.127 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:01.132 > mode:DIO, clock div:2
+18:08:01.135 > load:0x3fff0030,len:1184
+18:08:01.138 > load:0x40078000,len:13232
+18:08:01.141 > load:0x40080400,len:3028
+18:08:01.144 > entry 0x400805e4
+18:08:01.582 > 
+18:08:01.582 > Brownout detector was triggered
+18:08:01.585 > 
+18:08:01.585 > ets Jul 29 2019 12:21:46
+18:08:01.585 > 
+18:08:01.588 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:01.590 > configsip: 0, SPIWP:0xee
+18:08:01.593 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:01.599 > mode:DIO, clock div:2
+18:08:01.602 > load:0x3fff0030,len:1184
+18:08:01.604 > load:0x40078000,len:13232
+18:08:01.607 > load:0x40080400,len:3028
+18:08:01.610 > entry 0x400805e4
+18:08:02.048 > 
+18:08:02.048 > Brownout detector was triggered
+18:08:02.051 > 
+18:08:02.051 > ets Jul 29 2019 12:21:46
+18:08:02.051 > 
+18:08:02.054 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:02.057 > configsip: 0, SPIWP:0xee
+18:08:02.059 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:02.065 > mode:DIO, clock div:2
+18:08:02.068 > load:0x3fff0030,len:1184
+18:08:02.071 > load:0x40078000,len:13232
+18:08:02.073 > load:0x40080400,len:3028
+18:08:02.076 > entry 0x400805e4
+18:08:02.514 > 
+18:08:02.514 > Brownout detector was triggered
+18:08:02.517 > 
+18:08:02.517 > ets Jul 29 2019 12:21:46
+18:08:02.517 > 
+18:08:02.520 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:02.522 > configsip: 0, SPIWP:0xee
+18:08:02.526 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:02.530 > mode:DIO, clock div:2
+18:08:02.534 > load:0x3fff0030,len:1184
+18:08:02.537 > load:0x40078000,len:13232
+18:08:02.539 > load:0x40080400,len:3028
+18:08:02.542 > entry 0x400805e4
+18:08:02.979 > 
+18:08:02.979 > Brownout detector was triggered
+18:08:02.982 > 
+18:08:02.982 > ets Jul 29 2019 12:21:46
+18:08:02.982 > 
+18:08:02.985 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:02.988 > configsip: 0, SPIWP:0xee
+18:08:02.990 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:02.996 > mode:DIO, clock div:2
+18:08:02.999 > load:0x3fff0030,len:1184
+18:08:03.001 > load:0x40078000,len:13232
+18:08:03.004 > load:0x40080400,len:3028
+18:08:03.007 > entry 0x400805e4
+18:08:03.444 > 
+18:08:03.445 > Brownout detector was triggered
+18:08:03.448 > 
+18:08:03.448 > ets Jul 29 2019 12:21:46
+18:08:03.448 > 
+18:08:03.451 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:03.454 > configsip: 0, SPIWP:0xee
+18:08:03.456 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:03.462 > mode:DIO, clock div:2
+18:08:03.465 > load:0x3fff0030,len:1184
+18:08:03.467 > load:0x40078000,len:13232
+18:08:03.470 > load:0x40080400,len:3028
+18:08:03.473 > entry 0x400805e4
+18:08:03.910 > 
+18:08:03.910 > Brownout detector was triggered
+18:08:03.914 > 
+18:08:03.914 > ets Jul 29 2019 12:21:46
+18:08:03.914 > 
+18:08:03.916 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:03.919 > configsip: 0, SPIWP:0xee
+18:08:03.922 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:03.927 > mode:DIO, clock div:2
+18:08:03.931 > load:0x3fff0030,len:1184
+18:08:03.933 > load:0x40078000,len:13232
+18:08:03.937 > load:0x40080400,len:3028
+18:08:03.939 > entry 0x400805e4
+18:08:04.375 > 
+18:08:04.375 > Brownout detector was triggered
+18:08:04.379 > 
+18:08:04.379 > ets Jul 29 2019 12:21:46
+18:08:04.379 > 
+18:08:04.382 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:04.384 > configsip: 0, SPIWP:0xee
+18:08:04.387 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:04.393 > mode:DIO, clock div:2
+18:08:04.395 > load:0x3fff0030,len:1184
+18:08:04.399 > load:0x40078000,len:13232
+18:08:04.401 > load:0x40080400,len:3028
+18:08:04.404 > entry 0x400805e4
+18:08:04.840 > 
+18:08:04.841 > Brownout detector was triggered
+18:08:04.844 > 
+18:08:04.844 > ets Jul 29 2019 12:21:46
+18:08:04.844 > 
+18:08:04.847 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:04.850 > configsip: 0, SPIWP:0xee
+18:08:04.852 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:04.858 > mode:DIO, clock div:2
+18:08:04.861 > load:0x3fff0030,len:1184
+18:08:04.863 > load:0x40078000,len:13232
+18:08:04.866 > load:0x40080400,len:3028
+18:08:04.869 > entry 0x400805e4
+18:08:05.307 > 
+18:08:05.307 > Brownout detector was triggered
+18:08:05.310 > 
+18:08:05.310 > ets Jul 29 2019 12:21:46
+18:08:05.310 > 
+18:08:05.313 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:05.315 > configsip: 0, SPIWP:0xee
+18:08:05.318 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:05.324 > mode:DIO, clock div:2
+18:08:05.327 > load:0x3fff0030,len:1184
+18:08:05.330 > load:0x40078000,len:13232
+18:08:05.332 > load:0x40080400,len:3028
+18:08:05.335 > entry 0x400805e4
+18:08:05.774 > 
+18:08:05.774 > Brownout detector was triggered
+18:08:05.777 > 
+18:08:05.777 > ets Jul 29 2019 12:21:46
+18:08:05.777 > 
+18:08:05.780 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:05.783 > configsip: 0, SPIWP:0xee
+18:08:05.787 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:05.791 > mode:DIO, clock div:2
+18:08:05.794 > load:0x3fff0030,len:1184
+18:08:05.797 > load:0x40078000,len:13232
+18:08:05.799 > load:0x40080400,len:3028
+18:08:05.802 > entry 0x400805e4
+18:08:06.239 > 
+18:08:06.239 > Brownout detector was triggered
+18:08:06.244 > 
+18:08:06.244 > ets Jul 29 2019 12:21:46
+18:08:06.244 > 
+18:08:06.245 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:06.248 > configsip: 0, SPIWP:0xee
+18:08:06.251 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:06.256 > mode:DIO, clock div:2
+18:08:06.259 > load:0x3fff0030,len:1184
+18:08:06.261 > load:0x40078000,len:13232
+18:08:06.264 > load:0x40080400,len:3028
+18:08:06.267 > entry 0x400805e4
+18:08:06.704 > 
+18:08:06.704 > Brownout detector was triggered
+18:08:06.708 > 
+18:08:06.708 > ets Jul 29 2019 12:21:46
+18:08:06.708 > 
+18:08:06.711 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:06.713 > configsip: 0, SPIWP:0xee
+18:08:06.716 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:06.721 > mode:DIO, clock div:2
+18:08:06.724 > load:0x3fff0030,len:1184
+18:08:06.727 > load:0x40078000,len:13232
+18:08:06.730 > load:0x40080400,len:3028
+18:08:06.733 > entry 0x400805e4
+18:08:07.170 > 
+18:08:07.173 > Brownout detector was triggered
+18:08:07.173 > 
+18:08:07.173 > ets Jul 29 2019 12:21:46
+18:08:07.173 > 
+18:08:07.176 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:07.178 > configsip: 0, SPIWP:0xee
+18:08:07.181 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:07.187 > mode:DIO, clock div:2
+18:08:07.189 > load:0x3fff0030,len:1184
+18:08:07.192 > load:0x40078000,len:13232
+18:08:07.196 > load:0x40080400,len:3028
+18:08:07.198 > entry 0x400805e4
+18:08:07.635 > 
+18:08:07.635 > Brownout detector was triggered
+18:08:07.639 > 
+18:08:07.639 > ets Jul 29 2019 12:21:46
+18:08:07.639 > 
+18:08:07.641 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:07.644 > configsip: 0, SPIWP:0xee
+18:08:07.647 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:07.652 > mode:DIO, clock div:2
+18:08:07.655 > load:0x3fff0030,len:1184
+18:08:07.658 > load:0x40078000,len:13232
+18:08:07.660 > load:0x40080400,len:3028
+18:08:07.663 > entry 0x400805e4
+18:08:08.100 > 
+18:08:08.101 > Brownout detector was triggered
+18:08:08.104 > 
+18:08:08.104 > ets Jul 29 2019 12:21:46
+18:08:08.104 > 
+18:08:08.107 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:08.109 > configsip: 0, SPIWP:0xee
+18:08:08.112 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:08.118 > mode:DIO, clock div:2
+18:08:08.121 > load:0x3fff0030,len:1184
+18:08:08.124 > load:0x40078000,len:13232
+18:08:08.126 > load:0x40080400,len:3028
+18:08:08.130 > entry 0x400805e4
+18:08:08.566 > 
+18:08:08.566 > Brownout detector was triggered
+18:08:08.570 > 
+18:08:08.570 > ets Jul 29 2019 12:21:46
+18:08:08.570 > 
+18:08:08.573 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:08.575 > configsip: 0, SPIWP:0xee
+18:08:08.578 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:08.584 > mode:DIO, clock div:2
+18:08:08.586 > load:0x3fff0030,len:1184
+18:08:08.589 > load:0x40078000,len:13232
+18:08:08.592 > load:0x40080400,len:3028
+18:08:08.595 > entry 0x400805e4
+18:08:09.032 > 
+18:08:09.032 > Brownout detector was triggered
+18:08:09.036 > 
+18:08:09.036 > ets Jul 29 2019 12:21:46
+18:08:09.036 > 
+18:08:09.039 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:09.041 > configsip: 0, SPIWP:0xee
+18:08:09.043 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:09.049 > mode:DIO, clock div:2
+18:08:09.052 > load:0x3fff0030,len:1184
+18:08:09.056 > load:0x40078000,len:13232
+18:08:09.057 > load:0x40080400,len:3028
+18:08:09.060 > entry 0x400805e4
+18:08:09.497 > 
+18:08:09.497 > Brownout detector was triggered
+18:08:09.501 > 
+18:08:09.501 > ets Jul 29 2019 12:21:46
+18:08:09.501 > 
+18:08:09.503 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:09.506 > configsip: 0, SPIWP:0xee
+18:08:09.509 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:09.515 > mode:DIO, clock div:2
+18:08:09.517 > load:0x3fff0030,len:1184
+18:08:09.520 > load:0x40078000,len:13232
+18:08:09.523 > load:0x40080400,len:3028
+18:08:09.526 > entry 0x400805e4
+18:08:09.963 > 
+18:08:09.963 > Brownout detector was triggered
+18:08:09.966 > 
+18:08:09.966 > ets Jul 29 2019 12:21:46
+18:08:09.966 > 
+18:08:09.969 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:09.971 > configsip: 0, SPIWP:0xee
+18:08:09.974 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:09.979 > mode:DIO, clock div:2
+18:08:09.982 > load:0x3fff0030,len:1184
+18:08:09.985 > load:0x40078000,len:13232
+18:08:09.988 > load:0x40080400,len:3028
+18:08:09.992 > entry 0x400805e4
+18:08:10.428 > 
+18:08:10.428 > Brownout detector was triggered
+18:08:10.432 > 
+18:08:10.432 > ets Jul 29 2019 12:21:46
+18:08:10.432 > 
+18:08:10.435 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:10.437 > configsip: 0, SPIWP:0xee
+18:08:10.440 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:10.446 > mode:DIO, clock div:2
+18:08:10.449 > load:0x3fff0030,len:1184
+18:08:10.451 > load:0x40078000,len:13232
+18:08:10.454 > load:0x40080400,len:3028
+18:08:10.457 > entry 0x400805e4
+18:08:10.894 > 
+18:08:10.894 > Brownout detector was triggered
+18:08:10.897 > 
+18:08:10.897 > ets Jul 29 2019 12:21:46
+18:08:10.897 > 
+18:08:10.900 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:10.903 > configsip: 0, SPIWP:0xee
+18:08:10.905 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:10.911 > mode:DIO, clock div:2
+18:08:10.914 > load:0x3fff0030,len:1184
+18:08:10.916 > load:0x40078000,len:13232
+18:08:10.919 > load:0x40080400,len:3028
+18:08:10.923 > entry 0x400805e4
+18:08:11.358 > 
+18:08:11.361 > Brownout detector was triggered
+18:08:11.363 > 
+18:08:11.363 > ets Jul 29 2019 12:21:46
+18:08:11.363 > 
+18:08:11.365 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:11.368 > configsip: 0, SPIWP:0xee
+18:08:11.371 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:11.377 > mode:DIO, clock div:2
+18:08:11.379 > load:0x3fff0030,len:1184
+18:08:11.381 > load:0x40078000,len:13232
+18:08:11.384 > load:0x40080400,len:3028
+18:08:11.387 > entry 0x400805e4
+18:08:11.824 > 
+18:08:11.825 > Brownout detector was triggered
+18:08:11.828 > 
+18:08:11.828 > ets Jul 29 2019 12:21:46
+18:08:11.828 > 
+18:08:11.831 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:11.833 > configsip: 0, SPIWP:0xee
+18:08:11.836 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:11.842 > mode:DIO, clock div:2
+18:08:11.845 > load:0x3fff0030,len:1184
+18:08:11.847 > load:0x40078000,len:13232
+18:08:11.850 > load:0x40080400,len:3028
+18:08:11.853 > entry 0x400805e4
+18:08:12.290 > 
+18:08:12.290 > Brownout detector was triggered
+18:08:12.293 > 
+18:08:12.293 > ets Jul 29 2019 12:21:46
+18:08:12.293 > 
+18:08:12.296 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:12.298 > configsip: 0, SPIWP:0xee
+18:08:12.302 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:12.307 > mode:DIO, clock div:2
+18:08:12.309 > load:0x3fff0030,len:1184
+18:08:12.312 > load:0x40078000,len:13232
+18:08:12.315 > load:0x40080400,len:3028
+18:08:12.318 > entry 0x400805e4
+18:08:12.757 > 
+18:08:12.758 > Brownout detector was triggered
+18:08:12.761 > 
+18:08:12.761 > ets Jul 29 2019 12:21:46
+18:08:12.761 > 
+18:08:12.763 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:12.765 > configsip: 0, SPIWP:0xee
+18:08:12.769 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:12.774 > mode:DIO, clock div:2
+18:08:12.777 > load:0x3fff0030,len:1184
+18:08:12.779 > load:0x40078000,len:13232
+18:08:12.782 > load:0x40080400,len:3028
+18:08:12.785 > entry 0x400805e4
+18:08:13.223 > 
+18:08:13.223 > Brownout detector was triggered
+18:08:13.226 > 
+18:08:13.226 > ets Jul 29 2019 12:21:46
+18:08:13.226 > 
+18:08:13.229 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:13.232 > configsip: 0, SPIWP:0xee
+18:08:13.234 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:13.240 > mode:DIO, clock div:2
+18:08:13.243 > load:0x3fff0030,len:1184
+18:08:13.246 > load:0x40078000,len:13232
+18:08:13.250 > load:0x40080400,len:3028
+18:08:13.251 > entry 0x400805e4
+18:08:13.689 > 
+18:08:13.689 > Brownout detector was triggered
+18:08:13.692 > 
+18:08:13.692 > ets Jul 29 2019 12:21:46
+18:08:13.692 > 
+18:08:13.695 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:13.698 > configsip: 0, SPIWP:0xee
+18:08:13.701 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:13.706 > mode:DIO, clock div:2
+18:08:13.709 > load:0x3fff0030,len:1184
+18:08:13.712 > load:0x40078000,len:13232
+18:08:13.715 > load:0x40080400,len:3028
+18:08:13.718 > entry 0x400805e4
+18:08:14.156 > 
+18:08:14.156 > Brownout detector was triggered
+18:08:14.159 > 
+18:08:14.159 > ets Jul 29 2019 12:21:46
+18:08:14.159 > 
+18:08:14.162 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:14.166 > configsip: 0, SPIWP:0xee
+18:08:14.166 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:14.173 > mode:DIO, clock div:2
+18:08:14.176 > load:0x3fff0030,len:1184
+18:08:14.177 > load:0x40078000,len:13232
+18:08:14.180 > load:0x40080400,len:3028
+18:08:14.183 > entry 0x400805e4
+18:08:14.622 > 
+18:08:14.622 > Brownout detector was triggered
+18:08:14.625 > 
+18:08:14.625 > ets Jul 29 2019 12:21:46
+18:08:14.625 > 
+18:08:14.628 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:14.631 > configsip: 0, SPIWP:0xee
+18:08:14.633 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:14.638 > mode:DIO, clock div:2
+18:08:14.642 > load:0x3fff0030,len:1184
+18:08:14.645 > load:0x40078000,len:13232
+18:08:14.648 > load:0x40080400,len:3028
+18:08:14.650 > entry 0x400805e4
+18:08:15.088 > 
+18:08:15.088 > Brownout detector was triggered
+18:08:15.091 > 
+18:08:15.091 > ets Jul 29 2019 12:21:46
+18:08:15.091 > 
+18:08:15.094 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:15.096 > configsip: 0, SPIWP:0xee
+18:08:15.099 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:15.105 > mode:DIO, clock div:2
+18:08:15.108 > load:0x3fff0030,len:1184
+18:08:15.110 > load:0x40078000,len:13232
+18:08:15.113 > load:0x40080400,len:3028
+18:08:15.116 > entry 0x400805e4
+18:08:15.554 > 
+18:08:15.554 > Brownout detector was triggered
+18:08:15.557 > 
+18:08:15.557 > ets Jul 29 2019 12:21:46
+18:08:15.557 > 
+18:08:15.560 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:15.563 > configsip: 0, SPIWP:0xee
+18:08:15.565 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:15.571 > mode:DIO, clock div:2
+18:08:15.574 > load:0x3fff0030,len:1184
+18:08:15.576 > load:0x40078000,len:13232
+18:08:15.580 > load:0x40080400,len:3028
+18:08:15.582 > entry 0x400805e4
+18:08:16.020 > 
+18:08:16.021 > Brownout detector was triggered
+18:08:16.024 > 
+18:08:16.024 > ets Jul 29 2019 12:21:46
+18:08:16.024 > 
+18:08:16.026 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:16.029 > configsip: 0, SPIWP:0xee
+18:08:16.031 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:16.037 > mode:DIO, clock div:2
+18:08:16.040 > load:0x3fff0030,len:1184
+18:08:16.043 > load:0x40078000,len:13232
+18:08:16.046 > load:0x40080400,len:3028
+18:08:16.049 > entry 0x400805e4
+18:08:16.486 > 
+18:08:16.487 > Brownout detector was triggered
+18:08:16.490 > 
+18:08:16.490 > ets Jul 29 2019 12:21:46
+18:08:16.490 > 
+18:08:16.493 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:16.495 > configsip: 0, SPIWP:0xee
+18:08:16.498 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:16.503 > mode:DIO, clock div:2
+18:08:16.507 > load:0x3fff0030,len:1184
+18:08:16.509 > load:0x40078000,len:13232
+18:08:16.512 > load:0x40080400,len:3028
+18:08:16.515 > entry 0x400805e4
+18:08:16.952 > 
+18:08:16.952 > Brownout detector was triggered
+18:08:16.956 > 
+18:08:16.956 > ets Jul 29 2019 12:21:46
+18:08:16.956 > 
+18:08:16.959 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:16.961 > configsip: 0, SPIWP:0xee
+18:08:16.964 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:16.970 > mode:DIO, clock div:2
+18:08:16.972 > load:0x3fff0030,len:1184
+18:08:16.975 > load:0x40078000,len:13232
+18:08:16.978 > load:0x40080400,len:3028
+18:08:16.981 > entry 0x400805e4
+18:08:17.419 > 
+18:08:17.420 > Brownout detector was triggered
+18:08:17.422 > 
+18:08:17.422 > ets Jul 29 2019 12:21:46
+18:08:17.422 > 
+18:08:17.425 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:17.427 > configsip: 0, SPIWP:0xee
+18:08:17.430 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:17.435 > mode:DIO, clock div:2
+18:08:17.438 > load:0x3fff0030,len:1184
+18:08:17.443 > load:0x40078000,len:13232
+18:08:17.445 > load:0x40080400,len:3028
+18:08:17.447 > entry 0x400805e4
+18:08:17.885 > 
+18:08:17.885 > Brownout detector was triggered
+18:08:17.888 > 
+18:08:17.888 > ets Jul 29 2019 12:21:46
+18:08:17.888 > 
+18:08:17.891 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:17.893 > configsip: 0, SPIWP:0xee
+18:08:17.896 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:17.902 > mode:DIO, clock div:2
+18:08:17.904 > load:0x3fff0030,len:1184
+18:08:17.908 > load:0x40078000,len:13232
+18:08:17.911 > load:0x40080400,len:3028
+18:08:17.914 > entry 0x400805e4
+18:08:18.351 > 
+18:08:18.351 > Brownout detector was triggered
+18:08:18.355 > 
+18:08:18.355 > ets Jul 29 2019 12:21:46
+18:08:18.355 > 
+18:08:18.358 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:18.360 > configsip: 0, SPIWP:0xee
+18:08:18.363 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:18.368 > mode:DIO, clock div:2
+18:08:18.371 > load:0x3fff0030,len:1184
+18:08:18.374 > load:0x40078000,len:13232
+18:08:18.377 > load:0x40080400,len:3028
+18:08:18.380 > entry 0x400805e4
+18:08:18.817 > 
+18:08:18.817 > Brownout detector was triggered
+18:08:18.820 > 
+18:08:18.820 > ets Jul 29 2019 12:21:46
+18:08:18.820 > 
+18:08:18.823 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:18.826 > configsip: 0, SPIWP:0xee
+18:08:18.829 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:18.835 > mode:DIO, clock div:2
+18:08:18.837 > load:0x3fff0030,len:1184
+18:08:18.840 > load:0x40078000,len:13232
+18:08:18.843 > load:0x40080400,len:3028
+18:08:18.846 > entry 0x400805e4
+18:08:19.283 > 
+18:08:19.284 > Brownout detector was triggered
+18:08:19.287 > 
+18:08:19.287 > ets Jul 29 2019 12:21:46
+18:08:19.287 > 
+18:08:19.289 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:19.292 > configsip: 0, SPIWP:0xee
+18:08:19.295 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:19.301 > mode:DIO, clock div:2
+18:08:19.303 > load:0x3fff0030,len:1184
+18:08:19.306 > load:0x40078000,len:13232
+18:08:19.308 > load:0x40080400,len:3028
+18:08:19.311 > entry 0x400805e4
+18:08:19.750 > 
+18:08:19.750 > Brownout detector was triggered
+18:08:19.753 > 
+18:08:19.753 > ets Jul 29 2019 12:21:46
+18:08:19.753 > 
+18:08:19.756 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:19.758 > configsip: 0, SPIWP:0xee
+18:08:19.761 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:19.767 > mode:DIO, clock div:2
+18:08:19.769 > load:0x3fff0030,len:1184
+18:08:19.772 > load:0x40078000,len:13232
+18:08:19.775 > load:0x40080400,len:3028
+18:08:19.778 > entry 0x400805e4
+18:08:20.215 > 
+18:08:20.215 > Brownout detector was triggered
+18:08:20.218 > 
+18:08:20.218 > ets Jul 29 2019 12:21:46
+18:08:20.218 > 
+18:08:20.221 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:20.224 > configsip: 0, SPIWP:0xee
+18:08:20.226 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:20.232 > mode:DIO, clock div:2
+18:08:20.238 > load:0x3fff0030,len:1184
+18:08:20.238 > load:0x40078000,len:13232
+18:08:20.240 > load:0x40080400,len:3028
+18:08:20.243 > entry 0x400805e4
+18:08:20.680 > 
+18:08:20.681 > Brownout detector was triggered
+18:08:20.684 > 
+18:08:20.684 > ets Jul 29 2019 12:21:46
+18:08:20.684 > 
+18:08:20.686 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:20.689 > configsip: 0, SPIWP:0xee
+18:08:20.693 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:20.698 > mode:DIO, clock div:2
+18:08:20.700 > load:0x3fff0030,len:1184
+18:08:20.704 > load:0x40078000,len:13232
+18:08:20.706 > load:0x40080400,len:3028
+18:08:20.709 > entry 0x400805e4
+18:08:21.145 > 
+18:08:21.146 > Brownout detector was triggered
+18:08:21.149 > 
+18:08:21.149 > ets Jul 29 2019 12:21:46
+18:08:21.149 > 
+18:08:21.152 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:21.154 > configsip: 0, SPIWP:0xee
+18:08:21.157 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:21.163 > mode:DIO, clock div:2
+18:08:21.166 > load:0x3fff0030,len:1184
+18:08:21.169 > load:0x40078000,len:13232
+18:08:21.171 > load:0x40080400,len:3028
+18:08:21.174 > entry 0x400805e4
+18:08:21.611 > 
+18:08:21.611 > Brownout detector was triggered
+18:08:21.615 > 
+18:08:21.615 > ets Jul 29 2019 12:21:46
+18:08:21.615 > 
+18:08:21.617 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:21.620 > configsip: 0, SPIWP:0xee
+18:08:21.622 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:21.628 > mode:DIO, clock div:2
+18:08:21.631 > load:0x3fff0030,len:1184
+18:08:21.634 > load:0x40078000,len:13232
+18:08:21.636 > load:0x40080400,len:3028
+18:08:21.640 > entry 0x400805e4
+18:08:22.077 > 
+18:08:22.077 > Brownout detector was triggered
+18:08:22.080 > 
+18:08:22.080 > ets Jul 29 2019 12:21:46
+18:08:22.080 > 
+18:08:22.082 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:22.086 > configsip: 0, SPIWP:0xee
+18:08:22.089 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:22.094 > mode:DIO, clock div:2
+18:08:22.096 > load:0x3fff0030,len:1184
+18:08:22.099 > load:0x40078000,len:13232
+18:08:22.102 > load:0x40080400,len:3028
+18:08:22.105 > entry 0x400805e4
+18:08:22.541 > 
+18:08:22.542 > Brownout detector was triggered
+18:08:22.545 > 
+18:08:22.545 > ets Jul 29 2019 12:21:46
+18:08:22.545 > 
+18:08:22.548 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:22.551 > configsip: 0, SPIWP:0xee
+18:08:22.553 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:22.559 > mode:DIO, clock div:2
+18:08:22.562 > load:0x3fff0030,len:1184
+18:08:22.564 > load:0x40078000,len:13232
+18:08:22.567 > load:0x40080400,len:3028
+18:08:22.570 > entry 0x400805e4
+18:08:23.007 > 
+18:08:23.007 > Brownout detector was triggered
+18:08:23.010 > 
+18:08:23.010 > ets Jul 29 2019 12:21:46
+18:08:23.010 > 
+18:08:23.013 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:23.016 > configsip: 0, SPIWP:0xee
+18:08:23.018 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:23.024 > mode:DIO, clock div:2
+18:08:23.027 > load:0x3fff0030,len:1184
+18:08:23.029 > load:0x40078000,len:13232
+18:08:23.032 > load:0x40080400,len:3028
+18:08:23.035 > entry 0x400805e4
+18:08:23.472 > 
+18:08:23.473 > Brownout detector was triggered
+18:08:23.475 > 
+18:08:23.475 > ets Jul 29 2019 12:21:46
+18:08:23.475 > 
+18:08:23.478 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:23.481 > configsip: 0, SPIWP:0xee
+18:08:23.483 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:23.489 > mode:DIO, clock div:2
+18:08:23.491 > load:0x3fff0030,len:1184
+18:08:23.495 > load:0x40078000,len:13232
+18:08:23.498 > load:0x40080400,len:3028
+18:08:23.500 > entry 0x400805e4
+18:08:23.936 > 
+18:08:23.937 > Brownout detector was triggered
+18:08:23.940 > 
+18:08:23.940 > ets Jul 29 2019 12:21:46
+18:08:23.940 > 
+18:08:23.943 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:23.945 > configsip: 0, SPIWP:0xee
+18:08:23.948 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:23.954 > mode:DIO, clock div:2
+18:08:23.957 > load:0x3fff0030,len:1184
+18:08:23.959 > load:0x40078000,len:13232
+18:08:23.962 > load:0x40080400,len:3028
+18:08:23.965 > entry 0x400805e4
+18:08:24.402 > 
+18:08:24.402 > Brownout detector was triggered
+18:08:24.405 > 
+18:08:24.405 > ets Jul 29 2019 12:21:46
+18:08:24.405 > 
+18:08:24.409 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:24.411 > configsip: 0, SPIWP:0xee
+18:08:24.414 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:24.419 > mode:DIO, clock div:2
+18:08:24.422 > load:0x3fff0030,len:1184
+18:08:24.425 > load:0x40078000,len:13232
+18:08:24.427 > load:0x40080400,len:3028
+18:08:24.431 > entry 0x400805e4
+18:08:24.867 > 
+18:08:24.867 > Brownout detector was triggered
+18:08:24.871 > 
+18:08:24.871 > ets Jul 29 2019 12:21:46
+18:08:24.871 > 
+18:08:24.874 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:24.876 > configsip: 0, SPIWP:0xee
+18:08:24.879 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:24.884 > mode:DIO, clock div:2
+18:08:24.887 > load:0x3fff0030,len:1184
+18:08:24.889 > load:0x40078000,len:13232
+18:08:24.893 > load:0x40080400,len:3028
+18:08:24.896 > entry 0x400805e4
+18:08:25.332 > 
+18:08:25.332 > Brownout detector was triggered
+18:08:25.335 > 
+18:08:25.335 > ets Jul 29 2019 12:21:46
+18:08:25.335 > 
+18:08:25.338 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:25.340 > configsip: 0, SPIWP:0xee
+18:08:25.343 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:25.349 > mode:DIO, clock div:2
+18:08:25.352 > load:0x3fff0030,len:1184
+18:08:25.354 > load:0x40078000,len:13232
+18:08:25.357 > load:0x40080400,len:3028
+18:08:25.360 > entry 0x400805e4
+18:08:25.797 > 
+18:08:25.797 > Brownout detector was triggered
+18:08:25.800 > 
+18:08:25.800 > ets Jul 29 2019 12:21:46
+18:08:25.800 > 
+18:08:25.804 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:25.806 > configsip: 0, SPIWP:0xee
+18:08:25.809 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:25.814 > mode:DIO, clock div:2
+18:08:25.817 > load:0x3fff0030,len:1184
+18:08:25.820 > load:0x40078000,len:13232
+18:08:25.822 > load:0x40080400,len:3028
+18:08:25.826 > entry 0x400805e4
+18:08:26.262 > 
+18:08:26.262 > Brownout detector was triggered
+18:08:26.265 > 
+18:08:26.265 > ets Jul 29 2019 12:21:46
+18:08:26.265 > 
+18:08:26.268 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:26.270 > configsip: 0, SPIWP:0xee
+18:08:26.273 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:26.279 > mode:DIO, clock div:2
+18:08:26.282 > load:0x3fff0030,len:1184
+18:08:26.285 > load:0x40078000,len:13232
+18:08:26.287 > load:0x40080400,len:3028
+18:08:26.290 > entry 0x400805e4
+18:08:26.727 > 
+18:08:26.727 > Brownout detector was triggered
+18:08:26.730 > 
+18:08:26.730 > ets Jul 29 2019 12:21:46
+18:08:26.730 > 
+18:08:26.733 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:26.736 > configsip: 0, SPIWP:0xee
+18:08:26.737 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:26.743 > mode:DIO, clock div:2
+18:08:26.747 > load:0x3fff0030,len:1184
+18:08:26.749 > load:0x40078000,len:13232
+18:08:26.752 > load:0x40080400,len:3028
+18:08:26.755 > entry 0x400805e4
+18:08:27.164 > 
+18:08:27.164 > Brownout detector was triggered
+18:08:27.168 > 
+18:08:27.168 > ets Jul 29 2019 12:21:46
+18:08:27.168 > 
+18:08:27.170 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:27.173 > configsip: 0, SPIWP:0xee
+18:08:27.176 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:27.181 > mode:DIO, clock div:2
+18:08:27.184 > load:0x3fff0030,len:1184
+18:08:27.187 > load:0x40078000,len:13232
+18:08:27.190 > load:0x40080400,len:3028
+18:08:27.192 > entry 0x400805e4
+18:08:27.598 > 
+18:08:27.599 > Brownout detector was triggered
+18:08:27.602 > 
+18:08:27.602 > ets Jul 29 2019 12:21:46
+18:08:27.602 > 
+18:08:27.604 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:27.607 > configsip: 0, SPIWP:0xee
+18:08:27.610 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:27.616 > mode:DIO, clock div:2
+18:08:27.618 > load:0x3fff0030,len:1184
+18:08:27.621 > load:0x40078000,len:13232
+18:08:27.624 > load:0x40080400,len:3028
+18:08:27.627 > entry 0x400805e4
+18:08:28.063 > 
+18:08:28.064 > Brownout detector was triggered
+18:08:28.067 > 
+18:08:28.067 > ets Jul 29 2019 12:21:46
+18:08:28.067 > 
+18:08:28.070 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:28.073 > configsip: 0, SPIWP:0xee
+18:08:28.075 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:28.081 > mode:DIO, clock div:2
+18:08:28.083 > load:0x3fff0030,len:1184
+18:08:28.086 > load:0x40078000,len:13232
+18:08:28.089 > load:0x40080400,len:3028
+18:08:28.092 > entry 0x400805e4
+18:08:28.530 > 
+18:08:28.530 > Brownout detector was triggered
+18:08:28.533 > 
+18:08:28.533 > ets Jul 29 2019 12:21:46
+18:08:28.533 > 
+18:08:28.536 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:28.542 > configsip: 0, SPIWP:0xee
+18:08:28.542 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:28.546 > mode:DIO, clock div:2
+18:08:28.549 > load:0x3fff0030,len:1184
+18:08:28.552 > load:0x40078000,len:13232
+18:08:28.554 > load:0x40080400,len:3028
+18:08:28.557 > entry 0x400805e4
+18:08:28.995 > 
+18:08:28.996 > Brownout detector was triggered
+18:08:28.999 > 
+18:08:28.999 > ets Jul 29 2019 12:21:46
+18:08:28.999 > 
+18:08:29.002 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:29.004 > configsip: 0, SPIWP:0xee
+18:08:29.007 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:29.012 > mode:DIO, clock div:2
+18:08:29.015 > load:0x3fff0030,len:1184
+18:08:29.018 > load:0x40078000,len:13232
+18:08:29.021 > load:0x40080400,len:3028
+18:08:29.024 > entry 0x400805e4
+18:08:29.461 > 
+18:08:29.461 > Brownout detector was triggered
+18:08:29.464 > 
+18:08:29.464 > ets Jul 29 2019 12:21:46
+18:08:29.464 > 
+18:08:29.467 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:29.470 > configsip: 0, SPIWP:0xee
+18:08:29.472 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:29.478 > mode:DIO, clock div:2
+18:08:29.481 > load:0x3fff0030,len:1184
+18:08:29.483 > load:0x40078000,len:13232
+18:08:29.487 > load:0x40080400,len:3028
+18:08:29.490 > entry 0x400805e4
+18:08:29.926 > 
+18:08:29.926 > Brownout detector was triggered
+18:08:29.929 > 
+18:08:29.929 > ets Jul 29 2019 12:21:46
+18:08:29.929 > 
+18:08:29.932 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:29.935 > configsip: 0, SPIWP:0xee
+18:08:29.937 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:29.943 > mode:DIO, clock div:2
+18:08:29.946 > load:0x3fff0030,len:1184
+18:08:29.949 > load:0x40078000,len:13232
+18:08:29.951 > load:0x40080400,len:3028
+18:08:29.955 > entry 0x400805e4
+18:08:30.392 > 
+18:08:30.393 > Brownout detector was triggered
+18:08:30.395 > 
+18:08:30.395 > ets Jul 29 2019 12:21:46
+18:08:30.395 > 
+18:08:30.399 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:30.400 > configsip: 0, SPIWP:0xee
+18:08:30.403 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:30.411 > mode:DIO, clock div:2
+18:08:30.412 > load:0x3fff0030,len:1184
+18:08:30.414 > load:0x40078000,len:13232
+18:08:30.417 > load:0x40080400,len:3028
+18:08:30.420 > entry 0x400805e4
+18:08:30.857 > 
+18:08:30.857 > Brownout detector was triggered
+18:08:30.860 > 
+18:08:30.860 > ets Jul 29 2019 12:21:46
+18:08:30.860 > 
+18:08:30.863 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:30.865 > configsip: 0, SPIWP:0xee
+18:08:30.868 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:30.873 > mode:DIO, clock div:2
+18:08:30.876 > load:0x3fff0030,len:1184
+18:08:30.879 > load:0x40078000,len:13232
+18:08:30.881 > load:0x40080400,len:3028
+18:08:30.885 > entry 0x400805e4
+18:08:31.322 > 
+18:08:31.322 > Brownout detector was triggered
+18:08:31.325 > 
+18:08:31.325 > ets Jul 29 2019 12:21:46
+18:08:31.325 > 
+18:08:31.328 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:31.331 > configsip: 0, SPIWP:0xee
+18:08:31.333 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:31.339 > mode:DIO, clock div:2
+18:08:31.342 > load:0x3fff0030,len:1184
+18:08:31.345 > load:0x40078000,len:13232
+18:08:31.347 > load:0x40080400,len:3028
+18:08:31.350 > entry 0x400805e4
+18:08:31.786 > 
+18:08:31.787 > Brownout detector was triggered
+18:08:31.790 > 
+18:08:31.790 > ets Jul 29 2019 12:21:46
+18:08:31.790 > 
+18:08:31.793 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:31.796 > configsip: 0, SPIWP:0xee
+18:08:31.798 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:31.804 > mode:DIO, clock div:2
+18:08:31.807 > load:0x3fff0030,len:1184
+18:08:31.810 > load:0x40078000,len:13232
+18:08:31.812 > load:0x40080400,len:3028
+18:08:31.816 > entry 0x400805e4
+18:08:32.253 > 
+18:08:32.253 > Brownout detector was triggered
+18:08:32.257 > 
+18:08:32.257 > ets Jul 29 2019 12:21:46
+18:08:32.257 > 
+18:08:32.259 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:32.262 > configsip: 0, SPIWP:0xee
+18:08:32.264 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:32.270 > mode:DIO, clock div:2
+18:08:32.273 > load:0x3fff0030,len:1184
+18:08:32.276 > load:0x40078000,len:13232
+18:08:32.278 > load:0x40080400,len:3028
+18:08:32.281 > entry 0x400805e4
+18:08:32.718 > 
+18:08:32.718 > Brownout detector was triggered
+18:08:32.721 > 
+18:08:32.721 > ets Jul 29 2019 12:21:46
+18:08:32.721 > 
+18:08:32.724 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:32.726 > configsip: 0, SPIWP:0xee
+18:08:32.729 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:32.735 > mode:DIO, clock div:2
+18:08:32.738 > load:0x3fff0030,len:1184
+18:08:32.741 > load:0x40078000,len:13232
+18:08:32.744 > load:0x40080400,len:3028
+18:08:32.746 > entry 0x400805e4
+18:08:33.183 > 
+18:08:33.183 > Brownout detector was triggered
+18:08:33.186 > 
+18:08:33.186 > ets Jul 29 2019 12:21:46
+18:08:33.186 > 
+18:08:33.188 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:33.191 > configsip: 0, SPIWP:0xee
+18:08:33.193 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:33.199 > mode:DIO, clock div:2
+18:08:33.202 > load:0x3fff0030,len:1184
+18:08:33.204 > load:0x40078000,len:13232
+18:08:33.207 > load:0x40080400,len:3028
+18:08:33.210 > entry 0x400805e4
+18:08:33.647 > 
+18:08:33.648 > Brownout detector was triggered
+18:08:33.651 > 
+18:08:33.651 > ets Jul 29 2019 12:21:46
+18:08:33.651 > 
+18:08:33.654 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:33.656 > configsip: 0, SPIWP:0xee
+18:08:33.659 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:33.665 > mode:DIO, clock div:2
+18:08:33.668 > load:0x3fff0030,len:1184
+18:08:33.670 > load:0x40078000,len:13232
+18:08:33.673 > load:0x40080400,len:3028
+18:08:33.676 > entry 0x400805e4
+18:08:34.112 > 
+18:08:34.112 > Brownout detector was triggered
+18:08:34.115 > 
+18:08:34.115 > ets Jul 29 2019 12:21:46
+18:08:34.115 > 
+18:08:34.118 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:34.121 > configsip: 0, SPIWP:0xee
+18:08:34.123 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:34.129 > mode:DIO, clock div:2
+18:08:34.132 > load:0x3fff0030,len:1184
+18:08:34.134 > load:0x40078000,len:13232
+18:08:34.137 > load:0x40080400,len:3028
+18:08:34.141 > entry 0x400805e4
+18:08:34.577 > 
+18:08:34.578 > Brownout detector was triggered
+18:08:34.581 > 
+18:08:34.581 > ets Jul 29 2019 12:21:46
+18:08:34.581 > 
+18:08:34.583 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:34.586 > configsip: 0, SPIWP:0xee
+18:08:34.589 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:34.594 > mode:DIO, clock div:2
+18:08:34.597 > load:0x3fff0030,len:1184
+18:08:34.600 > load:0x40078000,len:13232
+18:08:34.602 > load:0x40080400,len:3028
+18:08:34.605 > entry 0x400805e4
+18:08:35.041 > 
+18:08:35.042 > Brownout detector was triggered
+18:08:35.044 > 
+18:08:35.044 > ets Jul 29 2019 12:21:46
+18:08:35.044 > 
+18:08:35.047 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:35.050 > configsip: 0, SPIWP:0xee
+18:08:35.053 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:35.059 > mode:DIO, clock div:2
+18:08:35.062 > load:0x3fff0030,len:1184
+18:08:35.064 > load:0x40078000,len:13232
+18:08:35.067 > load:0x40080400,len:3028
+18:08:35.070 > entry 0x400805e4
+18:08:35.506 > 
+18:08:35.506 > Brownout detector was triggered
+18:08:35.509 > 
+18:08:35.509 > ets Jul 29 2019 12:21:46
+18:08:35.509 > 
+18:08:35.512 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:35.514 > configsip: 0, SPIWP:0xee
+18:08:35.517 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:35.523 > mode:DIO, clock div:2
+18:08:35.526 > load:0x3fff0030,len:1184
+18:08:35.528 > load:0x40078000,len:13232
+18:08:35.531 > load:0x40080400,len:3028
+18:08:35.534 > entry 0x400805e4
+18:08:35.971 > 
+18:08:35.971 > Brownout detector was triggered
+18:08:35.975 > 
+18:08:35.975 > ets Jul 29 2019 12:21:46
+18:08:35.975 > 
+18:08:35.978 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:35.980 > configsip: 0, SPIWP:0xee
+18:08:35.982 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:35.988 > mode:DIO, clock div:2
+18:08:35.991 > load:0x3fff0030,len:1184
+18:08:35.994 > load:0x40078000,len:13232
+18:08:35.997 > load:0x40080400,len:3028
+18:08:35.999 > entry 0x400805e4
+18:08:36.435 > 
+18:08:36.435 > Brownout detector was triggered
+18:08:36.439 > 
+18:08:36.439 > ets Jul 29 2019 12:21:46
+18:08:36.439 > 
+18:08:36.442 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:36.445 > configsip: 0, SPIWP:0xee
+18:08:36.447 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:36.452 > mode:DIO, clock div:2
+18:08:36.455 > load:0x3fff0030,len:1184
+18:08:36.459 > load:0x40078000,len:13232
+18:08:36.461 > load:0x40080400,len:3028
+18:08:36.465 > entry 0x400805e4
+18:08:36.901 > 
+18:08:36.901 > Brownout detector was triggered
+18:08:36.904 > 
+18:08:36.904 > ets Jul 29 2019 12:21:46
+18:08:36.904 > 
+18:08:36.907 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:36.910 > configsip: 0, SPIWP:0xee
+18:08:36.912 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:36.918 > mode:DIO, clock div:2
+18:08:36.920 > load:0x3fff0030,len:1184
+18:08:36.924 > load:0x40078000,len:13232
+18:08:36.926 > load:0x40080400,len:3028
+18:08:36.929 > entry 0x400805e4
+18:08:37.366 > 
+18:08:37.366 > Brownout detector was triggered
+18:08:37.369 > 
+18:08:37.369 > ets Jul 29 2019 12:21:46
+18:08:37.369 > 
+18:08:37.371 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:37.374 > configsip: 0, SPIWP:0xee
+18:08:37.377 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:37.382 > mode:DIO, clock div:2
+18:08:37.385 > load:0x3fff0030,len:1184
+18:08:37.387 > load:0x40078000,len:13232
+18:08:37.391 > load:0x40080400,len:3028
+18:08:37.394 > entry 0x400805e4
+18:08:37.830 > 
+18:08:37.830 > Brownout detector was triggered
+18:08:37.834 > 
+18:08:37.834 > ets Jul 29 2019 12:21:46
+18:08:37.834 > 
+18:08:37.837 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:37.839 > configsip: 0, SPIWP:0xee
+18:08:37.841 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:37.848 > mode:DIO, clock div:2
+18:08:37.849 > load:0x3fff0030,len:1184
+18:08:37.853 > load:0x40078000,len:13232
+18:08:37.856 > load:0x40080400,len:3028
+18:08:37.859 > entry 0x400805e4
+18:08:38.295 > 
+18:08:38.295 > Brownout detector was triggered
+18:08:38.298 > 
+18:08:38.298 > ets Jul 29 2019 12:21:46
+18:08:38.298 > 
+18:08:38.301 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:38.304 > configsip: 0, SPIWP:0xee
+18:08:38.307 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:38.312 > mode:DIO, clock div:2
+18:08:38.315 > load:0x3fff0030,len:1184
+18:08:38.318 > load:0x40078000,len:13232
+18:08:38.320 > load:0x40080400,len:3028
+18:08:38.323 > entry 0x400805e4
+18:08:38.759 > 
+18:08:38.760 > Brownout detector was triggered
+18:08:38.763 > 
+18:08:38.763 > ets Jul 29 2019 12:21:46
+18:08:38.763 > 
+18:08:38.766 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:38.769 > configsip: 0, SPIWP:0xee
+18:08:38.771 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:38.777 > mode:DIO, clock div:2
+18:08:38.779 > load:0x3fff0030,len:1184
+18:08:38.782 > load:0x40078000,len:13232
+18:08:38.785 > load:0x40080400,len:3028
+18:08:38.788 > entry 0x400805e4
+18:08:39.224 > 
+18:08:39.224 > Brownout detector was triggered
+18:08:39.227 > 
+18:08:39.227 > ets Jul 29 2019 12:21:46
+18:08:39.227 > 
+18:08:39.230 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:39.233 > configsip: 0, SPIWP:0xee
+18:08:39.236 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:39.241 > mode:DIO, clock div:2
+18:08:39.244 > load:0x3fff0030,len:1184
+18:08:39.246 > load:0x40078000,len:13232
+18:08:39.250 > load:0x40080400,len:3028
+18:08:39.253 > entry 0x400805e4
+18:08:39.689 > 
+18:08:39.689 > Brownout detector was triggered
+18:08:39.692 > 
+18:08:39.692 > ets Jul 29 2019 12:21:46
+18:08:39.692 > 
+18:08:39.695 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:39.697 > configsip: 0, SPIWP:0xee
+18:08:39.701 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:39.706 > mode:DIO, clock div:2
+18:08:39.709 > load:0x3fff0030,len:1184
+18:08:39.712 > load:0x40078000,len:13232
+18:08:39.715 > load:0x40080400,len:3028
+18:08:39.718 > entry 0x400805e4
+18:08:40.154 > 
+18:08:40.154 > Brownout detector was triggered
+18:08:40.158 > 
+18:08:40.158 > ets Jul 29 2019 12:21:46
+18:08:40.158 > 
+18:08:40.160 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:40.163 > configsip: 0, SPIWP:0xee
+18:08:40.165 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:40.171 > mode:DIO, clock div:2
+18:08:40.174 > load:0x3fff0030,len:1184
+18:08:40.177 > load:0x40078000,len:13232
+18:08:40.179 > load:0x40080400,len:3028
+18:08:40.182 > entry 0x400805e4
+18:08:40.618 > 
+18:08:40.619 > Brownout detector was triggered
+18:08:40.622 > 
+18:08:40.622 > ets Jul 29 2019 12:21:46
+18:08:40.622 > 
+18:08:40.625 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:40.627 > configsip: 0, SPIWP:0xee
+18:08:40.630 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:40.635 > mode:DIO, clock div:2
+18:08:40.638 > load:0x3fff0030,len:1184
+18:08:40.641 > load:0x40078000,len:13232
+18:08:40.644 > load:0x40080400,len:3028
+18:08:40.647 > entry 0x400805e4
+18:08:41.083 > 
+18:08:41.083 > Brownout detector was triggered
+18:08:41.086 > 
+18:08:41.086 > ets Jul 29 2019 12:21:46
+18:08:41.086 > 
+18:08:41.089 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:41.092 > configsip: 0, SPIWP:0xee
+18:08:41.095 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:41.100 > mode:DIO, clock div:2
+18:08:41.103 > load:0x3fff0030,len:1184
+18:08:41.106 > load:0x40078000,len:13232
+18:08:41.110 > load:0x40080400,len:3028
+18:08:41.111 > entry 0x400805e4
+18:08:41.548 > 
+18:08:41.549 > Brownout detector was triggered
+18:08:41.551 > 
+18:08:41.551 > ets Jul 29 2019 12:21:46
+18:08:41.551 > 
+18:08:41.554 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:41.557 > configsip: 0, SPIWP:0xee
+18:08:41.559 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:41.565 > mode:DIO, clock div:2
+18:08:41.568 > load:0x3fff0030,len:1184
+18:08:41.571 > load:0x40078000,len:13232
+18:08:41.574 > load:0x40080400,len:3028
+18:08:41.577 > entry 0x400805e4
+18:08:42.013 > 
+18:08:42.013 > Brownout detector was triggered
+18:08:42.015 > 
+18:08:42.015 > ets Jul 29 2019 12:21:46
+18:08:42.015 > 
+18:08:42.019 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:42.021 > configsip: 0, SPIWP:0xee
+18:08:42.024 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:42.030 > mode:DIO, clock div:2
+18:08:42.032 > load:0x3fff0030,len:1184
+18:08:42.035 > load:0x40078000,len:13232
+18:08:42.038 > load:0x40080400,len:3028
+18:08:42.041 > entry 0x400805e4
+18:08:42.477 > 
+18:08:42.477 > Brownout detector was triggered
+18:08:42.481 > 
+18:08:42.481 > ets Jul 29 2019 12:21:46
+18:08:42.481 > 
+18:08:42.484 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:42.486 > configsip: 0, SPIWP:0xee
+18:08:42.488 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:42.495 > mode:DIO, clock div:2
+18:08:42.498 > load:0x3fff0030,len:1184
+18:08:42.500 > load:0x40078000,len:13232
+18:08:42.504 > load:0x40080400,len:3028
+18:08:42.506 > entry 0x400805e4
+18:08:42.942 > 
+18:08:42.943 > Brownout detector was triggered
+18:08:42.946 > 
+18:08:42.946 > ets Jul 29 2019 12:21:46
+18:08:42.946 > 
+18:08:42.948 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:42.951 > configsip: 0, SPIWP:0xee
+18:08:42.953 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:42.959 > mode:DIO, clock div:2
+18:08:42.962 > load:0x3fff0030,len:1184
+18:08:42.964 > load:0x40078000,len:13232
+18:08:42.967 > load:0x40080400,len:3028
+18:08:42.971 > entry 0x400805e4
+18:08:43.407 > 
+18:08:43.407 > Brownout detector was triggered
+18:08:43.410 > 
+18:08:43.410 > ets Jul 29 2019 12:21:46
+18:08:43.410 > 
+18:08:43.413 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:43.416 > configsip: 0, SPIWP:0xee
+18:08:43.418 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:43.424 > mode:DIO, clock div:2
+18:08:43.426 > load:0x3fff0030,len:1184
+18:08:43.430 > load:0x40078000,len:13232
+18:08:43.432 > load:0x40080400,len:3028
+18:08:43.435 > entry 0x400805e4
+18:08:43.871 > 
+18:08:43.871 > Brownout detector was triggered
+18:08:43.874 > 
+18:08:43.874 > ets Jul 29 2019 12:21:46
+18:08:43.874 > 
+18:08:43.877 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:43.880 > configsip: 0, SPIWP:0xee
+18:08:43.883 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:43.888 > mode:DIO, clock div:2
+18:08:43.891 > load:0x3fff0030,len:1184
+18:08:43.893 > load:0x40078000,len:13232
+18:08:43.896 > load:0x40080400,len:3028
+18:08:43.899 > entry 0x400805e4
+18:08:44.336 > 
+18:08:44.337 > Brownout detector was triggered
+18:08:44.340 > 
+18:08:44.340 > ets Jul 29 2019 12:21:46
+18:08:44.340 > 
+18:08:44.343 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:44.345 > configsip: 0, SPIWP:0xee
+18:08:44.348 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:44.354 > mode:DIO, clock div:2
+18:08:44.356 > load:0x3fff0030,len:1184
+18:08:44.359 > load:0x40078000,len:13232
+18:08:44.361 > load:0x40080400,len:3028
+18:08:44.365 > entry 0x400805e4
+18:08:44.801 > 
+18:08:44.801 > Brownout detector was triggered
+18:08:44.805 > 
+18:08:44.805 > ets Jul 29 2019 12:21:46
+18:08:44.805 > 
+18:08:44.807 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:44.810 > configsip: 0, SPIWP:0xee
+18:08:44.813 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:44.818 > mode:DIO, clock div:2
+18:08:44.821 > load:0x3fff0030,len:1184
+18:08:44.824 > load:0x40078000,len:13232
+18:08:44.826 > load:0x40080400,len:3028
+18:08:44.829 > entry 0x400805e4
+18:08:45.266 > 
+18:08:45.266 > Brownout detector was triggered
+18:08:45.269 > 
+18:08:45.269 > ets Jul 29 2019 12:21:46
+18:08:45.269 > 
+18:08:45.272 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:45.274 > configsip: 0, SPIWP:0xee
+18:08:45.277 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:45.283 > mode:DIO, clock div:2
+18:08:45.285 > load:0x3fff0030,len:1184
+18:08:45.288 > load:0x40078000,len:13232
+18:08:45.291 > load:0x40080400,len:3028
+18:08:45.294 > entry 0x400805e4
+18:08:45.729 > 
+18:08:45.730 > Brownout detector was triggered
+18:08:45.734 > 
+18:08:45.734 > ets Jul 29 2019 12:21:46
+18:08:45.734 > 
+18:08:45.737 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:45.740 > configsip: 0, SPIWP:0xee
+18:08:45.742 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:45.748 > mode:DIO, clock div:2
+18:08:45.751 > load:0x3fff0030,len:1184
+18:08:45.753 > load:0x40078000,len:13232
+18:08:45.756 > load:0x40080400,len:3028
+18:08:45.759 > entry 0x400805e4
+18:08:46.195 > 
+18:08:46.195 > Brownout detector was triggered
+18:08:46.199 > 
+18:08:46.199 > ets Jul 29 2019 12:21:46
+18:08:46.199 > 
+18:08:46.201 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:46.204 > configsip: 0, SPIWP:0xee
+18:08:46.206 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:46.212 > mode:DIO, clock div:2
+18:08:46.215 > load:0x3fff0030,len:1184
+18:08:46.217 > load:0x40078000,len:13232
+18:08:46.220 > load:0x40080400,len:3028
+18:08:46.223 > entry 0x400805e4
+18:08:46.660 > 
+18:08:46.660 > Brownout detector was triggered
+18:08:46.663 > 
+18:08:46.663 > ets Jul 29 2019 12:21:46
+18:08:46.663 > 
+18:08:46.666 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:46.668 > configsip: 0, SPIWP:0xee
+18:08:46.671 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:46.677 > mode:DIO, clock div:2
+18:08:46.680 > load:0x3fff0030,len:1184
+18:08:46.682 > load:0x40078000,len:13232
+18:08:46.685 > load:0x40080400,len:3028
+18:08:46.689 > entry 0x400805e4
+18:08:47.124 > 
+18:08:47.124 > Brownout detector was triggered
+18:08:47.129 > 
+18:08:47.129 > ets Jul 29 2019 12:21:46
+18:08:47.129 > 
+18:08:47.131 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:47.133 > configsip: 0, SPIWP:0xee
+18:08:47.135 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:47.141 > mode:DIO, clock div:2
+18:08:47.144 > load:0x3fff0030,len:1184
+18:08:47.148 > load:0x40078000,len:13232
+18:08:47.150 > load:0x40080400,len:3028
+18:08:47.154 > entry 0x400805e4
+18:08:47.589 > 
+18:08:47.590 > Brownout detector was triggered
+18:08:47.593 > 
+18:08:47.593 > ets Jul 29 2019 12:21:46
+18:08:47.593 > 
+18:08:47.596 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:47.599 > configsip: 0, SPIWP:0xee
+18:08:47.601 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:47.606 > mode:DIO, clock div:2
+18:08:47.609 > load:0x3fff0030,len:1184
+18:08:47.612 > load:0x40078000,len:13232
+18:08:47.615 > load:0x40080400,len:3028
+18:08:47.618 > entry 0x400805e4
+18:08:48.054 > 
+18:08:48.054 > Brownout detector was triggered
+18:08:48.058 > 
+18:08:48.058 > ets Jul 29 2019 12:21:46
+18:08:48.058 > 
+18:08:48.061 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:48.063 > configsip: 0, SPIWP:0xee
+18:08:48.066 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:48.071 > mode:DIO, clock div:2
+18:08:48.076 > load:0x3fff0030,len:1184
+18:08:48.076 > load:0x40078000,len:13232
+18:08:48.080 > load:0x40080400,len:3028
+18:08:48.082 > entry 0x400805e4
+18:08:48.519 > 
+18:08:48.519 > Brownout detector was triggered
+18:08:48.522 > 
+18:08:48.522 > ets Jul 29 2019 12:21:46
+18:08:48.522 > 
+18:08:48.524 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:48.527 > configsip: 0, SPIWP:0xee
+18:08:48.530 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:48.536 > mode:DIO, clock div:2
+18:08:48.538 > load:0x3fff0030,len:1184
+18:08:48.542 > load:0x40078000,len:13232
+18:08:48.544 > load:0x40080400,len:3028
+18:08:48.546 > entry 0x400805e4
+18:08:48.958 > 
+18:08:48.959 > Brownout detector was triggered
+18:08:48.962 > 
+18:08:48.962 > ets Jul 29 2019 12:21:46
+18:08:48.962 > 
+18:08:48.964 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:48.967 > configsip: 0, SPIWP:0xee
+18:08:48.970 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:48.975 > mode:DIO, clock div:2
+18:08:48.978 > load:0x3fff0030,len:1184
+18:08:48.981 > load:0x40078000,len:13232
+18:08:48.984 > load:0x40080400,len:3028
+18:08:48.987 > entry 0x400805e4
+18:08:49.423 > 
+18:08:49.423 > Brownout detector was triggered
+18:08:49.426 > 
+18:08:49.426 > ets Jul 29 2019 12:21:46
+18:08:49.426 > 
+18:08:49.429 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:49.431 > configsip: 0, SPIWP:0xee
+18:08:49.434 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:49.440 > mode:DIO, clock div:2
+18:08:49.442 > load:0x3fff0030,len:1184
+18:08:49.445 > load:0x40078000,len:13232
+18:08:49.448 > load:0x40080400,len:3028
+18:08:49.451 > entry 0x400805e4
+18:08:49.888 > 
+18:08:49.888 > Brownout detector was triggered
+18:08:49.891 > 
+18:08:49.891 > ets Jul 29 2019 12:21:46
+18:08:49.891 > 
+18:08:49.894 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:49.896 > configsip: 0, SPIWP:0xee
+18:08:49.899 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:49.904 > mode:DIO, clock div:2
+18:08:49.908 > load:0x3fff0030,len:1184
+18:08:49.910 > load:0x40078000,len:13232
+18:08:49.912 > load:0x40080400,len:3028
+18:08:49.916 > entry 0x400805e4
+18:08:50.353 > 
+18:08:50.353 > Brownout detector was triggered
+18:08:50.356 > 
+18:08:50.356 > ets Jul 29 2019 12:21:46
+18:08:50.356 > 
+18:08:50.359 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:50.361 > configsip: 0, SPIWP:0xee
+18:08:50.364 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:50.369 > mode:DIO, clock div:2
+18:08:50.372 > load:0x3fff0030,len:1184
+18:08:50.375 > load:0x40078000,len:13232
+18:08:50.377 > load:0x40080400,len:3028
+18:08:50.381 > entry 0x400805e4
+18:08:50.817 > 
+18:08:50.817 > Brownout detector was triggered
+18:08:50.820 > 
+18:08:50.820 > ets Jul 29 2019 12:21:46
+18:08:50.820 > 
+18:08:50.823 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:50.826 > configsip: 0, SPIWP:0xee
+18:08:50.829 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:50.834 > mode:DIO, clock div:2
+18:08:50.837 > load:0x3fff0030,len:1184
+18:08:50.840 > load:0x40078000,len:13232
+18:08:50.843 > load:0x40080400,len:3028
+18:08:50.846 > entry 0x400805e4
+18:08:51.282 > 
+18:08:51.285 > Brownout detector was triggered
+18:08:51.285 > 
+18:08:51.285 > ets Jul 29 2019 12:21:46
+18:08:51.285 > 
+18:08:51.288 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:51.291 > configsip: 0, SPIWP:0xee
+18:08:51.294 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:51.299 > mode:DIO, clock div:2
+18:08:51.302 > load:0x3fff0030,len:1184
+18:08:51.304 > load:0x40078000,len:13232
+18:08:51.307 > load:0x40080400,len:3028
+18:08:51.310 > entry 0x400805e4
+18:08:51.747 > 
+18:08:51.747 > Brownout detector was triggered
+18:08:51.750 > 
+18:08:51.750 > ets Jul 29 2019 12:21:46
+18:08:51.750 > 
+18:08:51.754 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:51.755 > configsip: 0, SPIWP:0xee
+18:08:51.759 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:51.764 > mode:DIO, clock div:2
+18:08:51.766 > load:0x3fff0030,len:1184
+18:08:51.769 > load:0x40078000,len:13232
+18:08:51.773 > load:0x40080400,len:3028
+18:08:51.775 > entry 0x400805e4
+18:08:52.210 > 
+18:08:52.211 > Brownout detector was triggered
+18:08:52.215 > 
+18:08:52.215 > ets Jul 29 2019 12:21:46
+18:08:52.215 > 
+18:08:52.218 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:52.220 > configsip: 0, SPIWP:0xee
+18:08:52.223 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:52.229 > mode:DIO, clock div:2
+18:08:52.231 > load:0x3fff0030,len:1184
+18:08:52.237 > load:0x40078000,len:13232
+18:08:52.237 > load:0x40080400,len:3028
+18:08:52.240 > entry 0x400805e4
+18:08:52.676 > 
+18:08:52.676 > Brownout detector was triggered
+18:08:52.680 > 
+18:08:52.680 > ets Jul 29 2019 12:21:46
+18:08:52.680 > 
+18:08:52.682 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:52.685 > configsip: 0, SPIWP:0xee
+18:08:52.687 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:52.693 > mode:DIO, clock div:2
+18:08:52.695 > load:0x3fff0030,len:1184
+18:08:52.699 > load:0x40078000,len:13232
+18:08:52.702 > load:0x40080400,len:3028
+18:08:52.704 > entry 0x400805e4
+18:08:53.141 > 
+18:08:53.141 > Brownout detector was triggered
+18:08:53.144 > 
+18:08:53.144 > ets Jul 29 2019 12:21:46
+18:08:53.144 > 
+18:08:53.146 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:53.150 > configsip: 0, SPIWP:0xee
+18:08:53.153 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:53.158 > mode:DIO, clock div:2
+18:08:53.161 > load:0x3fff0030,len:1184
+18:08:53.164 > load:0x40078000,len:13232
+18:08:53.166 > load:0x40080400,len:3028
+18:08:53.169 > entry 0x400805e4
+18:08:53.605 > 
+18:08:53.605 > Brownout detector was triggered
+18:08:53.609 > 
+18:08:53.609 > ets Jul 29 2019 12:21:46
+18:08:53.609 > 
+18:08:53.612 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:53.614 > configsip: 0, SPIWP:0xee
+18:08:53.617 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:53.623 > mode:DIO, clock div:2
+18:08:53.625 > load:0x3fff0030,len:1184
+18:08:53.628 > load:0x40078000,len:13232
+18:08:53.631 > load:0x40080400,len:3028
+18:08:53.634 > entry 0x400805e4
+18:08:54.071 > 
+18:08:54.071 > Brownout detector was triggered
+18:08:54.075 > 
+18:08:54.075 > ets Jul 29 2019 12:21:46
+18:08:54.075 > 
+18:08:54.077 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:54.080 > configsip: 0, SPIWP:0xee
+18:08:54.083 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:54.088 > mode:DIO, clock div:2
+18:08:54.091 > load:0x3fff0030,len:1184
+18:08:54.094 > load:0x40078000,len:13232
+18:08:54.097 > load:0x40080400,len:3028
+18:08:54.099 > entry 0x400805e4
+18:08:54.536 > 
+18:08:54.536 > Brownout detector was triggered
+18:08:54.539 > 
+18:08:54.539 > ets Jul 29 2019 12:21:46
+18:08:54.539 > 
+18:08:54.542 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:54.544 > configsip: 0, SPIWP:0xee
+18:08:54.548 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:54.553 > mode:DIO, clock div:2
+18:08:54.556 > load:0x3fff0030,len:1184
+18:08:54.558 > load:0x40078000,len:13232
+18:08:54.561 > load:0x40080400,len:3028
+18:08:54.564 > entry 0x400805e4
+18:08:55.001 > 
+18:08:55.001 > Brownout detector was triggered
+18:08:55.004 > 
+18:08:55.004 > ets Jul 29 2019 12:21:46
+18:08:55.004 > 
+18:08:55.006 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:55.010 > configsip: 0, SPIWP:0xee
+18:08:55.012 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:55.018 > mode:DIO, clock div:2
+18:08:55.021 > load:0x3fff0030,len:1184
+18:08:55.023 > load:0x40078000,len:13232
+18:08:55.026 > load:0x40080400,len:3028
+18:08:55.029 > entry 0x400805e4
+18:08:55.466 > 
+18:08:55.466 > Brownout detector was triggered
+18:08:55.470 > 
+18:08:55.470 > ets Jul 29 2019 12:21:46
+18:08:55.470 > 
+18:08:55.472 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:55.475 > configsip: 0, SPIWP:0xee
+18:08:55.478 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:55.483 > mode:DIO, clock div:2
+18:08:55.486 > load:0x3fff0030,len:1184
+18:08:55.489 > load:0x40078000,len:13232
+18:08:55.492 > load:0x40080400,len:3028
+18:08:55.495 > entry 0x400805e4
+18:08:55.931 > 
+18:08:55.931 > Brownout detector was triggered
+18:08:55.935 > 
+18:08:55.935 > ets Jul 29 2019 12:21:46
+18:08:55.935 > 
+18:08:55.938 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:55.940 > configsip: 0, SPIWP:0xee
+18:08:55.943 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:55.948 > mode:DIO, clock div:2
+18:08:55.951 > load:0x3fff0030,len:1184
+18:08:55.954 > load:0x40078000,len:13232
+18:08:55.957 > load:0x40080400,len:3028
+18:08:55.960 > entry 0x400805e4
+18:08:56.397 > 
+18:08:56.397 > Brownout detector was triggered
+18:08:56.400 > 
+18:08:56.400 > ets Jul 29 2019 12:21:46
+18:08:56.400 > 
+18:08:56.403 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:56.406 > configsip: 0, SPIWP:0xee
+18:08:56.409 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:56.414 > mode:DIO, clock div:2
+18:08:56.417 > load:0x3fff0030,len:1184
+18:08:56.420 > load:0x40078000,len:13232
+18:08:56.423 > load:0x40080400,len:3028
+18:08:56.425 > entry 0x400805e4
+18:08:56.861 > 
+18:08:56.862 > Brownout detector was triggered
+18:08:56.865 > 
+18:08:56.865 > ets Jul 29 2019 12:21:46
+18:08:56.865 > 
+18:08:56.868 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:56.870 > configsip: 0, SPIWP:0xee
+18:08:56.873 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:56.879 > mode:DIO, clock div:2
+18:08:56.881 > load:0x3fff0030,len:1184
+18:08:56.884 > load:0x40078000,len:13232
+18:08:56.887 > load:0x40080400,len:3028
+18:08:56.890 > entry 0x400805e4
+18:08:57.327 > 
+18:08:57.327 > Brownout detector was triggered
+18:08:57.330 > 
+18:08:57.330 > ets Jul 29 2019 12:21:46
+18:08:57.330 > 
+18:08:57.333 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:57.336 > configsip: 0, SPIWP:0xee
+18:08:57.339 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:57.344 > mode:DIO, clock div:2
+18:08:57.346 > load:0x3fff0030,len:1184
+18:08:57.349 > load:0x40078000,len:13232
+18:08:57.352 > load:0x40080400,len:3028
+18:08:57.355 > entry 0x400805e4
+18:08:57.792 > 
+18:08:57.792 > Brownout detector was triggered
+18:08:57.795 > 
+18:08:57.795 > ets Jul 29 2019 12:21:46
+18:08:57.795 > 
+18:08:57.798 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:57.800 > configsip: 0, SPIWP:0xee
+18:08:57.804 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:57.809 > mode:DIO, clock div:2
+18:08:57.811 > load:0x3fff0030,len:1184
+18:08:57.814 > load:0x40078000,len:13232
+18:08:57.817 > load:0x40080400,len:3028
+18:08:57.820 > entry 0x400805e4
+18:08:58.257 > 
+18:08:58.257 > Brownout detector was triggered
+18:08:58.260 > 
+18:08:58.260 > ets Jul 29 2019 12:21:46
+18:08:58.260 > 
+18:08:58.264 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:58.265 > configsip: 0, SPIWP:0xee
+18:08:58.268 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:58.273 > mode:DIO, clock div:2
+18:08:58.277 > load:0x3fff0030,len:1184
+18:08:58.279 > load:0x40078000,len:13232
+18:08:58.281 > load:0x40080400,len:3028
+18:08:58.284 > entry 0x400805e4
+18:08:58.720 > 
+18:08:58.720 > Brownout detector was triggered
+18:08:58.724 > 
+18:08:58.724 > ets Jul 29 2019 12:21:46
+18:08:58.724 > 
+18:08:58.726 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:58.729 > configsip: 0, SPIWP:0xee
+18:08:58.732 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:58.738 > mode:DIO, clock div:2
+18:08:58.740 > load:0x3fff0030,len:1184
+18:08:58.744 > load:0x40078000,len:13232
+18:08:58.746 > load:0x40080400,len:3028
+18:08:58.750 > entry 0x400805e4
+18:08:59.186 > 
+18:08:59.186 > Brownout detector was triggered
+18:08:59.190 > 
+18:08:59.190 > ets Jul 29 2019 12:21:46
+18:08:59.190 > 
+18:08:59.192 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:59.195 > configsip: 0, SPIWP:0xee
+18:08:59.198 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:59.203 > mode:DIO, clock div:2
+18:08:59.206 > load:0x3fff0030,len:1184
+18:08:59.209 > load:0x40078000,len:13232
+18:08:59.211 > load:0x40080400,len:3028
+18:08:59.214 > entry 0x400805e4
+18:08:59.650 > 
+18:08:59.651 > Brownout detector was triggered
+18:08:59.654 > 
+18:08:59.654 > ets Jul 29 2019 12:21:46
+18:08:59.654 > 
+18:08:59.657 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:08:59.659 > configsip: 0, SPIWP:0xee
+18:08:59.662 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:08:59.668 > mode:DIO, clock div:2
+18:08:59.670 > load:0x3fff0030,len:1184
+18:08:59.673 > load:0x40078000,len:13232
+18:08:59.676 > load:0x40080400,len:3028
+18:08:59.679 > entry 0x400805e4
+18:09:00.115 > 
+18:09:00.115 > Brownout detector was triggered
+18:09:00.119 > 
+18:09:00.119 > ets Jul 29 2019 12:21:46
+18:09:00.119 > 
+18:09:00.121 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:00.124 > configsip: 0, SPIWP:0xee
+18:09:00.127 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:00.133 > mode:DIO, clock div:2
+18:09:00.135 > load:0x3fff0030,len:1184
+18:09:00.138 > load:0x40078000,len:13232
+18:09:00.141 > load:0x40080400,len:3028
+18:09:00.144 > entry 0x400805e4
+18:09:00.581 > 
+18:09:00.581 > Brownout detector was triggered
+18:09:00.584 > 
+18:09:00.584 > ets Jul 29 2019 12:21:46
+18:09:00.584 > 
+18:09:00.587 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:00.590 > configsip: 0, SPIWP:0xee
+18:09:00.593 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:00.598 > mode:DIO, clock div:2
+18:09:00.601 > load:0x3fff0030,len:1184
+18:09:00.604 > load:0x40078000,len:13232
+18:09:00.606 > load:0x40080400,len:3028
+18:09:00.610 > entry 0x400805e4
+18:09:01.045 > 
+18:09:01.045 > Brownout detector was triggered
+18:09:01.049 > 
+18:09:01.049 > ets Jul 29 2019 12:21:46
+18:09:01.049 > 
+18:09:01.051 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:01.054 > configsip: 0, SPIWP:0xee
+18:09:01.057 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:01.063 > mode:DIO, clock div:2
+18:09:01.065 > load:0x3fff0030,len:1184
+18:09:01.068 > load:0x40078000,len:13232
+18:09:01.071 > load:0x40080400,len:3028
+18:09:01.074 > entry 0x400805e4
+18:09:01.510 > 
+18:09:01.510 > Brownout detector was triggered
+18:09:01.514 > 
+18:09:01.514 > ets Jul 29 2019 12:21:46
+18:09:01.514 > 
+18:09:01.516 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:01.521 > configsip: 0, SPIWP:0xee
+18:09:01.522 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:01.528 > mode:DIO, clock div:2
+18:09:01.531 > load:0x3fff0030,len:1184
+18:09:01.533 > load:0x40078000,len:13232
+18:09:01.535 > load:0x40080400,len:3028
+18:09:01.539 > entry 0x400805e4
+18:09:01.975 > 
+18:09:01.975 > Brownout detector was triggered
+18:09:01.979 > 
+18:09:01.979 > ets Jul 29 2019 12:21:46
+18:09:01.979 > 
+18:09:01.982 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:01.984 > configsip: 0, SPIWP:0xee
+18:09:01.987 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:01.992 > mode:DIO, clock div:2
+18:09:01.995 > load:0x3fff0030,len:1184
+18:09:01.998 > load:0x40078000,len:13232
+18:09:02.001 > load:0x40080400,len:3028
+18:09:02.004 > entry 0x400805e4
+18:09:02.440 > 
+18:09:02.440 > Brownout detector was triggered
+18:09:02.443 > 
+18:09:02.443 > ets Jul 29 2019 12:21:46
+18:09:02.443 > 
+18:09:02.446 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:02.448 > configsip: 0, SPIWP:0xee
+18:09:02.452 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:02.460 > mode:DIO, clock div:2
+18:09:02.460 > load:0x3fff0030,len:1184
+18:09:02.463 > load:0x40078000,len:13232
+18:09:02.466 > load:0x40080400,len:3028
+18:09:02.469 > entry 0x400805e4
+18:09:02.905 > 
+18:09:02.905 > Brownout detector was triggered
+18:09:02.908 > 
+18:09:02.908 > ets Jul 29 2019 12:21:46
+18:09:02.908 > 
+18:09:02.911 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:02.914 > configsip: 0, SPIWP:0xee
+18:09:02.916 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:02.922 > mode:DIO, clock div:2
+18:09:02.924 > load:0x3fff0030,len:1184
+18:09:02.927 > load:0x40078000,len:13232
+18:09:02.930 > load:0x40080400,len:3028
+18:09:02.933 > entry 0x400805e4
+18:09:03.369 > 
+18:09:03.370 > Brownout detector was triggered
+18:09:03.373 > 
+18:09:03.373 > ets Jul 29 2019 12:21:46
+18:09:03.373 > 
+18:09:03.376 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:03.378 > configsip: 0, SPIWP:0xee
+18:09:03.381 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:03.387 > mode:DIO, clock div:2
+18:09:03.389 > load:0x3fff0030,len:1184
+18:09:03.392 > load:0x40078000,len:13232
+18:09:03.395 > load:0x40080400,len:3028
+18:09:03.398 > entry 0x400805e4
+18:09:03.834 > 
+18:09:03.834 > Brownout detector was triggered
+18:09:03.837 > 
+18:09:03.837 > ets Jul 29 2019 12:21:46
+18:09:03.837 > 
+18:09:03.840 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:03.843 > configsip: 0, SPIWP:0xee
+18:09:03.845 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:03.851 > mode:DIO, clock div:2
+18:09:03.854 > load:0x3fff0030,len:1184
+18:09:03.856 > load:0x40078000,len:13232
+18:09:03.859 > load:0x40080400,len:3028
+18:09:03.863 > entry 0x400805e4
+18:09:04.299 > 
+18:09:04.299 > Brownout detector was triggered
+18:09:04.302 > 
+18:09:04.302 > ets Jul 29 2019 12:21:46
+18:09:04.302 > 
+18:09:04.305 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:04.307 > configsip: 0, SPIWP:0xee
+18:09:04.310 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:04.316 > mode:DIO, clock div:2
+18:09:04.318 > load:0x3fff0030,len:1184
+18:09:04.322 > load:0x40078000,len:13232
+18:09:04.324 > load:0x40080400,len:3028
+18:09:04.327 > entry 0x400805e4
+18:09:04.764 > 
+18:09:04.764 > Brownout detector was triggered
+18:09:04.767 > 
+18:09:04.767 > ets Jul 29 2019 12:21:46
+18:09:04.767 > 
+18:09:04.770 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:04.773 > configsip: 0, SPIWP:0xee
+18:09:04.776 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:04.781 > mode:DIO, clock div:2
+18:09:04.784 > load:0x3fff0030,len:1184
+18:09:04.787 > load:0x40078000,len:13232
+18:09:04.790 > load:0x40080400,len:3028
+18:09:04.792 > entry 0x400805e4
+18:09:05.229 > 
+18:09:05.229 > Brownout detector was triggered
+18:09:05.231 > 
+18:09:05.231 > ets Jul 29 2019 12:21:46
+18:09:05.231 > 
+18:09:05.235 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:05.237 > configsip: 0, SPIWP:0xee
+18:09:05.240 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:05.246 > mode:DIO, clock div:2
+18:09:05.248 > load:0x3fff0030,len:1184
+18:09:05.251 > load:0x40078000,len:13232
+18:09:05.254 > load:0x40080400,len:3028
+18:09:05.257 > entry 0x400805e4
+18:09:05.693 > 
+18:09:05.693 > Brownout detector was triggered
+18:09:05.696 > 
+18:09:05.696 > ets Jul 29 2019 12:21:46
+18:09:05.696 > 
+18:09:05.699 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:05.702 > configsip: 0, SPIWP:0xee
+18:09:05.704 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:05.710 > mode:DIO, clock div:2
+18:09:05.713 > load:0x3fff0030,len:1184
+18:09:05.715 > load:0x40078000,len:13232
+18:09:05.719 > load:0x40080400,len:3028
+18:09:05.722 > entry 0x400805e4
+18:09:06.158 > 
+18:09:06.158 > Brownout detector was triggered
+18:09:06.161 > 
+18:09:06.161 > ets Jul 29 2019 12:21:46
+18:09:06.161 > 
+18:09:06.164 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:06.167 > configsip: 0, SPIWP:0xee
+18:09:06.169 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:06.175 > mode:DIO, clock div:2
+18:09:06.177 > load:0x3fff0030,len:1184
+18:09:06.181 > load:0x40078000,len:13232
+18:09:06.183 > load:0x40080400,len:3028
+18:09:06.186 > entry 0x400805e4
+18:09:06.623 > 
+18:09:06.623 > Brownout detector was triggered
+18:09:06.626 > 
+18:09:06.626 > ets Jul 29 2019 12:21:46
+18:09:06.626 > 
+18:09:06.629 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:06.632 > configsip: 0, SPIWP:0xee
+18:09:06.635 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:06.640 > mode:DIO, clock div:2
+18:09:06.643 > load:0x3fff0030,len:1184
+18:09:06.646 > load:0x40078000,len:13232
+18:09:06.648 > load:0x40080400,len:3028
+18:09:06.651 > entry 0x400805e4
+18:09:07.067 > 
+18:09:07.068 > Brownout detector was triggered
+18:09:07.071 > 
+18:09:07.071 > ets Jul 29 2019 12:21:46
+18:09:07.071 > 
+18:09:07.073 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:07.076 > configsip: 0, SPIWP:0xee
+18:09:07.079 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:07.084 > mode:DIO, clock div:2
+18:09:07.088 > load:0x3fff0030,len:1184
+18:09:07.090 > load:0x40078000,len:13232
+18:09:07.093 > load:0x40080400,len:3028
+18:09:07.096 > entry 0x400805e4
+18:09:07.532 > 
+18:09:07.532 > Brownout detector was triggered
+18:09:07.536 > 
+18:09:07.536 > ets Jul 29 2019 12:21:46
+18:09:07.536 > 
+18:09:07.539 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:07.542 > configsip: 0, SPIWP:0xee
+18:09:07.545 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:07.550 > mode:DIO, clock div:2
+18:09:07.553 > load:0x3fff0030,len:1184
+18:09:07.555 > load:0x40078000,len:13232
+18:09:07.558 > load:0x40080400,len:3028
+18:09:07.561 > entry 0x400805e4
+18:09:07.997 > 
+18:09:07.997 > Brownout detector was triggered
+18:09:08.000 > 
+18:09:08.000 > ets Jul 29 2019 12:21:46
+18:09:08.000 > 
+18:09:08.003 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:08.006 > configsip: 0, SPIWP:0xee
+18:09:08.008 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:08.014 > mode:DIO, clock div:2
+18:09:08.016 > load:0x3fff0030,len:1184
+18:09:08.019 > load:0x40078000,len:13232
+18:09:08.022 > load:0x40080400,len:3028
+18:09:08.025 > entry 0x400805e4
+18:09:08.462 > 
+18:09:08.462 > Brownout detector was triggered
+18:09:08.466 > 
+18:09:08.466 > ets Jul 29 2019 12:21:46
+18:09:08.466 > 
+18:09:08.469 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:08.471 > configsip: 0, SPIWP:0xee
+18:09:08.475 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:08.479 > mode:DIO, clock div:2
+18:09:08.482 > load:0x3fff0030,len:1184
+18:09:08.485 > load:0x40078000,len:13232
+18:09:08.487 > load:0x40080400,len:3028
+18:09:08.490 > entry 0x400805e4
+18:09:08.927 > 
+18:09:08.927 > Brownout detector was triggered
+18:09:08.930 > 
+18:09:08.930 > ets Jul 29 2019 12:21:46
+18:09:08.930 > 
+18:09:08.933 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:08.936 > configsip: 0, SPIWP:0xee
+18:09:08.939 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:08.944 > mode:DIO, clock div:2
+18:09:08.946 > load:0x3fff0030,len:1184
+18:09:08.949 > load:0x40078000,len:13232
+18:09:08.952 > load:0x40080400,len:3028
+18:09:08.955 > entry 0x400805e4
+18:09:09.392 > 
+18:09:09.394 > Brownout detector was triggered
+18:09:09.395 > 
+18:09:09.395 > ets Jul 29 2019 12:21:46
+18:09:09.395 > 
+18:09:09.397 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:09.400 > configsip: 0, SPIWP:0xee
+18:09:09.403 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:09.408 > mode:DIO, clock div:2
+18:09:09.411 > load:0x3fff0030,len:1184
+18:09:09.415 > load:0x40078000,len:13232
+18:09:09.417 > load:0x40080400,len:3028
+18:09:09.419 > entry 0x400805e4
+18:09:09.856 > 
+18:09:09.857 > Brownout detector was triggered
+18:09:09.860 > 
+18:09:09.860 > ets Jul 29 2019 12:21:46
+18:09:09.860 > 
+18:09:09.863 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:09.865 > configsip: 0, SPIWP:0xee
+18:09:09.868 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:09.873 > mode:DIO, clock div:2
+18:09:09.876 > load:0x3fff0030,len:1184
+18:09:09.879 > load:0x40078000,len:13232
+18:09:09.882 > load:0x40080400,len:3028
+18:09:09.884 > entry 0x400805e4
+18:09:10.320 > 
+18:09:10.321 > Brownout detector was triggered
+18:09:10.324 > 
+18:09:10.324 > ets Jul 29 2019 12:21:46
+18:09:10.324 > 
+18:09:10.327 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:10.329 > configsip: 0, SPIWP:0xee
+18:09:10.332 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:10.338 > mode:DIO, clock div:2
+18:09:10.340 > load:0x3fff0030,len:1184
+18:09:10.343 > load:0x40078000,len:13232
+18:09:10.346 > load:0x40080400,len:3028
+18:09:10.349 > entry 0x400805e4
+18:09:10.786 > 
+18:09:10.787 > Brownout detector was triggered
+18:09:10.789 > 
+18:09:10.789 > ets Jul 29 2019 12:21:46
+18:09:10.789 > 
+18:09:10.792 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:10.795 > configsip: 0, SPIWP:0xee
+18:09:10.798 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:10.804 > mode:DIO, clock div:2
+18:09:10.806 > load:0x3fff0030,len:1184
+18:09:10.809 > load:0x40078000,len:13232
+18:09:10.811 > load:0x40080400,len:3028
+18:09:10.814 > entry 0x400805e4
+18:09:11.251 > 
+18:09:11.251 > Brownout detector was triggered
+18:09:11.254 > 
+18:09:11.254 > ets Jul 29 2019 12:21:46
+18:09:11.254 > 
+18:09:11.257 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:11.260 > configsip: 0, SPIWP:0xee
+18:09:11.265 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:11.268 > mode:DIO, clock div:2
+18:09:11.270 > load:0x3fff0030,len:1184
+18:09:11.275 > load:0x40078000,len:13232
+18:09:11.277 > load:0x40080400,len:3028
+18:09:11.279 > entry 0x400805e4
+18:09:11.715 > 
+18:09:11.715 > Brownout detector was triggered
+18:09:11.718 > 
+18:09:11.718 > ets Jul 29 2019 12:21:46
+18:09:11.718 > 
+18:09:11.721 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:11.724 > configsip: 0, SPIWP:0xee
+18:09:11.727 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:11.732 > mode:DIO, clock div:2
+18:09:11.735 > load:0x3fff0030,len:1184
+18:09:11.737 > load:0x40078000,len:13232
+18:09:11.741 > load:0x40080400,len:3028
+18:09:11.744 > entry 0x400805e4
+18:09:12.179 > 
+18:09:12.180 > Brownout detector was triggered
+18:09:12.183 > 
+18:09:12.183 > ets Jul 29 2019 12:21:46
+18:09:12.183 > 
+18:09:12.186 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:12.188 > configsip: 0, SPIWP:0xee
+18:09:12.192 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:12.197 > mode:DIO, clock div:2
+18:09:12.200 > load:0x3fff0030,len:1184
+18:09:12.203 > load:0x40078000,len:13232
+18:09:12.205 > load:0x40080400,len:3028
+18:09:12.209 > entry 0x400805e4
+18:09:12.645 > 
+18:09:12.645 > Brownout detector was triggered
+18:09:12.647 > 
+18:09:12.647 > ets Jul 29 2019 12:21:46
+18:09:12.647 > 
+18:09:12.650 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:12.653 > configsip: 0, SPIWP:0xee
+18:09:12.657 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:12.662 > mode:DIO, clock div:2
+18:09:12.665 > load:0x3fff0030,len:1184
+18:09:12.668 > load:0x40078000,len:13232
+18:09:12.670 > load:0x40080400,len:3028
+18:09:12.674 > entry 0x400805e4
+18:09:13.110 > 
+18:09:13.110 > Brownout detector was triggered
+18:09:13.113 > 
+18:09:13.113 > ets Jul 29 2019 12:21:46
+18:09:13.113 > 
+18:09:13.116 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:13.118 > configsip: 0, SPIWP:0xee
+18:09:13.122 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:13.127 > mode:DIO, clock div:2
+18:09:13.130 > load:0x3fff0030,len:1184
+18:09:13.132 > load:0x40078000,len:13232
+18:09:13.135 > load:0x40080400,len:3028
+18:09:13.138 > entry 0x400805e4
+18:09:13.574 > 
+18:09:13.575 > Brownout detector was triggered
+18:09:13.578 > 
+18:09:13.578 > ets Jul 29 2019 12:21:46
+18:09:13.578 > 
+18:09:13.580 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:13.583 > configsip: 0, SPIWP:0xee
+18:09:13.586 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:13.592 > mode:DIO, clock div:2
+18:09:13.594 > load:0x3fff0030,len:1184
+18:09:13.597 > load:0x40078000,len:13232
+18:09:13.599 > load:0x40080400,len:3028
+18:09:13.603 > entry 0x400805e4
+18:09:14.039 > 
+18:09:14.039 > Brownout detector was triggered
+18:09:14.042 > 
+18:09:14.042 > ets Jul 29 2019 12:21:46
+18:09:14.042 > 
+18:09:14.045 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:14.048 > configsip: 0, SPIWP:0xee
+18:09:14.051 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:14.056 > mode:DIO, clock div:2
+18:09:14.058 > load:0x3fff0030,len:1184
+18:09:14.061 > load:0x40078000,len:13232
+18:09:14.065 > load:0x40080400,len:3028
+18:09:14.068 > entry 0x400805e4
+18:09:14.503 > 
+18:09:14.503 > Brownout detector was triggered
+18:09:14.506 > 
+18:09:14.506 > ets Jul 29 2019 12:21:46
+18:09:14.506 > 
+18:09:14.509 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:14.512 > configsip: 0, SPIWP:0xee
+18:09:14.515 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:14.521 > mode:DIO, clock div:2
+18:09:14.524 > load:0x3fff0030,len:1184
+18:09:14.526 > load:0x40078000,len:13232
+18:09:14.529 > load:0x40080400,len:3028
+18:09:14.532 > entry 0x400805e4
+18:09:14.968 > 
+18:09:14.968 > Brownout detector was triggered
+18:09:14.971 > 
+18:09:14.971 > ets Jul 29 2019 12:21:46
+18:09:14.971 > 
+18:09:14.975 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:14.978 > configsip: 0, SPIWP:0xee
+18:09:14.981 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:14.986 > mode:DIO, clock div:2
+18:09:14.989 > load:0x3fff0030,len:1184
+18:09:14.991 > load:0x40078000,len:13232
+18:09:14.994 > load:0x40080400,len:3028
+18:09:14.997 > entry 0x400805e4
+18:09:15.433 > 
+18:09:15.434 > Brownout detector was triggered
+18:09:15.437 > 
+18:09:15.437 > ets Jul 29 2019 12:21:46
+18:09:15.437 > 
+18:09:15.440 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:15.443 > configsip: 0, SPIWP:0xee
+18:09:15.445 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:15.450 > mode:DIO, clock div:2
+18:09:15.453 > load:0x3fff0030,len:1184
+18:09:15.456 > load:0x40078000,len:13232
+18:09:15.459 > load:0x40080400,len:3028
+18:09:15.462 > entry 0x400805e4
+18:09:15.898 > 
+18:09:15.899 > Brownout detector was triggered
+18:09:15.901 > 
+18:09:15.901 > ets Jul 29 2019 12:21:46
+18:09:15.901 > 
+18:09:15.904 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:15.907 > configsip: 0, SPIWP:0xee
+18:09:15.910 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:15.915 > mode:DIO, clock div:2
+18:09:15.918 > load:0x3fff0030,len:1184
+18:09:15.921 > load:0x40078000,len:13232
+18:09:15.923 > load:0x40080400,len:3028
+18:09:15.926 > entry 0x400805e4
+18:09:16.363 > 
+18:09:16.364 > Brownout detector was triggered
+18:09:16.367 > 
+18:09:16.367 > ets Jul 29 2019 12:21:46
+18:09:16.367 > 
+18:09:16.370 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:16.372 > configsip: 0, SPIWP:0xee
+18:09:16.375 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:16.381 > mode:DIO, clock div:2
+18:09:16.383 > load:0x3fff0030,len:1184
+18:09:16.386 > load:0x40078000,len:13232
+18:09:16.389 > load:0x40080400,len:3028
+18:09:16.392 > entry 0x400805e4
+18:09:16.829 > 
+18:09:16.829 > Brownout detector was triggered
+18:09:16.833 > 
+18:09:16.833 > ets Jul 29 2019 12:21:46
+18:09:16.833 > 
+18:09:16.836 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:16.838 > configsip: 0, SPIWP:0xee
+18:09:16.841 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:16.846 > mode:DIO, clock div:2
+18:09:16.848 > load:0x3fff0030,len:1184
+18:09:16.851 > load:0x40078000,len:13232
+18:09:16.854 > load:0x40080400,len:3028
+18:09:16.857 > entry 0x400805e4
+18:09:17.293 > 
+18:09:17.294 > Brownout detector was triggered
+18:09:17.297 > 
+18:09:17.297 > ets Jul 29 2019 12:21:46
+18:09:17.297 > 
+18:09:17.300 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:17.303 > configsip: 0, SPIWP:0xee
+18:09:17.306 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:17.311 > mode:DIO, clock div:2
+18:09:17.313 > load:0x3fff0030,len:1184
+18:09:17.317 > load:0x40078000,len:13232
+18:09:17.319 > load:0x40080400,len:3028
+18:09:17.322 > entry 0x400805e4
+18:09:17.758 > 
+18:09:17.759 > Brownout detector was triggered
+18:09:17.762 > 
+18:09:17.762 > ets Jul 29 2019 12:21:46
+18:09:17.762 > 
+18:09:17.765 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:17.768 > configsip: 0, SPIWP:0xee
+18:09:17.771 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:17.776 > mode:DIO, clock div:2
+18:09:17.779 > load:0x3fff0030,len:1184
+18:09:17.782 > load:0x40078000,len:13232
+18:09:17.784 > load:0x40080400,len:3028
+18:09:17.787 > entry 0x400805e4
+18:09:18.224 > 
+18:09:18.224 > Brownout detector was triggered
+18:09:18.227 > 
+18:09:18.227 > ets Jul 29 2019 12:21:46
+18:09:18.227 > 
+18:09:18.230 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:18.233 > configsip: 0, SPIWP:0xee
+18:09:18.236 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:18.241 > mode:DIO, clock div:2
+18:09:18.244 > load:0x3fff0030,len:1184
+18:09:18.246 > load:0x40078000,len:13232
+18:09:18.249 > load:0x40080400,len:3028
+18:09:18.253 > entry 0x400805e4
+18:09:18.689 > 
+18:09:18.689 > Brownout detector was triggered
+18:09:18.692 > 
+18:09:18.692 > ets Jul 29 2019 12:21:46
+18:09:18.692 > 
+18:09:18.695 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:18.698 > configsip: 0, SPIWP:0xee
+18:09:18.701 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:18.706 > mode:DIO, clock div:2
+18:09:18.709 > load:0x3fff0030,len:1184
+18:09:18.712 > load:0x40078000,len:13232
+18:09:18.714 > load:0x40080400,len:3028
+18:09:18.717 > entry 0x400805e4
+18:09:19.154 > 
+18:09:19.154 > Brownout detector was triggered
+18:09:19.157 > 
+18:09:19.157 > ets Jul 29 2019 12:21:46
+18:09:19.157 > 
+18:09:19.160 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:19.163 > configsip: 0, SPIWP:0xee
+18:09:19.166 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:19.172 > mode:DIO, clock div:2
+18:09:19.174 > load:0x3fff0030,len:1184
+18:09:19.177 > load:0x40078000,len:13232
+18:09:19.179 > load:0x40080400,len:3028
+18:09:19.183 > entry 0x400805e4
+18:09:19.619 > 
+18:09:19.619 > Brownout detector was triggered
+18:09:19.622 > 
+18:09:19.622 > ets Jul 29 2019 12:21:46
+18:09:19.622 > 
+18:09:19.625 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:19.628 > configsip: 0, SPIWP:0xee
+18:09:19.631 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:19.636 > mode:DIO, clock div:2
+18:09:19.639 > load:0x3fff0030,len:1184
+18:09:19.642 > load:0x40078000,len:13232
+18:09:19.644 > load:0x40080400,len:3028
+18:09:19.647 > entry 0x400805e4
+18:09:20.083 > 
+18:09:20.085 > Brownout detector was triggered
+18:09:20.087 > 
+18:09:20.087 > ets Jul 29 2019 12:21:46
+18:09:20.087 > 
+18:09:20.090 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:20.092 > configsip: 0, SPIWP:0xee
+18:09:20.095 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:20.101 > mode:DIO, clock div:2
+18:09:20.103 > load:0x3fff0030,len:1184
+18:09:20.106 > load:0x40078000,len:13232
+18:09:20.109 > load:0x40080400,len:3028
+18:09:20.112 > entry 0x400805e4
+18:09:20.548 > 
+18:09:20.549 > Brownout detector was triggered
+18:09:20.552 > 
+18:09:20.552 > ets Jul 29 2019 12:21:46
+18:09:20.552 > 
+18:09:20.554 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:20.557 > configsip: 0, SPIWP:0xee
+18:09:20.560 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:20.565 > mode:DIO, clock div:2
+18:09:20.568 > load:0x3fff0030,len:1184
+18:09:20.571 > load:0x40078000,len:13232
+18:09:20.574 > load:0x40080400,len:3028
+18:09:20.577 > entry 0x400805e4
+18:09:21.014 > 
+18:09:21.014 > Brownout detector was triggered
+18:09:21.017 > 
+18:09:21.017 > ets Jul 29 2019 12:21:46
+18:09:21.017 > 
+18:09:21.019 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:21.022 > configsip: 0, SPIWP:0xee
+18:09:21.025 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:21.030 > mode:DIO, clock div:2
+18:09:21.033 > load:0x3fff0030,len:1184
+18:09:21.035 > load:0x40078000,len:13232
+18:09:21.038 > load:0x40080400,len:3028
+18:09:21.046 > entry 0x400805e4
+18:09:21.478 > 
+18:09:21.479 > Brownout detector was triggered
+18:09:21.482 > 
+18:09:21.482 > ets Jul 29 2019 12:21:46
+18:09:21.482 > 
+18:09:21.484 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:21.487 > configsip: 0, SPIWP:0xee
+18:09:21.490 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:21.495 > mode:DIO, clock div:2
+18:09:21.498 > load:0x3fff0030,len:1184
+18:09:21.500 > load:0x40078000,len:13232
+18:09:21.503 > load:0x40080400,len:3028
+18:09:21.507 > entry 0x400805e4
+18:09:21.943 > 
+18:09:21.944 > Brownout detector was triggered
+18:09:21.946 > 
+18:09:21.946 > ets Jul 29 2019 12:21:46
+18:09:21.946 > 
+18:09:21.949 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:21.952 > configsip: 0, SPIWP:0xee
+18:09:21.955 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:21.960 > mode:DIO, clock div:2
+18:09:21.963 > load:0x3fff0030,len:1184
+18:09:21.966 > load:0x40078000,len:13232
+18:09:21.970 > load:0x40080400,len:3028
+18:09:21.972 > entry 0x400805e4
+18:09:22.408 > 
+18:09:22.408 > Brownout detector was triggered
+18:09:22.411 > 
+18:09:22.411 > ets Jul 29 2019 12:21:46
+18:09:22.411 > 
+18:09:22.414 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:22.416 > configsip: 0, SPIWP:0xee
+18:09:22.419 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:22.427 > mode:DIO, clock div:2
+18:09:22.427 > load:0x3fff0030,len:1184
+18:09:22.431 > load:0x40078000,len:13232
+18:09:22.433 > load:0x40080400,len:3028
+18:09:22.437 > entry 0x400805e4
+18:09:22.872 > 
+18:09:22.873 > Brownout detector was triggered
+18:09:22.877 > 
+18:09:22.877 > ets Jul 29 2019 12:21:46
+18:09:22.877 > 
+18:09:22.879 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:22.881 > configsip: 0, SPIWP:0xee
+18:09:22.885 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:22.889 > mode:DIO, clock div:2
+18:09:22.892 > load:0x3fff0030,len:1184
+18:09:22.895 > load:0x40078000,len:13232
+18:09:22.898 > load:0x40080400,len:3028
+18:09:22.901 > entry 0x400805e4
+18:09:23.337 > 
+18:09:23.338 > Brownout detector was triggered
+18:09:23.341 > 
+18:09:23.341 > ets Jul 29 2019 12:21:46
+18:09:23.341 > 
+18:09:23.343 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:23.346 > configsip: 0, SPIWP:0xee
+18:09:23.349 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:23.354 > mode:DIO, clock div:2
+18:09:23.357 > load:0x3fff0030,len:1184
+18:09:23.360 > load:0x40078000,len:13232
+18:09:23.363 > load:0x40080400,len:3028
+18:09:23.366 > entry 0x400805e4
+18:09:23.802 > 
+18:09:23.802 > Brownout detector was triggered
+18:09:23.805 > 
+18:09:23.805 > ets Jul 29 2019 12:21:46
+18:09:23.805 > 
+18:09:23.808 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:23.811 > configsip: 0, SPIWP:0xee
+18:09:23.814 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:23.819 > mode:DIO, clock div:2
+18:09:23.822 > load:0x3fff0030,len:1184
+18:09:23.825 > load:0x40078000,len:13232
+18:09:23.828 > load:0x40080400,len:3028
+18:09:23.830 > entry 0x400805e4
+18:09:24.267 > 
+18:09:24.268 > Brownout detector was triggered
+18:09:24.270 > 
+18:09:24.270 > ets Jul 29 2019 12:21:46
+18:09:24.270 > 
+18:09:24.274 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:24.276 > configsip: 0, SPIWP:0xee
+18:09:24.279 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:24.284 > mode:DIO, clock div:2
+18:09:24.287 > load:0x3fff0030,len:1184
+18:09:24.289 > load:0x40078000,len:13232
+18:09:24.293 > load:0x40080400,len:3028
+18:09:24.296 > entry 0x400805e4
+18:09:24.732 > 
+18:09:24.732 > Brownout detector was triggered
+18:09:24.735 > 
+18:09:24.735 > ets Jul 29 2019 12:21:46
+18:09:24.735 > 
+18:09:24.739 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:24.742 > configsip: 0, SPIWP:0xee
+18:09:24.744 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:24.750 > mode:DIO, clock div:2
+18:09:24.752 > load:0x3fff0030,len:1184
+18:09:24.755 > load:0x40078000,len:13232
+18:09:24.758 > load:0x40080400,len:3028
+18:09:24.761 > entry 0x400805e4
+18:09:25.197 > 
+18:09:25.198 > Brownout detector was triggered
+18:09:25.201 > 
+18:09:25.201 > ets Jul 29 2019 12:21:46
+18:09:25.201 > 
+18:09:25.204 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:25.207 > configsip: 0, SPIWP:0xee
+18:09:25.209 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:25.215 > mode:DIO, clock div:2
+18:09:25.218 > load:0x3fff0030,len:1184
+18:09:25.221 > load:0x40078000,len:13232
+18:09:25.224 > load:0x40080400,len:3028
+18:09:25.226 > entry 0x400805e4
+18:09:25.663 > 
+18:09:25.663 > Brownout detector was triggered
+18:09:25.667 > 
+18:09:25.667 > ets Jul 29 2019 12:21:46
+18:09:25.667 > 
+18:09:25.669 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:25.672 > configsip: 0, SPIWP:0xee
+18:09:25.675 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:25.680 > mode:DIO, clock div:2
+18:09:25.683 > load:0x3fff0030,len:1184
+18:09:25.686 > load:0x40078000,len:13232
+18:09:25.688 > load:0x40080400,len:3028
+18:09:25.691 > entry 0x400805e4
+18:09:26.128 > 
+18:09:26.128 > Brownout detector was triggered
+18:09:26.132 > 
+18:09:26.132 > ets Jul 29 2019 12:21:46
+18:09:26.132 > 
+18:09:26.135 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:26.138 > configsip: 0, SPIWP:0xee
+18:09:26.141 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:26.147 > mode:DIO, clock div:2
+18:09:26.148 > load:0x3fff0030,len:1184
+18:09:26.151 > load:0x40078000,len:13232
+18:09:26.154 > load:0x40080400,len:3028
+18:09:26.157 > entry 0x400805e4
+18:09:26.593 > 
+18:09:26.593 > Brownout detector was triggered
+18:09:26.597 > 
+18:09:26.597 > ets Jul 29 2019 12:21:46
+18:09:26.597 > 
+18:09:26.600 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:26.601 > configsip: 0, SPIWP:0xee
+18:09:26.605 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:26.610 > mode:DIO, clock div:2
+18:09:26.613 > load:0x3fff0030,len:1184
+18:09:26.615 > load:0x40078000,len:13232
+18:09:26.618 > load:0x40080400,len:3028
+18:09:26.621 > entry 0x400805e4
+18:09:27.058 > 
+18:09:27.058 > Brownout detector was triggered
+18:09:27.061 > 
+18:09:27.061 > ets Jul 29 2019 12:21:46
+18:09:27.061 > 
+18:09:27.064 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:27.067 > configsip: 0, SPIWP:0xee
+18:09:27.070 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:27.075 > mode:DIO, clock div:2
+18:09:27.077 > load:0x3fff0030,len:1184
+18:09:27.083 > load:0x40078000,len:13232
+18:09:27.083 > load:0x40080400,len:3028
+18:09:27.086 > entry 0x400805e4
+18:09:27.523 > 
+18:09:27.523 > Brownout detector was triggered
+18:09:27.526 > 
+18:09:27.526 > ets Jul 29 2019 12:21:46
+18:09:27.526 > 
+18:09:27.529 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:27.532 > configsip: 0, SPIWP:0xee
+18:09:27.534 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:27.540 > mode:DIO, clock div:2
+18:09:27.543 > load:0x3fff0030,len:1184
+18:09:27.545 > load:0x40078000,len:13232
+18:09:27.548 > load:0x40080400,len:3028
+18:09:27.551 > entry 0x400805e4
+18:09:27.988 > 
+18:09:27.988 > Brownout detector was triggered
+18:09:27.991 > 
+18:09:27.991 > ets Jul 29 2019 12:21:46
+18:09:27.991 > 
+18:09:27.994 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:27.996 > configsip: 0, SPIWP:0xee
+18:09:28.000 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:28.004 > mode:DIO, clock div:2
+18:09:28.007 > load:0x3fff0030,len:1184
+18:09:28.010 > load:0x40078000,len:13232
+18:09:28.013 > load:0x40080400,len:3028
+18:09:28.016 > entry 0x400805e4
+18:09:28.453 > 
+18:09:28.453 > Brownout detector was triggered
+18:09:28.456 > 
+18:09:28.456 > ets Jul 29 2019 12:21:46
+18:09:28.456 > 
+18:09:28.459 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:28.461 > configsip: 0, SPIWP:0xee
+18:09:28.464 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:28.469 > mode:DIO, clock div:2
+18:09:28.472 > load:0x3fff0030,len:1184
+18:09:28.476 > load:0x40078000,len:13232
+18:09:28.478 > load:0x40080400,len:3028
+18:09:28.481 > entry 0x400805e4
+18:09:28.917 > 
+18:09:28.918 > Brownout detector was triggered
+18:09:28.921 > 
+18:09:28.921 > ets Jul 29 2019 12:21:46
+18:09:28.921 > 
+18:09:28.924 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:28.926 > configsip: 0, SPIWP:0xee
+18:09:28.929 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:28.935 > mode:DIO, clock div:2
+18:09:28.937 > load:0x3fff0030,len:1184
+18:09:28.940 > load:0x40078000,len:13232
+18:09:28.943 > load:0x40080400,len:3028
+18:09:28.946 > entry 0x400805e4
+18:09:29.383 > 
+18:09:29.384 > Brownout detector was triggered
+18:09:29.386 > 
+18:09:29.386 > ets Jul 29 2019 12:21:46
+18:09:29.386 > 
+18:09:29.389 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:29.392 > configsip: 0, SPIWP:0xee
+18:09:29.394 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:29.401 > mode:DIO, clock div:2
+18:09:29.403 > load:0x3fff0030,len:1184
+18:09:29.406 > load:0x40078000,len:13232
+18:09:29.409 > load:0x40080400,len:3028
+18:09:29.412 > entry 0x400805e4
+18:09:29.848 > 
+18:09:29.848 > Brownout detector was triggered
+18:09:29.852 > 
+18:09:29.852 > ets Jul 29 2019 12:21:46
+18:09:29.852 > 
+18:09:29.854 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:29.857 > configsip: 0, SPIWP:0xee
+18:09:29.859 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:29.864 > mode:DIO, clock div:2
+18:09:29.868 > load:0x3fff0030,len:1184
+18:09:29.871 > load:0x40078000,len:13232
+18:09:29.873 > load:0x40080400,len:3028
+18:09:29.876 > entry 0x400805e4
+18:09:30.312 > 
+18:09:30.313 > Brownout detector was triggered
+18:09:30.316 > 
+18:09:30.316 > ets Jul 29 2019 12:21:46
+18:09:30.316 > 
+18:09:30.321 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:30.322 > configsip: 0, SPIWP:0xee
+18:09:30.324 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:30.330 > mode:DIO, clock div:2
+18:09:30.332 > load:0x3fff0030,len:1184
+18:09:30.335 > load:0x40078000,len:13232
+18:09:30.338 > load:0x40080400,len:3028
+18:09:30.341 > entry 0x400805e4
+18:09:30.778 > 
+18:09:30.778 > Brownout detector was triggered
+18:09:30.781 > 
+18:09:30.781 > ets Jul 29 2019 12:21:46
+18:09:30.781 > 
+18:09:30.784 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:30.786 > configsip: 0, SPIWP:0xee
+18:09:30.789 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:30.795 > mode:DIO, clock div:2
+18:09:30.798 > load:0x3fff0030,len:1184
+18:09:30.800 > load:0x40078000,len:13232
+18:09:30.803 > load:0x40080400,len:3028
+18:09:30.806 > entry 0x400805e4
+18:09:31.243 > 
+18:09:31.243 > Brownout detector was triggered
+18:09:31.245 > 
+18:09:31.245 > ets Jul 29 2019 12:21:46
+18:09:31.245 > 
+18:09:31.248 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:31.251 > configsip: 0, SPIWP:0xee
+18:09:31.254 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:31.259 > mode:DIO, clock div:2
+18:09:31.262 > load:0x3fff0030,len:1184
+18:09:31.264 > load:0x40078000,len:13232
+18:09:31.268 > load:0x40080400,len:3028
+18:09:31.270 > entry 0x400805e4
+18:09:31.708 > 
+18:09:31.708 > Brownout detector was triggered
+18:09:31.711 > 
+18:09:31.711 > ets Jul 29 2019 12:21:46
+18:09:31.711 > 
+18:09:31.714 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:31.716 > configsip: 0, SPIWP:0xee
+18:09:31.722 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:31.725 > mode:DIO, clock div:2
+18:09:31.728 > load:0x3fff0030,len:1184
+18:09:31.732 > load:0x40078000,len:13232
+18:09:31.733 > load:0x40080400,len:3028
+18:09:31.736 > entry 0x400805e4
+18:09:32.173 > 
+18:09:32.173 > Brownout detector was triggered
+18:09:32.176 > 
+18:09:32.176 > ets Jul 29 2019 12:21:46
+18:09:32.176 > 
+18:09:32.179 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:32.183 > configsip: 0, SPIWP:0xee
+18:09:32.185 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:32.190 > mode:DIO, clock div:2
+18:09:32.193 > load:0x3fff0030,len:1184
+18:09:32.195 > load:0x40078000,len:13232
+18:09:32.199 > load:0x40080400,len:3028
+18:09:32.202 > entry 0x400805e4
+18:09:32.639 > 
+18:09:32.639 > Brownout detector was triggered
+18:09:32.642 > 
+18:09:32.642 > ets Jul 29 2019 12:21:46
+18:09:32.642 > 
+18:09:32.645 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:32.647 > configsip: 0, SPIWP:0xee
+18:09:32.650 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:32.656 > mode:DIO, clock div:2
+18:09:32.659 > load:0x3fff0030,len:1184
+18:09:32.661 > load:0x40078000,len:13232
+18:09:32.663 > load:0x40080400,len:3028
+18:09:32.667 > entry 0x400805e4
+18:09:33.104 > 
+18:09:33.104 > Brownout detector was triggered
+18:09:33.107 > 
+18:09:33.107 > ets Jul 29 2019 12:21:46
+18:09:33.107 > 
+18:09:33.110 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:33.113 > configsip: 0, SPIWP:0xee
+18:09:33.115 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:33.121 > mode:DIO, clock div:2
+18:09:33.123 > load:0x3fff0030,len:1184
+18:09:33.126 > load:0x40078000,len:13232
+18:09:33.130 > load:0x40080400,len:3028
+18:09:33.132 > entry 0x400805e4
+18:09:33.569 > 
+18:09:33.569 > Brownout detector was triggered
+18:09:33.572 > 
+18:09:33.572 > ets Jul 29 2019 12:21:46
+18:09:33.572 > 
+18:09:33.575 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:33.578 > configsip: 0, SPIWP:0xee
+18:09:33.581 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:33.587 > mode:DIO, clock div:2
+18:09:33.589 > load:0x3fff0030,len:1184
+18:09:33.592 > load:0x40078000,len:13232
+18:09:33.594 > load:0x40080400,len:3028
+18:09:33.597 > entry 0x400805e4
+18:09:34.034 > 
+18:09:34.034 > Brownout detector was triggered
+18:09:34.038 > 
+18:09:34.038 > ets Jul 29 2019 12:21:46
+18:09:34.038 > 
+18:09:34.041 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:34.043 > configsip: 0, SPIWP:0xee
+18:09:34.046 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:34.051 > mode:DIO, clock div:2
+18:09:34.054 > load:0x3fff0030,len:1184
+18:09:34.057 > load:0x40078000,len:13232
+18:09:34.059 > load:0x40080400,len:3028
+18:09:34.063 > entry 0x400805e4
+18:09:34.499 > 
+18:09:34.499 > Brownout detector was triggered
+18:09:34.502 > 
+18:09:34.502 > ets Jul 29 2019 12:21:46
+18:09:34.502 > 
+18:09:34.505 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:34.508 > configsip: 0, SPIWP:0xee
+18:09:34.511 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:34.516 > mode:DIO, clock div:2
+18:09:34.519 > load:0x3fff0030,len:1184
+18:09:34.522 > load:0x40078000,len:13232
+18:09:34.524 > load:0x40080400,len:3028
+18:09:34.528 > entry 0x400805e4
+18:09:34.964 > 
+18:09:34.964 > Brownout detector was triggered
+18:09:34.967 > 
+18:09:34.967 > ets Jul 29 2019 12:21:46
+18:09:34.967 > 
+18:09:34.970 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:34.973 > configsip: 0, SPIWP:0xee
+18:09:34.975 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:34.981 > mode:DIO, clock div:2
+18:09:34.984 > load:0x3fff0030,len:1184
+18:09:34.986 > load:0x40078000,len:13232
+18:09:34.989 > load:0x40080400,len:3028
+18:09:34.992 > entry 0x400805e4
+18:09:35.429 > 
+18:09:35.429 > Brownout detector was triggered
+18:09:35.432 > 
+18:09:35.432 > ets Jul 29 2019 12:21:46
+18:09:35.432 > 
+18:09:35.435 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:35.438 > configsip: 0, SPIWP:0xee
+18:09:35.440 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:35.446 > mode:DIO, clock div:2
+18:09:35.449 > load:0x3fff0030,len:1184
+18:09:35.451 > load:0x40078000,len:13232
+18:09:35.454 > load:0x40080400,len:3028
+18:09:35.458 > entry 0x400805e4
+18:09:35.894 > 
+18:09:35.895 > Brownout detector was triggered
+18:09:35.898 > 
+18:09:35.898 > ets Jul 29 2019 12:21:46
+18:09:35.898 > 
+18:09:35.901 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:35.903 > configsip: 0, SPIWP:0xee
+18:09:35.906 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:35.912 > mode:DIO, clock div:2
+18:09:35.914 > load:0x3fff0030,len:1184
+18:09:35.917 > load:0x40078000,len:13232
+18:09:35.920 > load:0x40080400,len:3028
+18:09:35.923 > entry 0x400805e4
+18:09:36.360 > 
+18:09:36.360 > Brownout detector was triggered
+18:09:36.363 > 
+18:09:36.363 > ets Jul 29 2019 12:21:46
+18:09:36.363 > 
+18:09:36.365 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:36.368 > configsip: 0, SPIWP:0xee
+18:09:36.371 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:36.376 > mode:DIO, clock div:2
+18:09:36.379 > load:0x3fff0030,len:1184
+18:09:36.383 > load:0x40078000,len:13232
+18:09:36.385 > load:0x40080400,len:3028
+18:09:36.388 > entry 0x400805e4
+18:09:36.824 > 
+18:09:36.824 > Brownout detector was triggered
+18:09:36.828 > 
+18:09:36.828 > ets Jul 29 2019 12:21:46
+18:09:36.828 > 
+18:09:36.831 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:36.833 > configsip: 0, SPIWP:0xee
+18:09:36.836 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:36.841 > mode:DIO, clock div:2
+18:09:36.844 > load:0x3fff0030,len:1184
+18:09:36.847 > load:0x40078000,len:13232
+18:09:36.850 > load:0x40080400,len:3028
+18:09:36.852 > entry 0x400805e4
+18:09:37.288 > 
+18:09:37.289 > Brownout detector was triggered
+18:09:37.293 > 
+18:09:37.293 > ets Jul 29 2019 12:21:46
+18:09:37.293 > 
+18:09:37.295 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:37.297 > configsip: 0, SPIWP:0xee
+18:09:37.303 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:37.306 > mode:DIO, clock div:2
+18:09:37.309 > load:0x3fff0030,len:1184
+18:09:37.311 > load:0x40078000,len:13232
+18:09:37.314 > load:0x40080400,len:3028
+18:09:37.317 > entry 0x400805e4
+18:09:37.754 > 
+18:09:37.754 > Brownout detector was triggered
+18:09:37.757 > 
+18:09:37.757 > ets Jul 29 2019 12:21:46
+18:09:37.757 > 
+18:09:37.760 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:37.763 > configsip: 0, SPIWP:0xee
+18:09:37.766 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:37.771 > mode:DIO, clock div:2
+18:09:37.773 > load:0x3fff0030,len:1184
+18:09:37.776 > load:0x40078000,len:13232
+18:09:37.779 > load:0x40080400,len:3028
+18:09:37.782 > entry 0x400805e4
+18:09:38.219 > 
+18:09:38.219 > Brownout detector was triggered
+18:09:38.222 > 
+18:09:38.222 > ets Jul 29 2019 12:21:46
+18:09:38.222 > 
+18:09:38.224 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:38.227 > configsip: 0, SPIWP:0xee
+18:09:38.230 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:38.235 > mode:DIO, clock div:2
+18:09:38.238 > load:0x3fff0030,len:1184
+18:09:38.241 > load:0x40078000,len:13232
+18:09:38.243 > load:0x40080400,len:3028
+18:09:38.247 > entry 0x400805e4
+18:09:38.683 > 
+18:09:38.683 > Brownout detector was triggered
+18:09:38.687 > 
+18:09:38.687 > ets Jul 29 2019 12:21:46
+18:09:38.687 > 
+18:09:38.690 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:38.692 > configsip: 0, SPIWP:0xee
+18:09:38.695 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:38.700 > mode:DIO, clock div:2
+18:09:38.703 > load:0x3fff0030,len:1184
+18:09:38.706 > load:0x40078000,len:13232
+18:09:38.708 > load:0x40080400,len:3028
+18:09:38.711 > entry 0x400805e4
+18:09:39.147 > 
+18:09:39.149 > Brownout detector was triggered
+18:09:39.152 > 
+18:09:39.152 > ets Jul 29 2019 12:21:46
+18:09:39.152 > 
+18:09:39.155 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:39.157 > configsip: 0, SPIWP:0xee
+18:09:39.160 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:39.166 > mode:DIO, clock div:2
+18:09:39.169 > load:0x3fff0030,len:1184
+18:09:39.171 > load:0x40078000,len:13232
+18:09:39.174 > load:0x40080400,len:3028
+18:09:39.179 > entry 0x400805e4
+18:09:39.612 > 
+18:09:39.613 > Brownout detector was triggered
+18:09:39.617 > 
+18:09:39.617 > ets Jul 29 2019 12:21:46
+18:09:39.617 > 
+18:09:39.619 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:39.621 > configsip: 0, SPIWP:0xee
+18:09:39.625 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:39.629 > mode:DIO, clock div:2
+18:09:39.632 > load:0x3fff0030,len:1184
+18:09:39.635 > load:0x40078000,len:13232
+18:09:39.638 > load:0x40080400,len:3028
+18:09:39.641 > entry 0x400805e4
+18:09:40.078 > 
+18:09:40.078 > Brownout detector was triggered
+18:09:40.081 > 
+18:09:40.081 > ets Jul 29 2019 12:21:46
+18:09:40.081 > 
+18:09:40.084 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:40.087 > configsip: 0, SPIWP:0xee
+18:09:40.090 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:40.095 > mode:DIO, clock div:2
+18:09:40.097 > load:0x3fff0030,len:1184
+18:09:40.100 > load:0x40078000,len:13232
+18:09:40.103 > load:0x40080400,len:3028
+18:09:40.106 > entry 0x400805e4
+18:09:40.542 > 
+18:09:40.543 > Brownout detector was triggered
+18:09:40.546 > 
+18:09:40.546 > ets Jul 29 2019 12:21:46
+18:09:40.546 > 
+18:09:40.550 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:40.551 > configsip: 0, SPIWP:0xee
+18:09:40.554 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:40.559 > mode:DIO, clock div:2
+18:09:40.563 > load:0x3fff0030,len:1184
+18:09:40.565 > load:0x40078000,len:13232
+18:09:40.568 > load:0x40080400,len:3028
+18:09:40.571 > entry 0x400805e4
+18:09:41.008 > 
+18:09:41.008 > Brownout detector was triggered
+18:09:41.011 > 
+18:09:41.011 > ets Jul 29 2019 12:21:46
+18:09:41.011 > 
+18:09:41.014 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:41.016 > configsip: 0, SPIWP:0xee
+18:09:41.018 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:41.024 > mode:DIO, clock div:2
+18:09:41.027 > load:0x3fff0030,len:1184
+18:09:41.029 > load:0x40078000,len:13232
+18:09:41.032 > load:0x40080400,len:3028
+18:09:41.036 > entry 0x400805e4
+18:09:41.472 > 
+18:09:41.472 > Brownout detector was triggered
+18:09:41.475 > 
+18:09:41.475 > ets Jul 29 2019 12:21:46
+18:09:41.475 > 
+18:09:41.478 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:41.481 > configsip: 0, SPIWP:0xee
+18:09:41.484 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:41.489 > mode:DIO, clock div:2
+18:09:41.491 > load:0x3fff0030,len:1184
+18:09:41.494 > load:0x40078000,len:13232
+18:09:41.497 > load:0x40080400,len:3028
+18:09:41.500 > entry 0x400805e4
+18:09:41.937 > 
+18:09:41.937 > Brownout detector was triggered
+18:09:41.940 > 
+18:09:41.940 > ets Jul 29 2019 12:21:46
+18:09:41.940 > 
+18:09:41.943 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:41.946 > configsip: 0, SPIWP:0xee
+18:09:41.949 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:41.954 > mode:DIO, clock div:2
+18:09:41.957 > load:0x3fff0030,len:1184
+18:09:41.959 > load:0x40078000,len:13232
+18:09:41.962 > load:0x40080400,len:3028
+18:09:41.965 > entry 0x400805e4
+18:09:42.402 > 
+18:09:42.402 > Brownout detector was triggered
+18:09:42.405 > 
+18:09:42.405 > ets Jul 29 2019 12:21:46
+18:09:42.405 > 
+18:09:42.408 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:42.410 > configsip: 0, SPIWP:0xee
+18:09:42.413 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:42.418 > mode:DIO, clock div:2
+18:09:42.421 > load:0x3fff0030,len:1184
+18:09:42.424 > load:0x40078000,len:13232
+18:09:42.427 > load:0x40080400,len:3028
+18:09:42.430 > entry 0x400805e4
+18:09:42.866 > 
+18:09:42.866 > Brownout detector was triggered
+18:09:42.869 > 
+18:09:42.869 > ets Jul 29 2019 12:21:46
+18:09:42.869 > 
+18:09:42.873 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:42.875 > configsip: 0, SPIWP:0xee
+18:09:42.877 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:42.884 > mode:DIO, clock div:2
+18:09:42.886 > load:0x3fff0030,len:1184
+18:09:42.889 > load:0x40078000,len:13232
+18:09:42.892 > load:0x40080400,len:3028
+18:09:42.895 > entry 0x400805e4
+18:09:43.331 > 
+18:09:43.331 > Brownout detector was triggered
+18:09:43.334 > 
+18:09:43.334 > ets Jul 29 2019 12:21:46
+18:09:43.334 > 
+18:09:43.338 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:43.340 > configsip: 0, SPIWP:0xee
+18:09:43.344 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:43.348 > mode:DIO, clock div:2
+18:09:43.350 > load:0x3fff0030,len:1184
+18:09:43.353 > load:0x40078000,len:13232
+18:09:43.356 > load:0x40080400,len:3028
+18:09:43.360 > entry 0x400805e4
+18:09:43.795 > 
+18:09:43.795 > Brownout detector was triggered
+18:09:43.799 > 
+18:09:43.799 > ets Jul 29 2019 12:21:46
+18:09:43.799 > 
+18:09:43.801 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:43.804 > configsip: 0, SPIWP:0xee
+18:09:43.807 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:43.812 > mode:DIO, clock div:2
+18:09:43.815 > load:0x3fff0030,len:1184
+18:09:43.818 > load:0x40078000,len:13232
+18:09:43.821 > load:0x40080400,len:3028
+18:09:43.824 > entry 0x400805e4
+18:09:44.260 > 
+18:09:44.260 > Brownout detector was triggered
+18:09:44.264 > 
+18:09:44.264 > ets Jul 29 2019 12:21:46
+18:09:44.264 > 
+18:09:44.266 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:44.270 > configsip: 0, SPIWP:0xee
+18:09:44.272 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:44.278 > mode:DIO, clock div:2
+18:09:44.280 > load:0x3fff0030,len:1184
+18:09:44.283 > load:0x40078000,len:13232
+18:09:44.286 > load:0x40080400,len:3028
+18:09:44.289 > entry 0x400805e4
+18:09:44.725 > 
+18:09:44.726 > Brownout detector was triggered
+18:09:44.729 > 
+18:09:44.729 > ets Jul 29 2019 12:21:46
+18:09:44.729 > 
+18:09:44.731 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:44.734 > configsip: 0, SPIWP:0xee
+18:09:44.737 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:44.742 > mode:DIO, clock div:2
+18:09:44.745 > load:0x3fff0030,len:1184
+18:09:44.748 > load:0x40078000,len:13232
+18:09:44.751 > load:0x40080400,len:3028
+18:09:44.754 > entry 0x400805e4
+18:09:45.189 > 
+18:09:45.191 > Brownout detector was triggered
+18:09:45.194 > 
+18:09:45.194 > ets Jul 29 2019 12:21:46
+18:09:45.194 > 
+18:09:45.196 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:45.199 > configsip: 0, SPIWP:0xee
+18:09:45.201 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:45.207 > mode:DIO, clock div:2
+18:09:45.210 > load:0x3fff0030,len:1184
+18:09:45.213 > load:0x40078000,len:13232
+18:09:45.215 > load:0x40080400,len:3028
+18:09:45.219 > entry 0x400805e4
+18:09:45.655 > 
+18:09:45.655 > Brownout detector was triggered
+18:09:45.658 > 
+18:09:45.658 > ets Jul 29 2019 12:21:46
+18:09:45.658 > 
+18:09:45.661 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:45.663 > configsip: 0, SPIWP:0xee
+18:09:45.666 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:45.672 > mode:DIO, clock div:2
+18:09:45.674 > load:0x3fff0030,len:1184
+18:09:45.677 > load:0x40078000,len:13232
+18:09:45.680 > load:0x40080400,len:3028
+18:09:45.683 > entry 0x400805e4
+18:09:46.119 > 
+18:09:46.121 > Brownout detector was triggered
+18:09:46.122 > 
+18:09:46.122 > ets Jul 29 2019 12:21:46
+18:09:46.122 > 
+18:09:46.125 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:46.128 > configsip: 0, SPIWP:0xee
+18:09:46.131 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:46.137 > mode:DIO, clock div:2
+18:09:46.139 > load:0x3fff0030,len:1184
+18:09:46.143 > load:0x40078000,len:13232
+18:09:46.145 > load:0x40080400,len:3028
+18:09:46.148 > entry 0x400805e4
+18:09:46.584 > 
+18:09:46.584 > Brownout detector was triggered
+18:09:46.588 > 
+18:09:46.588 > ets Jul 29 2019 12:21:46
+18:09:46.588 > 
+18:09:46.591 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:46.593 > configsip: 0, SPIWP:0xee
+18:09:46.598 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:46.602 > mode:DIO, clock div:2
+18:09:46.604 > load:0x3fff0030,len:1184
+18:09:46.607 > load:0x40078000,len:13232
+18:09:46.609 > load:0x40080400,len:3028
+18:09:46.613 > entry 0x400805e4
+18:09:47.049 > 
+18:09:47.049 > Brownout detector was triggered
+18:09:47.052 > 
+18:09:47.052 > ets Jul 29 2019 12:21:46
+18:09:47.052 > 
+18:09:47.055 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:47.058 > configsip: 0, SPIWP:0xee
+18:09:47.060 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:47.066 > mode:DIO, clock div:2
+18:09:47.068 > load:0x3fff0030,len:1184
+18:09:47.072 > load:0x40078000,len:13232
+18:09:47.074 > load:0x40080400,len:3028
+18:09:47.077 > entry 0x400805e4
+18:09:47.514 > 
+18:09:47.514 > Brownout detector was triggered
+18:09:47.517 > 
+18:09:47.517 > ets Jul 29 2019 12:21:46
+18:09:47.517 > 
+18:09:47.519 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:47.522 > configsip: 0, SPIWP:0xee
+18:09:47.525 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:47.531 > mode:DIO, clock div:2
+18:09:47.534 > load:0x3fff0030,len:1184
+18:09:47.536 > load:0x40078000,len:13232
+18:09:47.539 > load:0x40080400,len:3028
+18:09:47.542 > entry 0x400805e4
+18:09:47.979 > 
+18:09:47.979 > Brownout detector was triggered
+18:09:47.982 > 
+18:09:47.982 > ets Jul 29 2019 12:21:46
+18:09:47.982 > 
+18:09:47.985 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:47.987 > configsip: 0, SPIWP:0xee
+18:09:47.991 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:47.996 > mode:DIO, clock div:2
+18:09:47.999 > load:0x3fff0030,len:1184
+18:09:48.001 > load:0x40078000,len:13232
+18:09:48.004 > load:0x40080400,len:3028
+18:09:48.007 > entry 0x400805e4
+18:09:48.443 > 
+18:09:48.444 > Brownout detector was triggered
+18:09:48.447 > 
+18:09:48.447 > ets Jul 29 2019 12:21:46
+18:09:48.447 > 
+18:09:48.450 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:48.452 > configsip: 0, SPIWP:0xee
+18:09:48.455 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:48.460 > mode:DIO, clock div:2
+18:09:48.463 > load:0x3fff0030,len:1184
+18:09:48.466 > load:0x40078000,len:13232
+18:09:48.468 > load:0x40080400,len:3028
+18:09:48.472 > entry 0x400805e4
+18:09:48.908 > 
+18:09:48.908 > Brownout detector was triggered
+18:09:48.911 > 
+18:09:48.911 > ets Jul 29 2019 12:21:46
+18:09:48.911 > 
+18:09:48.913 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:48.917 > configsip: 0, SPIWP:0xee
+18:09:48.919 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:48.924 > mode:DIO, clock div:2
+18:09:48.927 > load:0x3fff0030,len:1184
+18:09:48.930 > load:0x40078000,len:13232
+18:09:48.933 > load:0x40080400,len:3028
+18:09:48.936 > entry 0x400805e4
+18:09:49.372 > 
+18:09:49.373 > Brownout detector was triggered
+18:09:49.376 > 
+18:09:49.376 > ets Jul 29 2019 12:21:46
+18:09:49.376 > 
+18:09:49.379 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:49.381 > configsip: 0, SPIWP:0xee
+18:09:49.384 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:49.389 > mode:DIO, clock div:2
+18:09:49.392 > load:0x3fff0030,len:1184
+18:09:49.395 > load:0x40078000,len:13232
+18:09:49.398 > load:0x40080400,len:3028
+18:09:49.401 > entry 0x400805e4
+18:09:49.837 > 
+18:09:49.837 > Brownout detector was triggered
+18:09:49.841 > 
+18:09:49.841 > ets Jul 29 2019 12:21:46
+18:09:49.841 > 
+18:09:49.843 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:49.846 > configsip: 0, SPIWP:0xee
+18:09:49.849 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:49.855 > mode:DIO, clock div:2
+18:09:49.857 > load:0x3fff0030,len:1184
+18:09:49.860 > load:0x40078000,len:13232
+18:09:49.863 > load:0x40080400,len:3028
+18:09:49.866 > entry 0x400805e4
+18:09:50.302 > 
+18:09:50.303 > Brownout detector was triggered
+18:09:50.306 > 
+18:09:50.306 > ets Jul 29 2019 12:21:46
+18:09:50.306 > 
+18:09:50.308 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:50.311 > configsip: 0, SPIWP:0xee
+18:09:50.314 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:50.319 > mode:DIO, clock div:2
+18:09:50.322 > load:0x3fff0030,len:1184
+18:09:50.325 > load:0x40078000,len:13232
+18:09:50.328 > load:0x40080400,len:3028
+18:09:50.331 > entry 0x400805e4
+18:09:50.767 > 
+18:09:50.767 > Brownout detector was triggered
+18:09:50.770 > 
+18:09:50.770 > ets Jul 29 2019 12:21:46
+18:09:50.770 > 
+18:09:50.773 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:50.776 > configsip: 0, SPIWP:0xee
+18:09:50.781 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:50.784 > mode:DIO, clock div:2
+18:09:50.787 > load:0x3fff0030,len:1184
+18:09:50.789 > load:0x40078000,len:13232
+18:09:50.793 > load:0x40080400,len:3028
+18:09:50.796 > entry 0x400805e4
+18:09:51.231 > 
+18:09:51.232 > Brownout detector was triggered
+18:09:51.235 > 
+18:09:51.235 > ets Jul 29 2019 12:21:46
+18:09:51.235 > 
+18:09:51.238 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:51.241 > configsip: 0, SPIWP:0xee
+18:09:51.243 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:51.249 > mode:DIO, clock div:2
+18:09:51.252 > load:0x3fff0030,len:1184
+18:09:51.255 > load:0x40078000,len:13232
+18:09:51.257 > load:0x40080400,len:3028
+18:09:51.261 > entry 0x400805e4
+18:09:51.696 > 
+18:09:51.696 > Brownout detector was triggered
+18:09:51.700 > 
+18:09:51.700 > ets Jul 29 2019 12:21:46
+18:09:51.700 > 
+18:09:51.703 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:51.705 > configsip: 0, SPIWP:0xee
+18:09:51.708 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:51.713 > mode:DIO, clock div:2
+18:09:51.717 > load:0x3fff0030,len:1184
+18:09:51.719 > load:0x40078000,len:13232
+18:09:51.722 > load:0x40080400,len:3028
+18:09:51.725 > entry 0x400805e4
+18:09:52.161 > 
+18:09:52.161 > Brownout detector was triggered
+18:09:52.164 > 
+18:09:52.164 > ets Jul 29 2019 12:21:46
+18:09:52.164 > 
+18:09:52.168 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:52.170 > configsip: 0, SPIWP:0xee
+18:09:52.174 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:52.178 > mode:DIO, clock div:2
+18:09:52.181 > load:0x3fff0030,len:1184
+18:09:52.184 > load:0x40078000,len:13232
+18:09:52.187 > load:0x40080400,len:3028
+18:09:52.191 > entry 0x400805e4
+18:09:52.626 > 
+18:09:52.626 > Brownout detector was triggered
+18:09:52.629 > 
+18:09:52.629 > ets Jul 29 2019 12:21:46
+18:09:52.629 > 
+18:09:52.632 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:52.635 > configsip: 0, SPIWP:0xee
+18:09:52.638 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:52.643 > mode:DIO, clock div:2
+18:09:52.646 > load:0x3fff0030,len:1184
+18:09:52.648 > load:0x40078000,len:13232
+18:09:52.651 > load:0x40080400,len:3028
+18:09:52.654 > entry 0x400805e4
+18:09:53.091 > 
+18:09:53.091 > Brownout detector was triggered
+18:09:53.094 > 
+18:09:53.094 > ets Jul 29 2019 12:21:46
+18:09:53.094 > 
+18:09:53.097 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:53.100 > configsip: 0, SPIWP:0xee
+18:09:53.103 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:53.108 > mode:DIO, clock div:2
+18:09:53.112 > load:0x3fff0030,len:1184
+18:09:53.114 > load:0x40078000,len:13232
+18:09:53.117 > load:0x40080400,len:3028
+18:09:53.119 > entry 0x400805e4
+18:09:53.555 > 
+18:09:53.555 > Brownout detector was triggered
+18:09:53.558 > 
+18:09:53.558 > ets Jul 29 2019 12:21:46
+18:09:53.558 > 
+18:09:53.561 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:53.564 > configsip: 0, SPIWP:0xee
+18:09:53.567 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:53.572 > mode:DIO, clock div:2
+18:09:53.575 > load:0x3fff0030,len:1184
+18:09:53.578 > load:0x40078000,len:13232
+18:09:53.580 > load:0x40080400,len:3028
+18:09:53.583 > entry 0x400805e4
+18:09:54.019 > 
+18:09:54.021 > Brownout detector was triggered
+18:09:54.023 > 
+18:09:54.023 > ets Jul 29 2019 12:21:46
+18:09:54.023 > 
+18:09:54.026 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:54.029 > configsip: 0, SPIWP:0xee
+18:09:54.032 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:54.037 > mode:DIO, clock div:2
+18:09:54.040 > load:0x3fff0030,len:1184
+18:09:54.042 > load:0x40078000,len:13232
+18:09:54.046 > load:0x40080400,len:3028
+18:09:54.049 > entry 0x400805e4
+18:09:54.485 > 
+18:09:54.485 > Brownout detector was triggered
+18:09:54.488 > 
+18:09:54.488 > ets Jul 29 2019 12:21:46
+18:09:54.488 > 
+18:09:54.491 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:54.493 > configsip: 0, SPIWP:0xee
+18:09:54.496 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:54.502 > mode:DIO, clock div:2
+18:09:54.505 > load:0x3fff0030,len:1184
+18:09:54.507 > load:0x40078000,len:13232
+18:09:54.510 > load:0x40080400,len:3028
+18:09:54.513 > entry 0x400805e4
+18:09:54.950 > 
+18:09:54.950 > Brownout detector was triggered
+18:09:54.954 > 
+18:09:54.954 > ets Jul 29 2019 12:21:46
+18:09:54.954 > 
+18:09:54.956 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:54.959 > configsip: 0, SPIWP:0xee
+18:09:54.962 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:54.967 > mode:DIO, clock div:2
+18:09:54.971 > load:0x3fff0030,len:1184
+18:09:54.973 > load:0x40078000,len:13232
+18:09:54.975 > load:0x40080400,len:3028
+18:09:54.978 > entry 0x400805e4
+18:09:55.415 > 
+18:09:55.415 > Brownout detector was triggered
+18:09:55.418 > 
+18:09:55.418 > ets Jul 29 2019 12:21:46
+18:09:55.418 > 
+18:09:55.421 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:55.423 > configsip: 0, SPIWP:0xee
+18:09:55.426 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:55.432 > mode:DIO, clock div:2
+18:09:55.434 > load:0x3fff0030,len:1184
+18:09:55.438 > load:0x40078000,len:13232
+18:09:55.439 > load:0x40080400,len:3028
+18:09:55.442 > entry 0x400805e4
+18:09:55.878 > 
+18:09:55.879 > Brownout detector was triggered
+18:09:55.882 > 
+18:09:55.882 > ets Jul 29 2019 12:21:46
+18:09:55.882 > 
+18:09:55.885 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:55.888 > configsip: 0, SPIWP:0xee
+18:09:55.891 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:55.896 > mode:DIO, clock div:2
+18:09:55.899 > load:0x3fff0030,len:1184
+18:09:55.902 > load:0x40078000,len:13232
+18:09:55.905 > load:0x40080400,len:3028
+18:09:55.908 > entry 0x400805e4
+18:09:56.344 > 
+18:09:56.344 > Brownout detector was triggered
+18:09:56.348 > 
+18:09:56.348 > ets Jul 29 2019 12:21:46
+18:09:56.348 > 
+18:09:56.350 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:56.353 > configsip: 0, SPIWP:0xee
+18:09:56.356 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:56.361 > mode:DIO, clock div:2
+18:09:56.364 > load:0x3fff0030,len:1184
+18:09:56.367 > load:0x40078000,len:13232
+18:09:56.370 > load:0x40080400,len:3028
+18:09:56.373 > entry 0x400805e4
+18:09:56.809 > 
+18:09:56.809 > Brownout detector was triggered
+18:09:56.812 > 
+18:09:56.812 > ets Jul 29 2019 12:21:46
+18:09:56.812 > 
+18:09:56.816 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:56.817 > configsip: 0, SPIWP:0xee
+18:09:56.820 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:56.826 > mode:DIO, clock div:2
+18:09:56.829 > load:0x3fff0030,len:1184
+18:09:56.831 > load:0x40078000,len:13232
+18:09:56.834 > load:0x40080400,len:3028
+18:09:56.837 > entry 0x400805e4
+18:09:57.273 > 
+18:09:57.274 > Brownout detector was triggered
+18:09:57.277 > 
+18:09:57.277 > ets Jul 29 2019 12:21:46
+18:09:57.277 > 
+18:09:57.280 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:57.284 > configsip: 0, SPIWP:0xee
+18:09:57.285 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:57.291 > mode:DIO, clock div:2
+18:09:57.293 > load:0x3fff0030,len:1184
+18:09:57.296 > load:0x40078000,len:13232
+18:09:57.312 > load:0x40080400,len:3028
+18:09:57.312 > entry 0x400805e4
+18:09:57.738 > 
+18:09:57.738 > Brownout detector was triggered
+18:09:57.742 > 
+18:09:57.742 > ets Jul 29 2019 12:21:46
+18:09:57.742 > 
+18:09:57.744 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:57.747 > configsip: 0, SPIWP:0xee
+18:09:57.750 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:57.755 > mode:DIO, clock div:2
+18:09:57.758 > load:0x3fff0030,len:1184
+18:09:57.761 > load:0x40078000,len:13232
+18:09:57.763 > load:0x40080400,len:3028
+18:09:57.766 > entry 0x400805e4
+18:09:58.203 > 
+18:09:58.203 > Brownout detector was triggered
+18:09:58.206 > 
+18:09:58.206 > ets Jul 29 2019 12:21:46
+18:09:58.206 > 
+18:09:58.209 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:58.212 > configsip: 0, SPIWP:0xee
+18:09:58.214 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:58.220 > mode:DIO, clock div:2
+18:09:58.222 > load:0x3fff0030,len:1184
+18:09:58.225 > load:0x40078000,len:13232
+18:09:58.228 > load:0x40080400,len:3028
+18:09:58.231 > entry 0x400805e4
+18:09:58.668 > 
+18:09:58.669 > Brownout detector was triggered
+18:09:58.671 > 
+18:09:58.671 > ets Jul 29 2019 12:21:46
+18:09:58.671 > 
+18:09:58.675 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:58.677 > configsip: 0, SPIWP:0xee
+18:09:58.680 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:58.684 > mode:DIO, clock div:2
+18:09:58.687 > load:0x3fff0030,len:1184
+18:09:58.690 > load:0x40078000,len:13232
+18:09:58.693 > load:0x40080400,len:3028
+18:09:58.696 > entry 0x400805e4
+18:09:59.132 > 
+18:09:59.132 > Brownout detector was triggered
+18:09:59.136 > 
+18:09:59.136 > ets Jul 29 2019 12:21:46
+18:09:59.136 > 
+18:09:59.139 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:59.141 > configsip: 0, SPIWP:0xee
+18:09:59.144 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:59.149 > mode:DIO, clock div:2
+18:09:59.152 > load:0x3fff0030,len:1184
+18:09:59.155 > load:0x40078000,len:13232
+18:09:59.158 > load:0x40080400,len:3028
+18:09:59.160 > entry 0x400805e4
+18:09:59.597 > 
+18:09:59.597 > Brownout detector was triggered
+18:09:59.600 > 
+18:09:59.600 > ets Jul 29 2019 12:21:46
+18:09:59.600 > 
+18:09:59.603 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:09:59.606 > configsip: 0, SPIWP:0xee
+18:09:59.609 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:09:59.614 > mode:DIO, clock div:2
+18:09:59.618 > load:0x3fff0030,len:1184
+18:09:59.620 > load:0x40078000,len:13232
+18:09:59.623 > load:0x40080400,len:3028
+18:09:59.625 > entry 0x400805e4
+18:10:00.062 > 
+18:10:00.062 > Brownout detector was triggered
+18:10:00.066 > 
+18:10:00.066 > ets Jul 29 2019 12:21:46
+18:10:00.066 > 
+18:10:00.068 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:00.072 > configsip: 0, SPIWP:0xee
+18:10:00.074 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:00.079 > mode:DIO, clock div:2
+18:10:00.082 > load:0x3fff0030,len:1184
+18:10:00.084 > load:0x40078000,len:13232
+18:10:00.087 > load:0x40080400,len:3028
+18:10:00.090 > entry 0x400805e4
+18:10:00.527 > 
+18:10:00.527 > Brownout detector was triggered
+18:10:00.530 > 
+18:10:00.530 > ets Jul 29 2019 12:21:46
+18:10:00.530 > 
+18:10:00.533 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:00.535 > configsip: 0, SPIWP:0xee
+18:10:00.538 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:00.544 > mode:DIO, clock div:2
+18:10:00.546 > load:0x3fff0030,len:1184
+18:10:00.549 > load:0x40078000,len:13232
+18:10:00.552 > load:0x40080400,len:3028
+18:10:00.555 > entry 0x400805e4
+18:10:00.991 > 
+18:10:00.992 > Brownout detector was triggered
+18:10:00.995 > 
+18:10:00.995 > ets Jul 29 2019 12:21:46
+18:10:00.995 > 
+18:10:00.998 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:01.000 > configsip: 0, SPIWP:0xee
+18:10:01.003 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:01.008 > mode:DIO, clock div:2
+18:10:01.011 > load:0x3fff0030,len:1184
+18:10:01.014 > load:0x40078000,len:13232
+18:10:01.016 > load:0x40080400,len:3028
+18:10:01.019 > entry 0x400805e4
+18:10:01.456 > 
+18:10:01.456 > Brownout detector was triggered
+18:10:01.460 > 
+18:10:01.460 > ets Jul 29 2019 12:21:46
+18:10:01.460 > 
+18:10:01.462 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:01.465 > configsip: 0, SPIWP:0xee
+18:10:01.468 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:01.473 > mode:DIO, clock div:2
+18:10:01.475 > load:0x3fff0030,len:1184
+18:10:01.478 > load:0x40078000,len:13232
+18:10:01.481 > load:0x40080400,len:3028
+18:10:01.484 > entry 0x400805e4
+18:10:01.921 > 
+18:10:01.921 > Brownout detector was triggered
+18:10:01.924 > 
+18:10:01.924 > ets Jul 29 2019 12:21:46
+18:10:01.924 > 
+18:10:01.927 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:01.930 > configsip: 0, SPIWP:0xee
+18:10:01.932 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:01.937 > mode:DIO, clock div:2
+18:10:01.940 > load:0x3fff0030,len:1184
+18:10:01.943 > load:0x40078000,len:13232
+18:10:01.946 > load:0x40080400,len:3028
+18:10:01.949 > entry 0x400805e4
+18:10:02.385 > 
+18:10:02.385 > Brownout detector was triggered
+18:10:02.389 > 
+18:10:02.389 > ets Jul 29 2019 12:21:46
+18:10:02.389 > 
+18:10:02.392 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:02.395 > configsip: 0, SPIWP:0xee
+18:10:02.397 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:02.402 > mode:DIO, clock div:2
+18:10:02.405 > load:0x3fff0030,len:1184
+18:10:02.408 > load:0x40078000,len:13232
+18:10:02.411 > load:0x40080400,len:3028
+18:10:02.413 > entry 0x400805e4
+18:10:02.850 > 
+18:10:02.850 > Brownout detector was triggered
+18:10:02.854 > 
+18:10:02.854 > ets Jul 29 2019 12:21:46
+18:10:02.854 > 
+18:10:02.857 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:02.859 > configsip: 0, SPIWP:0xee
+18:10:02.862 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:02.867 > mode:DIO, clock div:2
+18:10:02.870 > load:0x3fff0030,len:1184
+18:10:02.874 > load:0x40078000,len:13232
+18:10:02.876 > load:0x40080400,len:3028
+18:10:02.878 > entry 0x400805e4
+18:10:03.314 > 
+18:10:03.316 > Brownout detector was triggered
+18:10:03.318 > 
+18:10:03.318 > ets Jul 29 2019 12:21:46
+18:10:03.318 > 
+18:10:03.322 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:03.324 > configsip: 0, SPIWP:0xee
+18:10:03.326 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:03.331 > mode:DIO, clock div:2
+18:10:03.335 > load:0x3fff0030,len:1184
+18:10:03.338 > load:0x40078000,len:13232
+18:10:03.340 > load:0x40080400,len:3028
+18:10:03.343 > entry 0x400805e4
+18:10:03.779 > 
+18:10:03.779 > Brownout detector was triggered
+18:10:03.782 > 
+18:10:03.782 > ets Jul 29 2019 12:21:46
+18:10:03.782 > 
+18:10:03.785 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:03.788 > configsip: 0, SPIWP:0xee
+18:10:03.791 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:03.796 > mode:DIO, clock div:2
+18:10:03.799 > load:0x3fff0030,len:1184
+18:10:03.802 > load:0x40078000,len:13232
+18:10:03.805 > load:0x40080400,len:3028
+18:10:03.808 > entry 0x400805e4
+18:10:04.245 > 
+18:10:04.245 > Brownout detector was triggered
+18:10:04.248 > 
+18:10:04.248 > ets Jul 29 2019 12:21:46
+18:10:04.248 > 
+18:10:04.251 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:04.253 > configsip: 0, SPIWP:0xee
+18:10:04.256 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:04.262 > mode:DIO, clock div:2
+18:10:04.265 > load:0x3fff0030,len:1184
+18:10:04.268 > load:0x40078000,len:13232
+18:10:04.270 > load:0x40080400,len:3028
+18:10:04.273 > entry 0x400805e4
+18:10:04.709 > 
+18:10:04.710 > Brownout detector was triggered
+18:10:04.713 > 
+18:10:04.713 > ets Jul 29 2019 12:21:46
+18:10:04.713 > 
+18:10:04.716 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:04.718 > configsip: 0, SPIWP:0xee
+18:10:04.721 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:04.726 > mode:DIO, clock div:2
+18:10:04.729 > load:0x3fff0030,len:1184
+18:10:04.732 > load:0x40078000,len:13232
+18:10:04.735 > load:0x40080400,len:3028
+18:10:04.738 > entry 0x400805e4
+18:10:05.174 > 
+18:10:05.174 > Brownout detector was triggered
+18:10:05.177 > 
+18:10:05.177 > ets Jul 29 2019 12:21:46
+18:10:05.177 > 
+18:10:05.180 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:05.183 > configsip: 0, SPIWP:0xee
+18:10:05.186 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:05.191 > mode:DIO, clock div:2
+18:10:05.194 > load:0x3fff0030,len:1184
+18:10:05.197 > load:0x40078000,len:13232
+18:10:05.199 > load:0x40080400,len:3028
+18:10:05.202 > entry 0x400805e4
+18:10:05.639 > 
+18:10:05.639 > Brownout detector was triggered
+18:10:05.642 > 
+18:10:05.642 > ets Jul 29 2019 12:21:46
+18:10:05.642 > 
+18:10:05.645 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:05.647 > configsip: 0, SPIWP:0xee
+18:10:05.651 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:05.656 > mode:DIO, clock div:2
+18:10:05.658 > load:0x3fff0030,len:1184
+18:10:05.661 > load:0x40078000,len:13232
+18:10:05.664 > load:0x40080400,len:3028
+18:10:05.667 > entry 0x400805e4
+18:10:06.103 > 
+18:10:06.103 > Brownout detector was triggered
+18:10:06.107 > 
+18:10:06.107 > ets Jul 29 2019 12:21:46
+18:10:06.107 > 
+18:10:06.109 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:06.112 > configsip: 0, SPIWP:0xee
+18:10:06.115 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:06.120 > mode:DIO, clock div:2
+18:10:06.123 > load:0x3fff0030,len:1184
+18:10:06.126 > load:0x40078000,len:13232
+18:10:06.128 > load:0x40080400,len:3028
+18:10:06.131 > entry 0x400805e4
+18:10:06.568 > 
+18:10:06.568 > Brownout detector was triggered
+18:10:06.572 > 
+18:10:06.572 > ets Jul 29 2019 12:21:46
+18:10:06.572 > 
+18:10:06.574 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:06.577 > configsip: 0, SPIWP:0xee
+18:10:06.580 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:06.585 > mode:DIO, clock div:2
+18:10:06.588 > load:0x3fff0030,len:1184
+18:10:06.591 > load:0x40078000,len:13232
+18:10:06.593 > load:0x40080400,len:3028
+18:10:06.597 > entry 0x400805e4
+18:10:07.033 > 
+18:10:07.034 > Brownout detector was triggered
+18:10:07.036 > 
+18:10:07.036 > ets Jul 29 2019 12:21:46
+18:10:07.036 > 
+18:10:07.039 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:07.041 > configsip: 0, SPIWP:0xee
+18:10:07.044 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:07.049 > mode:DIO, clock div:2
+18:10:07.052 > load:0x3fff0030,len:1184
+18:10:07.055 > load:0x40078000,len:13232
+18:10:07.058 > load:0x40080400,len:3028
+18:10:07.061 > entry 0x400805e4
+18:10:07.497 > 
+18:10:07.498 > Brownout detector was triggered
+18:10:07.501 > 
+18:10:07.501 > ets Jul 29 2019 12:21:46
+18:10:07.501 > 
+18:10:07.503 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:07.506 > configsip: 0, SPIWP:0xee
+18:10:07.509 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:07.514 > mode:DIO, clock div:2
+18:10:07.517 > load:0x3fff0030,len:1184
+18:10:07.520 > load:0x40078000,len:13232
+18:10:07.523 > load:0x40080400,len:3028
+18:10:07.526 > entry 0x400805e4
+18:10:07.962 > 
+18:10:07.963 > Brownout detector was triggered
+18:10:07.966 > 
+18:10:07.966 > ets Jul 29 2019 12:21:46
+18:10:07.966 > 
+18:10:07.969 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:07.972 > configsip: 0, SPIWP:0xee
+18:10:07.974 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:07.979 > mode:DIO, clock div:2
+18:10:07.982 > load:0x3fff0030,len:1184
+18:10:07.985 > load:0x40078000,len:13232
+18:10:07.988 > load:0x40080400,len:3028
+18:10:07.991 > entry 0x400805e4
+18:10:08.427 > 
+18:10:08.427 > Brownout detector was triggered
+18:10:08.431 > 
+18:10:08.431 > ets Jul 29 2019 12:21:46
+18:10:08.431 > 
+18:10:08.434 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:08.436 > configsip: 0, SPIWP:0xee
+18:10:08.439 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:08.445 > mode:DIO, clock div:2
+18:10:08.447 > load:0x3fff0030,len:1184
+18:10:08.450 > load:0x40078000,len:13232
+18:10:08.453 > load:0x40080400,len:3028
+18:10:08.456 > entry 0x400805e4
+18:10:08.892 > 
+18:10:08.892 > Brownout detector was triggered
+18:10:08.895 > 
+18:10:08.895 > ets Jul 29 2019 12:21:46
+18:10:08.895 > 
+18:10:08.898 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:08.901 > configsip: 0, SPIWP:0xee
+18:10:08.904 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:08.909 > mode:DIO, clock div:2
+18:10:08.912 > load:0x3fff0030,len:1184
+18:10:08.915 > load:0x40078000,len:13232
+18:10:08.917 > load:0x40080400,len:3028
+18:10:08.920 > entry 0x400805e4
+18:10:09.357 > 
+18:10:09.358 > Brownout detector was triggered
+18:10:09.360 > 
+18:10:09.360 > ets Jul 29 2019 12:21:46
+18:10:09.360 > 
+18:10:09.363 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:09.366 > configsip: 0, SPIWP:0xee
+18:10:09.369 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:09.374 > mode:DIO, clock div:2
+18:10:09.377 > load:0x3fff0030,len:1184
+18:10:09.379 > load:0x40078000,len:13232
+18:10:09.382 > load:0x40080400,len:3028
+18:10:09.385 > entry 0x400805e4
+18:10:09.822 > 
+18:10:09.822 > Brownout detector was triggered
+18:10:09.826 > 
+18:10:09.826 > ets Jul 29 2019 12:21:46
+18:10:09.826 > 
+18:10:09.829 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:09.831 > configsip: 0, SPIWP:0xee
+18:10:09.834 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:09.839 > mode:DIO, clock div:2
+18:10:09.842 > load:0x3fff0030,len:1184
+18:10:09.845 > load:0x40078000,len:13232
+18:10:09.847 > load:0x40080400,len:3028
+18:10:09.850 > entry 0x400805e4
+18:10:10.287 > 
+18:10:10.287 > Brownout detector was triggered
+18:10:10.290 > 
+18:10:10.290 > ets Jul 29 2019 12:21:46
+18:10:10.290 > 
+18:10:10.293 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:10.296 > configsip: 0, SPIWP:0xee
+18:10:10.298 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:10.304 > mode:DIO, clock div:2
+18:10:10.307 > load:0x3fff0030,len:1184
+18:10:10.309 > load:0x40078000,len:13232
+18:10:10.312 > load:0x40080400,len:3028
+18:10:10.315 > entry 0x400805e4
+18:10:10.752 > 
+18:10:10.752 > Brownout detector was triggered
+18:10:10.755 > 
+18:10:10.755 > ets Jul 29 2019 12:21:46
+18:10:10.755 > 
+18:10:10.758 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:10.761 > configsip: 0, SPIWP:0xee
+18:10:10.763 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:10.768 > mode:DIO, clock div:2
+18:10:10.771 > load:0x3fff0030,len:1184
+18:10:10.774 > load:0x40078000,len:13232
+18:10:10.777 > load:0x40080400,len:3028
+18:10:10.779 > entry 0x400805e4
+18:10:11.216 > 
+18:10:11.217 > Brownout detector was triggered
+18:10:11.219 > 
+18:10:11.219 > ets Jul 29 2019 12:21:46
+18:10:11.219 > 
+18:10:11.222 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:11.224 > configsip: 0, SPIWP:0xee
+18:10:11.228 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:11.234 > mode:DIO, clock div:2
+18:10:11.236 > load:0x3fff0030,len:1184
+18:10:11.244 > load:0x40078000,len:13232
+18:10:11.244 > load:0x40080400,len:3028
+18:10:11.245 > entry 0x400805e4
+18:10:11.681 > 
+18:10:11.681 > Brownout detector was triggered
+18:10:11.684 > 
+18:10:11.684 > ets Jul 29 2019 12:21:46
+18:10:11.684 > 
+18:10:11.687 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:11.690 > configsip: 0, SPIWP:0xee
+18:10:11.693 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:11.698 > mode:DIO, clock div:2
+18:10:11.701 > load:0x3fff0030,len:1184
+18:10:11.704 > load:0x40078000,len:13232
+18:10:11.707 > load:0x40080400,len:3028
+18:10:11.709 > entry 0x400805e4
+18:10:12.145 > 
+18:10:12.146 > Brownout detector was triggered
+18:10:12.149 > 
+18:10:12.149 > ets Jul 29 2019 12:21:46
+18:10:12.149 > 
+18:10:12.152 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:12.155 > configsip: 0, SPIWP:0xee
+18:10:12.158 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:12.163 > mode:DIO, clock div:2
+18:10:12.166 > load:0x3fff0030,len:1184
+18:10:12.168 > load:0x40078000,len:13232
+18:10:12.171 > load:0x40080400,len:3028
+18:10:12.174 > entry 0x400805e4
+18:10:12.610 > 
+18:10:12.611 > Brownout detector was triggered
+18:10:12.614 > 
+18:10:12.614 > ets Jul 29 2019 12:21:46
+18:10:12.614 > 
+18:10:12.617 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:12.619 > configsip: 0, SPIWP:0xee
+18:10:12.622 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:12.627 > mode:DIO, clock div:2
+18:10:12.630 > load:0x3fff0030,len:1184
+18:10:12.633 > load:0x40078000,len:13232
+18:10:12.636 > load:0x40080400,len:3028
+18:10:12.639 > entry 0x400805e4
+18:10:13.075 > 
+18:10:13.075 > Brownout detector was triggered
+18:10:13.079 > 
+18:10:13.079 > ets Jul 29 2019 12:21:46
+18:10:13.079 > 
+18:10:13.081 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:13.084 > configsip: 0, SPIWP:0xee
+18:10:13.087 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:13.093 > mode:DIO, clock div:2
+18:10:13.095 > load:0x3fff0030,len:1184
+18:10:13.098 > load:0x40078000,len:13232
+18:10:13.101 > load:0x40080400,len:3028
+18:10:13.104 > entry 0x400805e4
+18:10:13.540 > 
+18:10:13.540 > Brownout detector was triggered
+18:10:13.543 > 
+18:10:13.543 > ets Jul 29 2019 12:21:46
+18:10:13.543 > 
+18:10:13.546 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:13.548 > configsip: 0, SPIWP:0xee
+18:10:13.553 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:13.557 > mode:DIO, clock div:2
+18:10:13.560 > load:0x3fff0030,len:1184
+18:10:13.563 > load:0x40078000,len:13232
+18:10:13.566 > load:0x40080400,len:3028
+18:10:13.569 > entry 0x400805e4
+18:10:14.004 > 
+18:10:14.005 > Brownout detector was triggered
+18:10:14.008 > 
+18:10:14.008 > ets Jul 29 2019 12:21:46
+18:10:14.008 > 
+18:10:14.011 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:14.014 > configsip: 0, SPIWP:0xee
+18:10:14.016 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:14.022 > mode:DIO, clock div:2
+18:10:14.024 > load:0x3fff0030,len:1184
+18:10:14.027 > load:0x40078000,len:13232
+18:10:14.030 > load:0x40080400,len:3028
+18:10:14.033 > entry 0x400805e4
+18:10:14.470 > 
+18:10:14.470 > Brownout detector was triggered
+18:10:14.473 > 
+18:10:14.473 > ets Jul 29 2019 12:21:46
+18:10:14.473 > 
+18:10:14.476 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:14.479 > configsip: 0, SPIWP:0xee
+18:10:14.482 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:14.487 > mode:DIO, clock div:2
+18:10:14.490 > load:0x3fff0030,len:1184
+18:10:14.492 > load:0x40078000,len:13232
+18:10:14.495 > load:0x40080400,len:3028
+18:10:14.498 > entry 0x400805e4
+18:10:14.934 > 
+18:10:14.935 > Brownout detector was triggered
+18:10:14.938 > 
+18:10:14.938 > ets Jul 29 2019 12:21:46
+18:10:14.938 > 
+18:10:14.941 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:14.944 > configsip: 0, SPIWP:0xee
+18:10:14.946 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:14.952 > mode:DIO, clock div:2
+18:10:14.955 > load:0x3fff0030,len:1184
+18:10:14.957 > load:0x40078000,len:13232
+18:10:14.960 > load:0x40080400,len:3028
+18:10:14.963 > entry 0x400805e4
+18:10:15.399 > 
+18:10:15.399 > Brownout detector was triggered
+18:10:15.403 > 
+18:10:15.403 > ets Jul 29 2019 12:21:46
+18:10:15.403 > 
+18:10:15.406 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:15.408 > configsip: 0, SPIWP:0xee
+18:10:15.411 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:15.416 > mode:DIO, clock div:2
+18:10:15.419 > load:0x3fff0030,len:1184
+18:10:15.422 > load:0x40078000,len:13232
+18:10:15.424 > load:0x40080400,len:3028
+18:10:15.428 > entry 0x400805e4
+18:10:15.864 > 
+18:10:15.864 > Brownout detector was triggered
+18:10:15.867 > 
+18:10:15.867 > ets Jul 29 2019 12:21:46
+18:10:15.867 > 
+18:10:15.870 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:15.872 > configsip: 0, SPIWP:0xee
+18:10:15.876 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:15.881 > mode:DIO, clock div:2
+18:10:15.884 > load:0x3fff0030,len:1184
+18:10:15.886 > load:0x40078000,len:13232
+18:10:15.889 > load:0x40080400,len:3028
+18:10:15.893 > entry 0x400805e4
+18:10:16.329 > 
+18:10:16.330 > Brownout detector was triggered
+18:10:16.332 > 
+18:10:16.332 > ets Jul 29 2019 12:21:46
+18:10:16.332 > 
+18:10:16.335 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:16.339 > configsip: 0, SPIWP:0xee
+18:10:16.341 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:16.346 > mode:DIO, clock div:2
+18:10:16.349 > load:0x3fff0030,len:1184
+18:10:16.352 > load:0x40078000,len:13232
+18:10:16.355 > load:0x40080400,len:3028
+18:10:16.358 > entry 0x400805e4
+18:10:16.794 > 
+18:10:16.795 > Brownout detector was triggered
+18:10:16.798 > 
+18:10:16.798 > ets Jul 29 2019 12:21:46
+18:10:16.798 > 
+18:10:16.801 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:16.804 > configsip: 0, SPIWP:0xee
+18:10:16.807 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:16.812 > mode:DIO, clock div:2
+18:10:16.815 > load:0x3fff0030,len:1184
+18:10:16.818 > load:0x40078000,len:13232
+18:10:16.820 > load:0x40080400,len:3028
+18:10:16.823 > entry 0x400805e4
+18:10:17.236 > 
+18:10:17.236 > Brownout detector was triggered
+18:10:17.240 > 
+18:10:17.240 > ets Jul 29 2019 12:21:46
+18:10:17.240 > 
+18:10:17.242 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:17.245 > configsip: 0, SPIWP:0xee
+18:10:17.248 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:17.253 > mode:DIO, clock div:2
+18:10:17.256 > load:0x3fff0030,len:1184
+18:10:17.259 > load:0x40078000,len:13232
+18:10:17.262 > load:0x40080400,len:3028
+18:10:17.264 > entry 0x400805e4
+18:10:17.671 > 
+18:10:17.671 > Brownout detector was triggered
+18:10:17.674 > 
+18:10:17.674 > ets Jul 29 2019 12:21:46
+18:10:17.674 > 
+18:10:17.676 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:17.679 > configsip: 0, SPIWP:0xee
+18:10:17.682 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:17.688 > mode:DIO, clock div:2
+18:10:17.690 > load:0x3fff0030,len:1184
+18:10:17.694 > load:0x40078000,len:13232
+18:10:17.696 > load:0x40080400,len:3028
+18:10:17.700 > entry 0x400805e4
+18:10:18.104 > 
+18:10:18.105 > Brownout detector was triggered
+18:10:18.109 > 
+18:10:18.109 > ets Jul 29 2019 12:21:46
+18:10:18.109 > 
+18:10:18.112 > rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+18:10:18.114 > configsip: 0, SPIWP:0xee
+18:10:18.117 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+18:10:18.124 > mode:DIO, clock div:2
+18:10:18.125 > load:0x3fff0030,len:1184
+18:10:18.128 > load:0x40078000,len:13232
+18:10:18.131 > load:0x40080400,len:3028
+18:10:18.134 > entry 0x400805e4

@@ -1,0 +1,25 @@
+14:49:22.768 > ets Jul 29 2019 12:21:46
+14:49:22.768 > 
+14:49:22.768 > rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+14:49:22.771 > configsip: 0, SPIWP:0xee
+14:49:22.779 > clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+14:49:22.785 > mode:DIO, clock div:2
+14:49:22.787 > load:0x3fff0030,len:1184
+14:49:22.789 > load:0x40078000,len:13232
+14:49:22.792 > load:0x40080400,len:3028
+14:49:22.792 > entry 0x400805e4
+14:49:23.254 > [启动] 上次复位原因=1 (上电复位)
+14:49:23.926 > [   727][E][esp32-hal-cpu.c:110] addApbChangeCallback(): duplicate func=0x400ebcbc arg=0x3ffbdc30
+14:49:23.938 > LittleFS 初始化成功
+14:49:23.938 > [SD] SPI 引脚: SCK=18 MISO=19 MOSI=23 CS=32
+14:49:24.006 > [   807][E][sd_diskio.cpp:806] sdcard_mount(): f_mount failed: (1) A hard error occurred in the low level disk I/O layer
+14:49:24.015 > [   819][W][sd_diskio.cpp:180] sdCommand(): crc error
+14:49:24.116 > [SD] 20 MHz 挂载失败，自动降速重试
+14:49:24.190 > [SD] 挂载成功：速率=10 MHz 类型=SDHC/SDXC 容量=7580 MB
+14:49:24.211 > 写入成功
+14:49:24.217 > 追加成功
+14:49:24.223 > 扫描到 0 张图片
+14:49:28.653 > [WiFi] 稳定性优化已启用: setSleep(false)/autoReconnect/TX=11dBm
+14:49:32.458 > [语音] I2S 初始化: 成功
+14:49:32.458 > Web 服务器已启动，访问 http://192.168.1.137
+14:49:32.458 > 服务器已启动
