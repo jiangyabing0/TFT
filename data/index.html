@@ -17,6 +17,9 @@
   .img-list li { padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
   .img-list li:hover { background: #e8f5e9; }
   .img-name { flex: 1; }
+  #voiceBtn { background-color: #dc3545; color: white; user-select: none; }
+  #voiceBtn:active { background-color: #a71d2a; }
+  #listenLabel { margin-left: 12px; user-select: none; color: #333; font-size: 14px; }
   .status { color: #666; margin-top: 10px; }
 </style>
 </head>
@@ -45,9 +48,11 @@
   </div>
   <!-- 语音对话区域 -->
   <div class="card">
-  <h2>语音助手</h2>
-  <button id="voiceBtn">🔴 开始语音对话</button>
-  <div class="status" id="voiceStatus">未连接</div>
+    <h2>ESP32 语音对话</h2>
+    <button id="voiceBtn">🔴 按住说话</button>
+    <label id="listenLabel"><input type="checkbox" id="listenChk" checked> 播放 ESP32 麦克风的声音</label>
+    <div class="status" id="voiceStatus">未连接</div>
+    <div class="status">按住按钮：手机麦克风的声音送到 ESP32 喇叭播放；松开：ESP32 麦克风的声音传回手机。</div>
   </div>
 
   <script>
@@ -116,69 +121,194 @@
     }
 
     loadImages();
-      // === 语音对话逻辑 ===
-const voiceBtn = document.getElementById('voiceBtn');
-const voiceStatus = document.getElementById('voiceStatus');
-let wsAudio = null;
-let audioCtx = null;
+    /* ================= 语音对话 ================= */
+    // 与 ESP32 固件的格式约定：
+    //   音频：16000Hz / 单声道 / 16bit 小端 PCM
+    //   网页 -> ESP32：文本帧 "start" / "stop" / "listen:0|1"，二进制帧每包 1024 采样点(2048字节)
+    //   ESP32 -> 网页：二进制帧（每包约 1~2KB）
+    const AUDIO_RATE = 16000;          // 采样率（与固件 sample_rate 一致）
+    const MIC_CHUNK_SAMPLES = 1024;    // 每次上传 1024 采样点 = 2048 字节
 
-voiceBtn.addEventListener('click', async () => {
-  if (!wsAudio || wsAudio.readyState !== WebSocket.OPEN) {
-    // 初始化 WebSocket 连接到 ESP32
-    wsAudio = new WebSocket(`ws://${window.location.host}/audio`);
-    
-    wsAudio.onopen = () => {
-      voiceStatus.textContent = '已连接，点击开始说话';
-      voiceBtn.textContent = '停止';
-    };
+    const voiceBtn = document.getElementById('voiceBtn');
+    const voiceStatusEl = document.getElementById('voiceStatus');
+    const listenChk = document.getElementById('listenChk');
 
-    wsAudio.onmessage = (event) => {
-      // 收到 ESP32 返回的音频数据（假设是二进制）
-      if (audioCtx && event.data instanceof ArrayBuffer) {
-        audioCtx.decodeAudioData(event.data).then(buffer => {
-          const source = audioCtx.createBufferSource();
-          source.buffer = buffer;
-          source.connect(audioCtx.destination);
-          source.start();
-        });
-      }
-    };
+    let wsAudio = null;        // WebSocket 连接
+    let wsRetryTimer = null;   // 断线重连定时器
+    let micCtx = null;         // 录音用的 AudioContext（网页 -> ESP32）
+    let micStream = null;
+    let micSource = null;
+    let micProcessor = null;
+    let micPhase = 0;          // 重采样相位，跨回调保持连续
+    let spkCtx = null;         // 播放用的 AudioContext（ESP32 -> 网页）
+    let spkNextTime = 0;       // 下一块音频的播放时刻（用于无缝拼接）
+    let pressing = false;      // 是否正在“按住说话”
 
-    // 获取麦克风权限并开始录音
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
-      const source = audioCtx.createMediaStreamSource(stream);
-      
-      // 定时把麦克风数据发送给 ESP32
-      const processor = audioCtx.createScriptProcessor(4096, 1, 1);
-      processor.onaudioprocess = (e) => {
-        if (wsAudio && wsAudio.readyState === WebSocket.OPEN) {
-          // 将 Float32 转换为 16-bit PCM 并发送
-          const input = e.inputBuffer.getChannelData(0);
-          const buf = new ArrayBuffer(input.length * 2);
-          const view = new DataView(buf);
-          for (let i = 0; i < input.length; i++) {
-            view.setInt16(i * 2, input[i] * 0x7FFF, true);
-          }
-          wsAudio.send(buf);
+    function setVoiceStatus(text) { voiceStatusEl.textContent = text; }
+
+    // 只在连接已打开时发送，否则浏览器会报
+    // "Failed to execute 'send' on 'WebSocket': Still in CONNECTING state."
+    function sendText(text) {
+      if (wsAudio && wsAudio.readyState === WebSocket.OPEN) wsAudio.send(text);
+    }
+
+    // ---------- 1. 建立 WebSocket 连接（断线自动重连） ----------
+    function connectAudio() {
+      if (wsAudio && (wsAudio.readyState === WebSocket.OPEN || wsAudio.readyState === WebSocket.CONNECTING)) return;
+      setVoiceStatus('正在连接...');
+      wsAudio = new WebSocket(`ws://${window.location.host}/audio`);
+      wsAudio.binaryType = 'arraybuffer'; // 必须指定，否则无法接收二进制音频
+
+      wsAudio.onopen = () => {
+        if (wsRetryTimer) { clearTimeout(wsRetryTimer); wsRetryTimer = null; }
+        setVoiceStatus('已连接，按住按钮说话');
+        sendText(listenChk.checked ? 'listen:1' : 'listen:0');
+      };
+      wsAudio.onclose = () => {
+        // ESP32 重启、手机息屏、WiFi 抖动都会断开连接，这里 1 秒后自动重连
+        setVoiceStatus('连接已断开，1 秒后自动重连...');
+        pressing = false;
+        voiceBtn.textContent = '🔴 按住说话';
+        if (!wsRetryTimer) {
+          wsRetryTimer = setTimeout(() => { wsRetryTimer = null; connectAudio(); }, 1000);
         }
       };
-      source.connect(processor);
-      processor.connect(audioCtx.destination);
+      wsAudio.onerror = () => { setVoiceStatus('WebSocket 出错，正在重连...'); };
 
-    } catch (err) {
-      voiceStatus.textContent = '麦克风权限被拒绝';
+      // ---------- 2. 接收 ESP32 麦克风的声音并播放 ----------
+      wsAudio.onmessage = (event) => {
+        if (event.data instanceof ArrayBuffer) playFromEsp32(new Uint8Array(event.data));
+      };
     }
-  } else {
-    // 停止对话
-    wsAudio.close();
-    wsAudio = null;
-    if (audioCtx) audioCtx.close();
-    voiceStatus.textContent = '已断开';
-    voiceBtn.textContent = '🔴 开始语音对话';
-  }
-});
+
+    // ---------- 3. 播放 ESP32 传来的 PCM（无缝拼接，不再用 WAV 碎片） ----------
+    function initSpeaker() {
+      if (!spkCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        spkCtx = new Ctx();
+      }
+      // 手机/Chrome 要求必须在用户手势里才能出声
+      if (spkCtx.state === 'suspended') spkCtx.resume();
+    }
+
+    function playFromEsp32(bytes) {
+      if (!spkCtx || bytes.length < 2) return;
+      const samples = Math.floor(bytes.length / 2);
+      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.length);
+      const buf = spkCtx.createBuffer(1, samples, AUDIO_RATE); // 按 16000Hz 建缓冲，浏览器自动重采样播放
+      const ch = buf.getChannelData(0);
+      for (let i = 0; i < samples; i++) ch[i] = view.getInt16(i * 2, true) / 32768;
+
+      const src = spkCtx.createBufferSource();
+      src.buffer = buf;
+      src.connect(spkCtx.destination);
+      const now = spkCtx.currentTime;
+      if (spkNextTime < now + 0.06) spkNextTime = now + 0.06; // 预缓冲 60ms 抗网络抖动
+      src.start(spkNextTime);
+      spkNextTime += buf.duration;                            // 紧接上一块，声音连续
+    }
+
+    // ---------- 4. 采集手机麦克风并发送给 ESP32 ----------
+    // 浏览器可能忽略 16000Hz 的请求（例如 Firefox 固定用 48kHz），
+    // 这里做线性插值重采样，保证发给 ESP32 的始终是 16kHz。
+    function resampleTo16k(input) {
+      const ratio = micCtx.sampleRate / AUDIO_RATE;
+      if (Math.abs(ratio - 1) < 0.001) return input;
+      const outLen = Math.max(1, Math.floor((input.length - 1 - micPhase) / ratio));
+      const out = new Float32Array(outLen);
+      for (let i = 0; i < outLen; i++) {
+        const pos = micPhase + i * ratio;
+        const i0 = Math.floor(pos);
+        const frac = pos - i0;
+        const a = input[i0];
+        const b = (i0 + 1 < input.length) ? input[i0 + 1] : a;
+        out[i] = a + (b - a) * frac;
+      }
+      micPhase = Math.max(0, micPhase + outLen * ratio - input.length);
+      return out;
+    }
+
+    async function initMic() {
+      if (micCtx) return true;
+      // 注意：http:// 页面属于“非安全上下文”，浏览器会禁用麦克风
+      // （此时 navigator.mediaDevices 是 undefined）。
+      // 请用 https:// 打开本页，或在电脑上把本站地址加入
+      // chrome://flags/#unsafely-treat-insecure-origin-as-secure
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setVoiceStatus('浏览器禁止在 http:// 页面使用麦克风：请用 https:// 打开本页，或在电脑 Chrome 里把本站加入“不安全源白名单”');
+        return false;
+      }
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        micCtx = new Ctx({ sampleRate: AUDIO_RATE });
+        micStream = await navigator.mediaDevices.getUserMedia({
+          audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+        });
+        micSource = micCtx.createMediaStreamSource(micStream);
+        micProcessor = micCtx.createScriptProcessor(MIC_CHUNK_SAMPLES, 1, 1);
+
+        micProcessor.onaudioprocess = (e) => {
+          if (!pressing) return;                                         // 没按住就不发送
+          if (!wsAudio || wsAudio.readyState !== WebSocket.OPEN) return;  // 连接断开时不发送
+          const pcmF32 = resampleTo16k(e.inputBuffer.getChannelData(0));
+          const pcm16 = new Int16Array(pcmF32.length);                    // 1024 采样点 = 2048 字节
+          for (let i = 0; i < pcmF32.length; i++) {
+            const s = Math.round(pcmF32[i] * 32767);
+            pcm16[i] = s < -32768 ? -32768 : (s > 32767 ? 32767 : s);      // 限幅，避免溢出爆音
+          }
+          wsAudio.send(pcm16.buffer);
+        };
+        micSource.connect(micProcessor);
+        micProcessor.connect(micCtx.destination); // 必须接上 destination 才会触发 onaudioprocess
+        return true;
+      } catch (err) {
+        setVoiceStatus('无法使用麦克风：' + (err && err.name ? err.name : err));
+        return false;
+      }
+    }
+
+    // ---------- 5. 按住说话 / 松开停止（鼠标 + 触屏都支持） ----------
+    async function startTalk(ev) {
+      if (ev && ev.cancelable) ev.preventDefault(); // 触屏时阻止再触发一套鼠标事件
+      if (pressing) return;
+      pressing = true;
+      voiceBtn.textContent = '🔴 正在说话...';
+      initSpeaker();                                 // 在用户手势里恢复播放（手机自动播放策略）
+      if (!(await initMic())) {
+        pressing = false;
+        voiceBtn.textContent = '🔴 按住说话';
+        return;
+      }
+      if (!pressing) return;                         // 等待权限期间已经松手了
+      if (micCtx.state === 'suspended') await micCtx.resume();
+      sendText('start');                             // 通知 ESP32 打开功放准备播放
+    }
+
+    function stopTalk(ev) {
+      if (ev && ev.cancelable) ev.preventDefault();
+      if (!pressing) return;
+      pressing = false;
+      sendText('stop');                              // 通知 ESP32 关闭功放，恢复麦克风
+      voiceBtn.textContent = '🔴 按住说话';
+      if (micCtx && micCtx.state === 'running') micCtx.suspend(); // 暂停录音回调，不再发送数据
+    }
+
+    voiceBtn.addEventListener('mousedown', startTalk);
+    voiceBtn.addEventListener('mouseup', stopTalk);
+    voiceBtn.addEventListener('mouseleave', stopTalk);
+    voiceBtn.addEventListener('touchstart', startTalk, { passive: false });
+    voiceBtn.addEventListener('touchend', stopTalk);
+    voiceBtn.addEventListener('touchcancel', stopTalk);
+
+    // 是否接收 ESP32 麦克风的声音（关掉可以省流量、避免手机与 ESP32 之间啸叫）
+    listenChk.addEventListener('change', () => sendText(listenChk.checked ? 'listen:1' : 'listen:0'));
+
+    // 页面第一次被点击/触摸时初始化播放上下文（浏览器要求用户手势后才允许出声）
+    document.addEventListener('click', initSpeaker, { once: true });
+    document.addEventListener('touchstart', initSpeaker, { once: true });
+
+    connectAudio();
   </script>
 </body>
 </html>

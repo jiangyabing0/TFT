@@ -15,6 +15,7 @@
 #include <driver/i2s.h>
 #include <Wire.h>
 #include <AsyncWebSocket.h>
+#include <freertos/stream_buffer.h>  // 音频播放缓冲 (StreamBuffer)
 
 // 触摸引脚（确保与 User_Setup.h 或实际接线一致）
 #define TOUCH_CS  21
@@ -321,22 +322,181 @@ String getControlPage() {
 }
 
 AsyncWebSocket wsAudio("/audio");
+// 下面三个标志会被不同任务读写（Arduino loop 任务 / async_tcp 回调 / 播放任务），加 volatile 防止被优化
+volatile bool isPlaying = false; // 状态标志：true=播放(说)，false=录音(听)
+volatile bool wsAudioConnected = false; // 是否有网页连上了 /audio
+volatile bool micStreamEnabled = true;  // 网页是否希望接收 ESP32 麦克风的声音（网页可发 "listen:0/1" 关闭）
 
+// 每个音频包 1024 采样点 = 2048 字节 = 16kHz 下约 64ms（与网页端的包长一致）
+#define AUDIO_CHUNK_BYTES 2048
+// 功放播放缓冲大小（16kHz/16bit 单声道 ≈ 32KB/s，这里留 8KB ≈ 250ms 抗抖动）
+#define AUDIO_SPK_BUFFER_BYTES 8192
+
+// 待播放的音频数据：WebSocket 回调只做“非阻塞入队”，由独立的播放任务写 I2S。
+// 千万不要在 WebSocket 回调里调用 i2s_write(portMAX_DELAY)：
+// 回调运行在 async_tcp 任务里，阻塞它会导致网页卡死、看门狗复位，
+// 以及 WebSocket 发送队列积压（终端会打印
+// "[E][AsyncWebSocket.cpp] Too many messages queued: closing connection" 并把连接踢掉）。
+StreamBufferHandle_t spkBuffer = NULL;
+TaskHandle_t spkTaskHandle = NULL;
+
+// ================= I2S 初始化 =================
+bool initI2S() {
+  // 1. 初始化 I2S 输入（麦克风）
+  i2s_config_t i2s_in_config = {
+    .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
+    .sample_rate = sample_rate,
+    .bits_per_sample = i2s_bits_per_sample_t(bits_per_sample),
+    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
+    .dma_buf_count = 8,
+    .dma_buf_len = 512
+  };
+  i2s_pin_config_t in_pins = {
+    .bck_io_num = INMP441_SCK_PIN,
+    .ws_io_num = INMP441_WS_PIN,
+    .data_out_num = -1,
+    .data_in_num = INMP441_SD_PIN
+  };
+  esp_err_t err = i2s_driver_install(I2S_NUM_0, &i2s_in_config, 0, NULL);
+  if (err != ESP_OK) {
+    Serial.printf("[语音] 麦克风 I2S 初始化失败 (err=%d)，请检查引脚是否被占用\n", err);
+    return false;
+  }
+  i2s_set_pin(I2S_NUM_0, &in_pins);
+
+  // 2. 初始化 I2S 输出（功放）
+  i2s_config_t i2s_out_config = {
+    .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_TX),
+    .sample_rate = sample_rate,
+    .bits_per_sample = i2s_bits_per_sample_t(bits_per_sample),
+    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
+    .dma_buf_count = 8,
+    .dma_buf_len = 512
+  };
+  i2s_pin_config_t out_pins = {
+    .bck_io_num = MAX98357_BCLK_PIN,
+    .ws_io_num = MAX98357_LRC_PIN,
+    .data_out_num = MAX98357_DIN_PIN,
+    .data_in_num = -1
+  };
+  err = i2s_driver_install(I2S_NUM_1, &i2s_out_config, 0, NULL);
+  if (err != ESP_OK) {
+    Serial.printf("[语音] 功放 I2S 初始化失败 (err=%d)，请检查引脚是否被占用\n", err);
+    return false;
+  }
+  i2s_set_pin(I2S_NUM_1, &out_pins);
+  return true;
+}
+
+// ================= 功放开/关（说/听 切换） =================
+void setAudioMode(bool play) {
+  isPlaying = play;
+  // 注意：部分MAX98357模块高电平开启，部分低电平开启。如果反了，请交换 HIGH 和 LOW
+  digitalWrite(MUTE_PIN, play ? HIGH : LOW);
+  Serial.println(play ? "切换到【说】模式：功放开启" : "切换到【听】模式：麦克风录音");
+}
+
+// ================= 功放播放任务 =================
+// 只做一件事：从缓冲里取数据写 I2S。与 Web 服务器任务彻底解耦，
+// 因此 WebSocket 回调不会被 I2S 的阻塞写入卡住。
+void spkTask(void *param) {
+  static uint8_t buf[1024];   // 1024 字节 = 16ms 音频（4 字节为 L/R 一帧，必须是 4 的整数倍）
+  for (;;) {
+    if (spkBuffer == NULL) {
+      vTaskDelay(pdMS_TO_TICKS(100));
+      continue;
+    }
+
+    // 不在【说】模式：把缓冲区里的残留数据取走丢掉，
+    // 保证下次开口时从干净状态开始（不会先播出上一次的旧声音）
+    if (!isPlaying) {
+      uint8_t trash[256];
+      xStreamBufferReceive(spkBuffer, trash, sizeof(trash), pdMS_TO_TICKS(100));
+      continue;
+    }
+
+    size_t n = xStreamBufferReceive(spkBuffer, buf, sizeof(buf), portMAX_DELAY);
+    if (n == 0) continue;
+    size_t bytes_written = 0;
+    i2s_write(I2S_NUM_1, buf, n, &bytes_written, portMAX_DELAY);
+  }
+}
+
+// ================= WebSocket 事件回调 =================
+// 协议约定（与 data/index.html 保持一致）：
+//   文本帧 "start" -> 打开功放（网页按住说话）
+//   文本帧 "stop"  -> 关闭功放，恢复麦克风
+//   文本帧 "listen:0/1" -> 关闭/打开 ESP32 麦克风推流
+//   二进制帧       -> 网页麦克风的 PCM 数据（16kHz/16bit/单声道/小端）
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, 
                AwsEventType type, void *arg, uint8_t *data, size_t len) {
-    if (type == WS_EVT_DATA) {
-        // 处理浏览器传来的音频数据，并将其转交给 MAX98357A 功放播放
-        if (wsAudio.count() > 0) {   // 该版本库 hasClient() 需要传入客户端 id，这里改用 count()
-            wsAudio.textAll(data, len);
+    switch (type) {
+      case WS_EVT_CONNECT:
+        wsAudioConnected = true;
+        setAudioMode(false);   // 新页面接入，先回到【听】模式
+        Serial.printf("[语音] 网页已连接 (id=%u, IP=%s)\n", client->id(),
+                      client->remoteIP().toString().c_str());
+        break;
+
+      case WS_EVT_DISCONNECT:
+        wsAudioConnected = false;
+        setAudioMode(false);
+        Serial.printf("[语音] 网页已断开 (id=%u)，等待重连...\n", client->id());
+        break;
+
+      case WS_EVT_ERROR:
+        Serial.printf("[语音] WebSocket 出错 (id=%u)\n", client->id());
+        break;
+
+      case WS_EVT_DATA: {
+        AwsFrameInfo *info = (AwsFrameInfo *)arg;
+        // 注意：不能再用 len < 5 之类的长度猜类型，
+        // 否则 5 个字节的 "start" 会被当成音频数据（这就是之前功放不响的原因）。
+        bool isText = (info->index == 0 && info->opcode == WS_TEXT);
+        bool isBinary = (info->index == 0 && info->opcode == WS_BINARY) ||
+                        (info->index > 0 && info->message_opcode == WS_BINARY);
+        if (isText) {
+          String cmd((char *)data, len);   // 按长度构造，不依赖 '\0' 结尾
+          cmd.trim();
+          if (cmd == "start") {
+            setAudioMode(true);            // 网页按住说话，ESP32 打开功放播放
+          } else if (cmd == "stop") {
+            setAudioMode(false);           // 网页松开，ESP32 关闭功放，进入录音模式
+          } else if (cmd.startsWith("listen:")) {
+            micStreamEnabled = (cmd.substring(7).toInt() != 0);
+            Serial.printf("[语音] 麦克风推流: %s\n", micStreamEnabled ? "开" : "关");
+          }
+        } else if (isBinary) {
+          // 分片重组：TCP 可能把一个 WebSocket 消息拆成几段回调，
+          // 按 info->index 偏移拼进重组缓冲，凑齐最后一个分片再送功放。
+          // （不做重组的话，拆包时会把半截数据写进 I2S，出现“咔咔”杂音）
+          static uint8_t accum[8192];
+          if (info->index + len <= sizeof(accum)) {
+            memcpy(accum + info->index, data, len);
+            if (info->final) {                       // 本消息的最后一个分片
+              size_t total = info->index + len;      // 该消息的总长度
+              if (isPlaying && spkBuffer != NULL && total > 0 && (total % 4) == 0) {
+                // 非阻塞写入（最多等 20ms）：写不下就丢掉这一包。
+                // 丢包只会让声音卡一下，不会把 WebSocket 撑爆导致断连。
+                xStreamBufferSend(spkBuffer, accum, total, pdMS_TO_TICKS(20));
+              }
+            }
+          } else if (len > sizeof(accum)) {
+            Serial.printf("[语音] 音频包过大(%u 字节)，已忽略（请刷新网页）\n", (unsigned)len);
+          }
         }
+        break;
+      }
+
+      default:
+        break;
     }
 }
 
-void setupAudio() {
-    wsAudio.onEvent(onWsEvent);
-    server.addHandler(&wsAudio);
-  
-}
 
 // 打印上次复位原因，用于区分“手机访问导致断网”是单纯 WiFi 掉线还是芯片复位重启
 void printResetReason() {
@@ -647,52 +807,35 @@ void setup() {
     }
   });
 
-  // 初始化 I2S 输入（麦克风）
-  i2s_config_t i2s_in_config = {
-    .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
-    .sample_rate = sample_rate,
-    .bits_per_sample = i2s_bits_per_sample_t(bits_per_sample),
-    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
-    .dma_buf_count = 8,
-    .dma_buf_len = 1024
-  };
-  i2s_pin_config_t in_pins = {
-    .bck_io_num = INMP441_SCK_PIN,
-    .ws_io_num = INMP441_WS_PIN,
-    .data_out_num = -1,
-    .data_in_num = INMP441_SD_PIN
-  };
-  i2s_driver_install(I2S_NUM_0, &i2s_in_config, 0, NULL);
-  i2s_set_pin(I2S_NUM_0, &in_pins);
+  // 1. 初始化功放静音引脚（先静音，避免上电“砰”的一声）
+  pinMode(MUTE_PIN, OUTPUT);
+  isPlaying = false;
+  digitalWrite(MUTE_PIN, LOW);
 
-  // 初始化 I2S 输出（功放）
-  i2s_config_t i2s_out_config = {
-    .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_TX),
-    .sample_rate = sample_rate,
-    .bits_per_sample = i2s_bits_per_sample_t(bits_per_sample),
-    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
-    .dma_buf_count = 8,
-    .dma_buf_len = 1024
-  };
-  i2s_pin_config_t out_pins = {
-    .bck_io_num = MAX98357_BCLK_PIN,
-    .ws_io_num = MAX98357_LRC_PIN,
-    .data_out_num = MAX98357_DIN_PIN,
-    .data_in_num = -1
-  };
-  i2s_driver_install(I2S_NUM_1, &i2s_out_config, 0, NULL);
-  i2s_set_pin(I2S_NUM_1, &out_pins);
+  // 2. 初始化 I2S（麦克风 + 功放）
+  bool i2sOK = initI2S();
+  Serial.printf("[语音] I2S 初始化: %s\n", i2sOK ? "成功" : "失败");
 
-setupAudio();
+  // 3. 创建功放播放缓冲 + 播放任务
+  //    （把 I2S 写入从 Web 服务器任务里挪出来，避免阻塞网页服务/WebSocket）
+  spkBuffer = xStreamBufferCreate(AUDIO_SPK_BUFFER_BYTES, 1);
+  if (spkBuffer != NULL) {
+    xTaskCreatePinnedToCore(spkTask, "spk_task", 4096, NULL, 1, &spkTaskHandle, 0);
+  } else {
+    Serial.println("[语音] 播放缓冲创建失败，网页说话功能不可用");
+  }
 
   // 启动服务器
   server.begin();
   Serial.print("Web 服务器已启动，访问 http://");
   Serial.println(WiFi.localIP());
+
+  // 4. 挂载 WebSocket 和 WebServer
+  wsAudio.onEvent(onWsEvent);
+  server.addHandler(&wsAudio);
+  server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
+  server.begin();
+  Serial.println("服务器已启动");
 }
 
 void loop() {
@@ -759,10 +902,31 @@ void loop() {
     lastUpdate = millis();
   }
   
-  size_t bytes_read;
-  int16_t buffer[1024];
-  // 读取麦克风数据
-  i2s_read(I2S_NUM_0, buffer, sizeof(buffer), &bytes_read, portMAX_DELAY);
-  // 将数据写入功放（如听到回声说明通道全通）
-  i2s_write(I2S_NUM_1, buffer, bytes_read, &bytes_read, portMAX_DELAY); 
+  // 定期清理已断开/超时的 WebSocket 客户端
+  // （库要求定期调用，否则列表里的“僵尸客户端”会越积越多，广播一次要遍历很久）
+  static unsigned long lastWsCleanup = 0;
+  if (millis() - lastWsCleanup > 5000) {
+    wsAudio.cleanupClients();
+    lastWsCleanup = millis();
+  }
+
+  // 【听】模式下把本地麦克风(INMP441)的声音推给网页
+  // 说明：
+  //  1) i2s_read 自己按“有多少数据就读多少”的节奏返回，这里**不要**再额外 delay，
+  //     否则读取速度慢于 16kHz 的采样速度，DMA 会溢出丢样本（声音断续）。
+  //  2) 发送前必须用 availableForWriteAll() 看发送队列是否还有空间：
+  //     队列满时无条件 binaryAll() 会让库打印
+  //     “[E][AsyncWebSocket.cpp] Too many messages queued: closing connection”
+  //     并直接断开 WebSocket（这就是之前终端里的报错）。
+  //     队列满就丢掉这一帧，只影响一点音质，不会断线。
+  if (!isPlaying && micStreamEnabled && wsAudioConnected && wsAudio.count() > 0) {
+    static int16_t micBuf[AUDIO_CHUNK_BYTES / 2];   // 1024 采样点 = 2048 字节 ≈ 64ms
+    size_t bytesRead = 0;
+    if (i2s_read(I2S_NUM_0, micBuf, sizeof(micBuf), &bytesRead, pdMS_TO_TICKS(100)) == ESP_OK && bytesRead > 0) {
+      bytesRead &= ~1u;   // 只发整数个 16bit 采样点，避免网页端解码错位
+      if (bytesRead > 0 && wsAudio.availableForWriteAll()) {
+        wsAudio.binaryAll((const char *)micBuf, bytesRead);
+      }
+    }
+  }
 }

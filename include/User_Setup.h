@@ -18,7 +18,8 @@
 #define MAX98357_BCLK_PIN 27 // BCLK
 #define MAX98357_LRC_PIN  14 // LRCLK
 #define MAX98357_DIN_PIN  22 // DIN
-
+// 功放静音控制引脚 (SD脚)
+#define MUTE_PIN          33  
 
 #define TFT_MISO 19
 #define TFT_MOSI 23
