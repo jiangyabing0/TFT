@@ -105,8 +105,15 @@ static String fileNameOf(const String &path) {
 //       更麻烦的是：对调后算出的“x”其实是手指的竖直位置，一旦超过屏幕高度 240，就会被
 //       getTouch() 里的 `if (x_tmp >= _width || y_tmp >= _height) return false;` 当越界丢掉，
 //       于是屏幕右边那一片怎么点都没反应。
-// 修正：setup() 里调用 initTouch()，用 tft.setTouch() 装上下面这组本机可用参数：
-//       rotate=0（不再对调） + 保留示例里的水平镜像。
+// 修正：setup() 里调用 initTouch()，用 tft.setTouch() 装上下面这组本机实测可用的参数：
+//       rotate=0（不再对调） + invert_y=开（垂直镜像）。
+//       推导过程（对着实测现象反推，两块拼起来就是答案）：
+//         ① 用库默认值(rotate=1,invert_x=开)时是“X/Y 对调”  → 说明本屏的触摸原始轴
+//            正好是库假设的那两个轴“互换”了（把 rotate 关掉就补回来了）；
+//         ② 关掉对调后又变成“水平、垂直都镜像”（相当于整屏转了 180°）
+//            → 在 rotate=0 的公式里，把两个镜像位都翻转即可，
+//              即 invert_x 由“开”改“关”、invert_y 由“关”改“开” → flags=0x04。
+//       若哪块屏还有个别像素级偏差，串口发 c 做一次四点校准即可一劳永逸。
 // 参数格式与 TFT_eSPI 的 calibrateTouch()/setTouch() 完全一致：
 //   [0]=x0  [1]=x1(跨度)  [2]=y0  [3]=y1(跨度)  [4]=标志位
 //   标志位 bit0=rotate(交换 X/Y)  bit1=invert_x(水平镜像)  bit2=invert_y(垂直镜像)
@@ -114,11 +121,17 @@ static String fileNameOf(const String &path) {
 //   c = 跑一次四点校准（库会自动测出全部参数并存盘，最准，建议先做一次）
 //   x = 交换/取消交换 X/Y      h = 水平镜像开关     v = 垂直镜像开关
 //   p = 打印当前参数           r = 恢复出厂默认
+//   d = 开关调试输出（打印 原始值 → 屏幕坐标，用来判断是对调还是镜像）
+//   s<y> = 模拟点击屏幕 y 处（如 s60），用来验证点击链路，不需要手指
 // 调好的判断标准：手指按哪里，绿点就出现在哪里；四个角都点得到。
 #define TOUCH_Z_THRESHOLD 600   // 压力阈值：手指没按时 z 只有 200~400 左右
 #define IMG_BAR_H 30            // 图片界面底部“返回”灰条的高度（绘制与命中判断共用）
+// 默认参数版本号：每次调整下面 TOUCH_CAL_DEFAULT 就 +1。
+// 作用：NVS 里存的是“带版本号”的参数，版本对不上就丢弃旧的、改用新的默认值，
+//       否则改了代码重新烧写，开机还是读回上一次存错的参数，会以为改动没生效。
+#define TOUCH_CAL_VERSION 2
 
-static const uint16_t TOUCH_CAL_DEFAULT[5] = {300, 3600, 300, 3600, 0x02};
+static const uint16_t TOUCH_CAL_DEFAULT[5] = {300, 3600, 300, 3600, 0x04};
 static uint16_t touchCalData[5];
 Preferences touchPrefs;
 
@@ -131,6 +144,7 @@ void printTouchConfig() {
 // 保存当前参数到 NVS（下次开机自动生效）
 void saveTouchConfig() {
   touchPrefs.putBytes("cal", touchCalData, sizeof(touchCalData));
+  touchPrefs.putUChar("ver", TOUCH_CAL_VERSION);   // 记下版本，避免升级后被旧参数覆盖
 }
 
 // 把参数装进 TFT_eSPI 并记下（tft.setTouch() 只是记参数，不画屏）
@@ -139,30 +153,68 @@ void applyTouchConfig() {
   saveTouchConfig();
 }
 
-// setup() 里调用：优先用 NVS 里存过的参数，没有就用默认值
+// setup() 里调用：优先用 NVS 里存过的参数，没有（或版本对不上）就用新的默认值
 void initTouch() {
   bool ok = touchPrefs.begin("touch", false);
   if (!ok) Serial.println("[触摸] NVS 打开失败，使用默认校准参数");
 
   memcpy(touchCalData, TOUCH_CAL_DEFAULT, sizeof(touchCalData));
-  if (touchPrefs.getBytesLength("cal") == sizeof(touchCalData)) {
+
+  uint8_t ver = touchPrefs.getUChar("ver", 0);
+  if (ver == TOUCH_CAL_VERSION && touchPrefs.getBytesLength("cal") == sizeof(touchCalData)) {
     touchPrefs.getBytes("cal", touchCalData, sizeof(touchCalData));
+    Serial.println("[触摸] 使用 NVS 里保存的校准参数");
   } else {
-    Serial.println("[触摸] 首次运行：使用默认校准参数（串口发 c 可做精确校准）");
+    // 首次运行，或者固件里的默认参数改过（版本号变了）：
+    // 旧版参数直接作废，改用新的默认值并落盘。这样改完代码重新烧写就能立刻看到效果。
+    touchPrefs.putBytes("cal", touchCalData, sizeof(touchCalData));
+    touchPrefs.putUChar("ver", TOUCH_CAL_VERSION);
+    Serial.println("[触摸] 使用新的默认校准参数（串口发 c 可做精确校准）");
   }
 
   tft.setTouch(touchCalData);
   printTouchConfig();
-  Serial.println("[触摸] 若绿点不跟手：串口发 c 做四点校准；x=对调X/Y  h=水平镜像  v=垂直镜像  r=恢复默认  p=打印参数");
+  Serial.println("[触摸] 若绿点不跟手：串口发 c 做四点校准；x=对调X/Y  h=水平镜像  v=垂直镜像  r=恢复默认  p=打印参数  d=调试输出  s<y>=模拟点击");
 }
+
+// 调试开关：'d' 打开后，每次触摸都会打印“原始值 → 换算后的屏幕坐标”，串口里限速 5 次/秒。
+// 用途：手指按住屏幕上某个已知位置（例如左上角），看打印出来的坐标就能立刻判断
+//       是“X/Y 对调”还是“水平/垂直镜像”，一次把参数改对：
+//         raw 的 X 变大时屏幕 x 反而变小 → 水平镜像(invert_x) 方向不对
+//         raw 的 Y 变大时屏幕 y 反而变小 → 垂直镜像(invert_y) 方向不对
+static bool touchDebug = false;
+void printTouchDebug(uint16_t x, uint16_t y) {
+  static uint32_t lastMs = 0;
+  if (millis() - lastMs < 200) return;   // 限速，别把串口刷爆
+  lastMs = millis();
+  uint16_t rx = 0, ry = 0;
+  tft.getTouchRaw(&rx, &ry);             // 仅在调试时多读一次原始值
+  Serial.printf("[触摸调试] 原始 raw=(%u,%u) → 屏幕 (%u,%u)  屏幕=%dx%d flags=0x%02X\n",
+                rx, ry, x, y, tft.width(), tft.height(), touchCalData[4]);
+}
+
+// ===== 串口模拟点击（调试用，见 handleTouchSerial() 的 's' 命令）=====
+// 串口发 “s60”（数字是屏幕 y 坐标）＝ 模拟一次“手指按在 (屏幕中间, y) 上再抬起”。
+// 它不会绕过任何逻辑：readScreenTouch() 直接把坐标喂给 updateTouchFeedback()/handleTouch()，
+// 和真手指走的是同一条路径（绿点反馈 → 命中判断 → 状态机 → 松手复位），
+// 因此可以用来在没实物/没法触屏时验证“点列表出不出图、点返回条能不能回去”，
+// 也是本次“第一次点击之后再也点不动”那个 bug 的现成回归测试。
+static int8_t   simTouchPhase = 0;   // 0=不模拟 1=按下（本轮循环） 2=抬起（下一轮循环自动结束）
+static uint16_t simTouchX = 0, simTouchY = 0;
 
 // 触摸的统一读取入口：返回的坐标就是“屏幕坐标”（和 tft.drawXXX 同一套坐标系）
 // 绿点反馈与翻页/返回的命中判断都走这里，两边不可能再各用一套坐标而“点不中”。
 bool readScreenTouch(uint16_t *x, uint16_t *y) {
+  if (simTouchPhase == 1) {          // 模拟按下：直接给出坐标，其余流程完全照旧
+    *x = simTouchX;
+    *y = simTouchY;
+    return true;
+  }
   uint16_t tx = 0, ty = 0;
   if (!tft.getTouch(&tx, &ty, TOUCH_Z_THRESHOLD)) return false;
   *x = tx;
   *y = ty;
+  if (touchDebug) printTouchDebug(tx, ty);
   return true;
 }
 
@@ -396,6 +448,8 @@ void showSelectedImage(int index) {
   // 绘制屏幕必须和 Web 任务（/display、/delete）串行，否则 SPI 会互相打架
   xSemaphoreTake(tftMutex, portMAX_DELAY);
 
+  Serial.printf("[图片] 显示 #%d: %s\n", index, imageList[index].c_str());
+
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawString("Loading...", 10, 10, 2);
@@ -407,13 +461,18 @@ void showSelectedImage(int index) {
   // 使用 TJpg_Decoder 从 SD 卡绘制图片
   // imageList[] 里存的是带 '/' 的完整路径（如 "/1.jpg"），SD.open() 才能打开；
   // 解码/打开失败时屏幕上给出提示，方便区分是文件问题还是接线问题
+  uint32_t t0 = millis();
   JRESULT jres = TJpgDec.drawSdJpg(0, 0, imageList[index]);
   // JDR_INTR(1) 不是失败：图片比屏幕高时 tftOutput() 会返回 0 让解码提前结束，
   // 此时图片已经画出来了，和 JDR_OK 一样算成功；只有其它返回值才是真的出错。
   if (jres != JDR_OK && jres != JDR_INTR) {
+    // JDR_INPUT_FMT(2)=不是 JPEG、JDR_FS_READ_ERROR(5)=SD 读失败、JDR_NOT_OPENED(9)=文件打不开
     Serial.printf("[图片] 打开/解码失败(%d): %s\n", (int)jres, imageList[index].c_str());
     tft.setTextColor(TFT_RED, TFT_BLACK);
     tft.drawString("Decode failed!", 10, 40, 2);
+  } else {
+    Serial.printf("[图片] 显示完成: %s  结果=%d  用时 %lu ms\n",
+                  fileNameOf(imageList[index]).c_str(), (int)jres, (unsigned long)(millis() - t0));
   }
 
   // 底部绘制返回提示（按屏幕真实高度定位：横屏 320x240 时 y=290 已经在屏幕外了）
@@ -427,6 +486,12 @@ void showSelectedImage(int index) {
 }
 // 保存背景并画绿点
 void drawTouchDot(uint16_t x, uint16_t y) {
+    // 绿点区域的背景是【刚刚从屏幕上读回来】的，所以它是有效可还原的：
+    // 把“界面已重绘、不要还原旧背景”的标志清掉，
+    // 不然会出现“图片上粘着一颗擦不掉的绿点”（标志还留着 true，
+    // 松手时 restoreTouchDot() 直接跳过还原）。
+    forceClearDot = false;
+
     // 边界约束：防止画到屏幕边缘外导致内存越界
     int startX = constrain(x - DOT_RADIUS, 0, tft.width() - DOT_SIZE);
     int startY = constrain(y - DOT_RADIUS, 0, tft.height() - DOT_SIZE);
@@ -488,6 +553,15 @@ void updateTouchFeedback() {
     }
 }
 // ================= 3. 触摸与状态机 =================
+// 【重要修复】actionTriggered 必须定义在函数作用域，原因：
+//   原来的写法是在 if (isTouching) { ... } 和 else { ... } 两个大括号里
+//   各写了一句 “static bool actionTriggered = false;”，而 C++ 里块作用域的 static
+//   是两块各自独立的变量：if 分支里那个被置为 true 之后，永远不可能被 else 分支里的
+//   “actionTriggered = false” 复位（改的是另一个变量）。
+//   表现就是：开机后第一次按压之后，屏幕上再怎么点都没有反应 ——
+//   点列表不出图、点 “Tap HERE to return” 也回不到列表。
+//   现在提到函数外面只留一份，松开手指时就能正确复位。
+static bool actionTriggered = false;   // 本次按压是否已经处理过（防止一次按压重复触发）
 void handleTouch() {
   // 每次循环先处理绿点反馈
   updateTouchFeedback();
@@ -495,7 +569,6 @@ void handleTouch() {
   // 如果当前有触摸动作，才去判断是否触发翻页/返回逻辑
   if (isTouching) {
     // 简单防抖：只在第一次按下的瞬间触发逻辑，移动时不反复触发
-    static bool actionTriggered = false;
     if (!actionTriggered) {
       actionTriggered = true;
       
@@ -511,13 +584,22 @@ void handleTouch() {
           if (row >= 0 && row < imageCount) {
             currentSelectedIndex = row;
             currentView = MODE_IMAGE;
+            // 串口留个痕迹：点了第几行、要打开哪个文件，方便对照“是不是点了却没反应”
+            Serial.printf("[触摸] 列表点击: 屏幕 y=%u → 第 %d 行 -> %s\n",
+                          lastY, row, imageList[row].c_str());
             
             // 界面即将完全重绘，强制取消绿点恢复，防止花屏
             forceClearDot = true;
             isTouching = false; 
             
             showSelectedImage(row); // 显示图片
+          } else {
+            Serial.printf("[触摸] 该行没有图片: row=%d, 已扫描 %d 张（一页显示 %d 行）\n",
+                          row, imageCount, visibleRows);
           }
+        } else {
+          Serial.printf("[触摸] 没点到列表行: y=%u，有效范围 %d~%d（一页 %d 行）\n",
+                        lastY, LIST_HEADER_H, LIST_HEADER_H + visibleRows * LIST_ROW_H - 1, visibleRows);
         }
       } 
       else if (currentView == MODE_IMAGE) {
@@ -525,6 +607,7 @@ void handleTouch() {
         // 原来判的是 lastY > 280，在 240 高的横屏上永远不成立 → 点“Tap HERE to return”返回不了。
         if (lastY >= tft.height() - IMG_BAR_H) {
           currentView = MODE_LIST;
+          Serial.printf("[触摸] 点击返回条 (y=%u >= %d) → 回到列表\n", lastY, tft.height() - IMG_BAR_H);
           
           // 界面即将完全重绘，强制取消绿点恢复
           forceClearDot = true;
@@ -535,10 +618,15 @@ void handleTouch() {
       }
     }
   } else {
-    // 松开后重置触发标志
-    static bool actionTriggered = false;
+    // 松开后重置触发标志（这里改的就是上面那个函数级变量，下一轮按压才能再次触发）
     actionTriggered = false;
   }
+
+  // 串口模拟点击的收尾：本轮循环按“按下”处理完，下一轮就按“抬起”来处理，
+  // 让 updateTouchFeedback() 走一遍真正的松手路径（恢复绿点 + isTouching=false），
+  // 这样状态机的“释放复位”逻辑也被覆盖到，和真手指的效果一致。
+  if (simTouchPhase == 1)      simTouchPhase = 2;
+  else if (simTouchPhase == 2) simTouchPhase = 0;
 }
 
 
@@ -596,6 +684,8 @@ void runTouchCalibration() {
 //   c = 四点校准并保存      x = 交换/取消交换 X/Y
 //   h = 水平镜像开关        v = 垂直镜像开关
 //   p = 打印当前参数        r = 恢复出厂默认
+//   d = 开关触摸调试输出（打印 原始值 → 屏幕坐标，用来判断对调/镜像）
+//   s<y> = 模拟一次点击：s60 表示“点屏幕 y=60 的地方”，走的是和真手指一样的代码路径
 void handleTouchSerial() {
   while (Serial.available()) {
     int c = Serial.read();
@@ -603,6 +693,10 @@ void handleTouchSerial() {
       case 'c':
         Serial.println("[触摸] 开始四点校准：请依次点屏幕四个角出现的箭头");
         runTouchCalibration();
+        break;
+      case 'd':
+        touchDebug = !touchDebug;
+        Serial.printf("[触摸] 调试输出: %s\n", touchDebug ? "开（按住屏幕看串口打印）" : "关");
         break;
       case 'x':
         touchCalData[4] ^= 0x01;   // bit0: 交换 X/Y
@@ -622,6 +716,20 @@ void handleTouchSerial() {
       case 'p':
         printTouchConfig();
         break;
+      case 's': {
+        // 模拟点击：后面跟屏幕 y 坐标，例如 s60（x 自动取屏幕中线）
+        uint16_t y = 0;
+        while (Serial.available()) {
+          int d = Serial.peek();
+          if (d < '0' || d > '9') break;
+          y = (uint16_t)(y * 10 + (Serial.read() - '0'));
+        }
+        simTouchX = tft.width() / 2;
+        simTouchY = y;
+        simTouchPhase = 1;
+        Serial.printf("[触摸] 模拟点击 (x=%u, y=%u)：下一轮循环里按下并抬起一次\n", simTouchX, simTouchY);
+        break;
+      }
       case 'r':
         memcpy(touchCalData, TOUCH_CAL_DEFAULT, sizeof(touchCalData));
         applyTouchConfig();

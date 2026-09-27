@@ -8,3 +8,23 @@
 20:45:17.176 > load:0x40078000,len:13232
 20:45:17.178 > load:0x40080400,len:3028
 20:45:17.178 > entry 0x400805e4
+20:45:17.644 > [启动] 上次复位原因=1 (上电复位)
+20:45:18.319 > [   729][E][esp32-hal-cpu.c:110] addApbChangeCallback(): duplicate func=0x400edd78 arg=0x3ffbdc64
+20:45:18.328 > [   739][E][Preferences.cpp:503] getBytesLength(): nvs_get_blob len fail: cal NOT_FOUND
+20:45:18.334 > [触摸] 首次运行：使用默认校准参数（串口发 c 可做精确校准）
+20:45:18.342 > [触摸] 校准参数 x0=300 x1=3600 y0=300 y1=3600 flags=0x02 (交换X/Y=0 水平镜像=1 垂直镜像=0)
+20:45:18.350 > [触摸] 若绿点不跟手：串口发 c 做四点校准；x=对调X/Y  h=水平镜像  v=垂直镜像  r=恢复默认  p=打印参数
+20:45:18.365 > LittleFS 初始化成功
+20:45:18.365 > [SD] SPI 引脚: SCK=18 MISO=19 MOSI=23 CS=32
+20:45:18.426 > [   841][E][sd_diskio.cpp:806] sdcard_mount(): f_mount failed: (1) A hard error occurred in the low level disk I/O layer
+20:45:18.440 > [   852][W][sd_diskio.cpp:180] sdCommand(): crc error
+20:45:18.538 > [SD] 20 MHz 挂载失败，自动降速重试
+20:45:18.616 > [SD] 挂载成功：速率=10 MHz 类型=SDHC/SDXC 容量=7580 MB
+20:45:18.633 > 写入成功
+20:45:18.638 > 追加成功
+20:45:18.650 > 扫描到 1 张图片
+20:45:18.650 >       [0] /1.jpg
+20:45:23.099 > [WiFi] 稳定性优化已启用: setSleep(false)/autoReconnect/TX=11dBm
+20:45:23.797 > [语音] I2S 初始化: 成功
+20:45:23.801 > Web 服务器已启动，访问 http://192.168.1.137
+20:45:23.803 > 服务器已启动
