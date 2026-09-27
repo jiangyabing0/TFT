@@ -17,6 +17,7 @@
 #include <Wire.h>
 #include <AsyncWebSocket.h>
 #include <freertos/stream_buffer.h>  // 音频播放缓冲 (StreamBuffer)
+#include <Preferences.h>   // NVS：保存触摸校准参数（掉电不丢）
 
 // 触摸引脚（确保与 User_Setup.h 或实际接线一致）
 // 说明：platformio.ini 用 "-include include/User_Setup.h" 强制包含了 User_Setup.h，
@@ -64,6 +65,13 @@ int currentSelectedIndex = -1; // 当前查看的图片索引
 enum ViewMode { MODE_LIST, MODE_IMAGE };
 ViewMode currentView = MODE_LIST; // 当前界面模式
 bool sdCardReady = false;         // SD 卡是否挂载成功
+// ================= 绿点反馈相关变量 =================
+bool isTouching = false;
+uint16_t lastX = 0, lastY = 0;
+uint16_t bgBuffer[9][9]; // 缓存绿点区域的背景颜色 (9x9像素)
+const int DOT_RADIUS = 4; // 绿点半径
+const int DOT_SIZE = DOT_RADIUS * 2 + 1; // 9x9
+bool forceClearDot = false; // 强制清除点标志（用于界面切换时）
 
 // ================= 相册列表布局参数 =================
 // 屏幕 rotation=1（横屏）时 tft.width()=320、tft.height()=240。
@@ -86,6 +94,78 @@ static int listRowsPerPage() {
 static String fileNameOf(const String &path) {
   return path.startsWith("/") ? path.substring(1) : path;
 }
+
+// ================= 触摸校准 & 坐标方向（修正“触摸位置与显示位置 X/Y 对调”） =================
+// 现象：手指按屏幕左边，绿点/选中行却跑到上边（X/Y 对调）；点屏幕右半边干脆没反应。
+// 原因：TFT_eSPI 触摸部分内置的是一组 ILI9341 的“示例”校准值
+//       （Extensions/Touch.h: x0=300 x1=3600 y0=300 y1=3600, rotate=1, invert_x=开, invert_y=关），
+//       其中 rotate=1 的含义是“把触摸读到的 X/Y 对调一次”。
+//       本机是 240x320 的 ST7789 + XPT2046，屏幕 rotation=1（横屏）时恰好不需要这次对调，
+//       于是被多对调了一次 → 报出来的坐标就成了实际位置的 (y,x)，表现为 X/Y 相反；
+//       更麻烦的是：对调后算出的“x”其实是手指的竖直位置，一旦超过屏幕高度 240，就会被
+//       getTouch() 里的 `if (x_tmp >= _width || y_tmp >= _height) return false;` 当越界丢掉，
+//       于是屏幕右边那一片怎么点都没反应。
+// 修正：setup() 里调用 initTouch()，用 tft.setTouch() 装上下面这组本机可用参数：
+//       rotate=0（不再对调） + 保留示例里的水平镜像。
+// 参数格式与 TFT_eSPI 的 calibrateTouch()/setTouch() 完全一致：
+//   [0]=x0  [1]=x1(跨度)  [2]=y0  [3]=y1(跨度)  [4]=标志位
+//   标志位 bit0=rotate(交换 X/Y)  bit1=invert_x(水平镜像)  bit2=invert_y(垂直镜像)
+// 参数存在 NVS(Preferences) 里，掉电不丢；串口监视器（115200）随时可以调，改完立刻生效：
+//   c = 跑一次四点校准（库会自动测出全部参数并存盘，最准，建议先做一次）
+//   x = 交换/取消交换 X/Y      h = 水平镜像开关     v = 垂直镜像开关
+//   p = 打印当前参数           r = 恢复出厂默认
+// 调好的判断标准：手指按哪里，绿点就出现在哪里；四个角都点得到。
+#define TOUCH_Z_THRESHOLD 600   // 压力阈值：手指没按时 z 只有 200~400 左右
+#define IMG_BAR_H 30            // 图片界面底部“返回”灰条的高度（绘制与命中判断共用）
+
+static const uint16_t TOUCH_CAL_DEFAULT[5] = {300, 3600, 300, 3600, 0x02};
+static uint16_t touchCalData[5];
+Preferences touchPrefs;
+
+void printTouchConfig() {
+  Serial.printf("[触摸] 校准参数 x0=%u x1=%u y0=%u y1=%u flags=0x%02X (交换X/Y=%d 水平镜像=%d 垂直镜像=%d)\n",
+                touchCalData[0], touchCalData[1], touchCalData[2], touchCalData[3], touchCalData[4],
+                (touchCalData[4] & 0x01) ? 1 : 0, (touchCalData[4] & 0x02) ? 1 : 0, (touchCalData[4] & 0x04) ? 1 : 0);
+}
+
+// 保存当前参数到 NVS（下次开机自动生效）
+void saveTouchConfig() {
+  touchPrefs.putBytes("cal", touchCalData, sizeof(touchCalData));
+}
+
+// 把参数装进 TFT_eSPI 并记下（tft.setTouch() 只是记参数，不画屏）
+void applyTouchConfig() {
+  tft.setTouch(touchCalData);
+  saveTouchConfig();
+}
+
+// setup() 里调用：优先用 NVS 里存过的参数，没有就用默认值
+void initTouch() {
+  bool ok = touchPrefs.begin("touch", false);
+  if (!ok) Serial.println("[触摸] NVS 打开失败，使用默认校准参数");
+
+  memcpy(touchCalData, TOUCH_CAL_DEFAULT, sizeof(touchCalData));
+  if (touchPrefs.getBytesLength("cal") == sizeof(touchCalData)) {
+    touchPrefs.getBytes("cal", touchCalData, sizeof(touchCalData));
+  } else {
+    Serial.println("[触摸] 首次运行：使用默认校准参数（串口发 c 可做精确校准）");
+  }
+
+  tft.setTouch(touchCalData);
+  printTouchConfig();
+  Serial.println("[触摸] 若绿点不跟手：串口发 c 做四点校准；x=对调X/Y  h=水平镜像  v=垂直镜像  r=恢复默认  p=打印参数");
+}
+
+// 触摸的统一读取入口：返回的坐标就是“屏幕坐标”（和 tft.drawXXX 同一套坐标系）
+// 绿点反馈与翻页/返回的命中判断都走这里，两边不可能再各用一套坐标而“点不中”。
+bool readScreenTouch(uint16_t *x, uint16_t *y) {
+  uint16_t tx = 0, ty = 0;
+  if (!tft.getTouch(&tx, &ty, TOUCH_Z_THRESHOLD)) return false;
+  *x = tx;
+  *y = ty;
+  return true;
+}
+
 
 // ================= 1. SD卡基础读写功能 =================
 // SD 卡和 TFT/触摸共用同一条 SPI 总线（VSPI: SCK=18, MISO=19, MOSI=23），
@@ -337,40 +417,219 @@ void showSelectedImage(int index) {
   }
 
   // 底部绘制返回提示（按屏幕真实高度定位：横屏 320x240 时 y=290 已经在屏幕外了）
-  const int barH = 30;
-  const int barY = tft.height() - barH;
-  tft.fillRect(0, barY, tft.width(), barH, TFT_DARKGREY);
+  // 高度用 IMG_BAR_H，和 handleTouch() 里的命中判断共用同一个常量，保证“点得到”
+  const int barY = tft.height() - IMG_BAR_H;
+  tft.fillRect(0, barY, tft.width(), IMG_BAR_H, TFT_DARKGREY);
   tft.setTextColor(TFT_WHITE, TFT_DARKGREY);
   tft.drawString("Tap HERE to return", 50, barY + 7, 2);
 
   xSemaphoreGive(tftMutex);
 }
+// 保存背景并画绿点
+void drawTouchDot(uint16_t x, uint16_t y) {
+    // 边界约束：防止画到屏幕边缘外导致内存越界
+    int startX = constrain(x - DOT_RADIUS, 0, tft.width() - DOT_SIZE);
+    int startY = constrain(y - DOT_RADIUS, 0, tft.height() - DOT_SIZE);
+    lastX = startX + DOT_RADIUS; // 更新实际的中心点
+    lastY = startY + DOT_RADIUS;
 
+    // 1. 读取并保存背景颜色
+    for (int i = 0; i < DOT_SIZE; i++) {
+        for (int j = 0; j < DOT_SIZE; j++) {
+            bgBuffer[i][j] = tft.readPixel(startX + i, startY + j);
+        }
+    }
+
+    // 2. 画绿点
+    tft.fillCircle(lastX, lastY, DOT_RADIUS, TFT_GREEN);
+}
+
+// 恢复背景（擦除绿点）
+void restoreTouchDot() {
+    if (forceClearDot) {
+        forceClearDot = false; // 界面已重绘，无需恢复旧背景
+        return;
+    }
+    int startX = lastX - DOT_RADIUS;
+    int startY = lastY - DOT_RADIUS;
+    
+    // 将缓存的背景颜色写回屏幕
+    for (int i = 0; i < DOT_SIZE; i++) {
+        for (int j = 0; j < DOT_SIZE; j++) {
+            tft.drawPixel(startX + i, startY + j, bgBuffer[i][j]);
+        }
+    }
+}
+
+// 核心触摸更新逻辑（代替原来的 delay(200) 防抖）
+void updateTouchFeedback() {
+    uint16_t x, y;
+    // 统一走 readScreenTouch()：内部已经装好校准参数，返回的就是屏幕坐标。
+    // （原来直接调 tft.getTouch()，用的是 TFT_eSPI 内置的 ILI9341 示例参数，
+    //   里面 rotate=1 会多做一次 X/Y 对调 → 这就是“触摸位置和显示位置对调”的根源）
+    bool currentlyTouching = readScreenTouch(&x, &y);
+
+    if (currentlyTouching) {
+        if (!isTouching) {
+            // 第一次按下
+            isTouching = true;
+            drawTouchDot(x, y);
+        } else if (abs(x - lastX) > 2 || abs(y - lastY) > 2) {
+            // 手指移动超过2像素，先恢复旧位置，再在新位置画点
+            restoreTouchDot();
+            drawTouchDot(x, y);
+        }
+    } else {
+        // 松开手指
+        if (isTouching) {
+            restoreTouchDot();
+            isTouching = false;
+        }
+    }
+}
 // ================= 3. 触摸与状态机 =================
 void handleTouch() {
-  uint16_t touchX, touchY;
-  if (tft.getTouch(&touchX, &touchY, 600)) {
-    delay(200); // 简单防抖
+  // 每次循环先处理绿点反馈
+  updateTouchFeedback();
 
-    if (currentView == MODE_LIST) {
-      // 点击列表区域（行位置/行数都用和 drawImageList() 相同的常量算，保证点得准）
-      int rows = listRowsPerPage();
-      if (rows > imageCount) rows = imageCount;
-      if (touchY >= LIST_HEADER_H && touchY < LIST_HEADER_H + rows * LIST_ROW_H) {
-        int row = (touchY - LIST_HEADER_H) / LIST_ROW_H;
-        if (row >= 0 && row < imageCount) {
-          currentSelectedIndex = row;
-          currentView = MODE_IMAGE;       // 切换到图片模式
-          showSelectedImage(row);         // 显示图片
+  // 如果当前有触摸动作，才去判断是否触发翻页/返回逻辑
+  if (isTouching) {
+    // 简单防抖：只在第一次按下的瞬间触发逻辑，移动时不反复触发
+    static bool actionTriggered = false;
+    if (!actionTriggered) {
+      actionTriggered = true;
+      
+      if (currentView == MODE_LIST) {
+        // 点击列表区域：行位置必须用 drawImageList() 画每一行时的同一套几何参数来算。
+        // 原来写死的 45 / (45 + 15 * 18) / 18 是竖屏时代的数字，有三个问题：
+        //   ① 45 与真实的标题高度 LIST_HEADER_H(46) 差 1 像素；
+        //   ② 15 行 × 18 = 315 超过横屏高度 240，连最后一行以外的空白也算“第 N 行”；
+        //   ③ 行号因此整体偏移 —— 表现为“看得见却点不中 / 点错行”。
+        const int visibleRows = listRowsPerPage();
+        if (lastY >= LIST_HEADER_H && lastY < LIST_HEADER_H + visibleRows * LIST_ROW_H) {
+          int row = (lastY - LIST_HEADER_H) / LIST_ROW_H;
+          if (row >= 0 && row < imageCount) {
+            currentSelectedIndex = row;
+            currentView = MODE_IMAGE;
+            
+            // 界面即将完全重绘，强制取消绿点恢复，防止花屏
+            forceClearDot = true;
+            isTouching = false; 
+            
+            showSelectedImage(row); // 显示图片
+          }
+        }
+      } 
+      else if (currentView == MODE_IMAGE) {
+        // 点击底部灰条返回：灰条顶边是 tft.height() - IMG_BAR_H（横屏 240 时 = 210）。
+        // 原来判的是 lastY > 280，在 240 高的横屏上永远不成立 → 点“Tap HERE to return”返回不了。
+        if (lastY >= tft.height() - IMG_BAR_H) {
+          currentView = MODE_LIST;
+          
+          // 界面即将完全重绘，强制取消绿点恢复
+          forceClearDot = true;
+          isTouching = false; 
+          
+          drawImageList();
         }
       }
-    } 
-    else if (currentView == MODE_IMAGE) {
-      // 点击底部返回条返回列表
-      if (touchY > tft.height() - 30) {
-        currentView = MODE_LIST;
-        drawImageList();
-      }
+    }
+  } else {
+    // 松开后重置触发标志
+    static bool actionTriggered = false;
+    actionTriggered = false;
+  }
+}
+
+
+// ================= 4. 触摸校准 / 方向微调（串口命令触发） =================
+// 四点校准：依次点屏幕上四个角出现的箭头，TFT_eSPI 会根据测到的原始值
+// 自动判断触摸轴是否需要 X/Y 对调、是否需要水平/垂直镜像（见 Extensions/Touch.cpp
+// 里 calibrateTouch() 的 “touchCalibration_rotate = false; if(abs(...) > abs(...))” 一段），
+// 所以它能把“X/Y 对调”连同偏移、镜像一起纠正过来；结果存进 NVS，下次开机自动生效。
+void runTouchCalibration() {
+  xSemaphoreTake(tftMutex, portMAX_DELAY);
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(2);
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+  tft.drawString("Touch Calibration", 10, 10);
+  tft.setTextSize(1);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawString("Tap each arrow and HOLD until the next one appears", 10, 45);
+  tft.drawString("order: top-left, bottom-left, top-right, bottom-right", 10, 61);
+  xSemaphoreGive(tftMutex);
+  delay(1500);
+
+  // 注意：calibrateTouch() 会一直等到四个角都点完才返回（没点就卡在这里），
+  //       只有串口主动发 'c' 才会走到这，所以不会影响正常开机。
+  // 画箭头 + 读触摸的全过程都必须独占 TFT/SPI（TFT_eSPI 不是线程安全的）：
+  // 这期间 Web 里会画屏的请求（/display、/delete）会稍微等一下，代价可以接受，
+  // 不加锁的话两个任务同时用 SPI 会把屏幕画花、触摸采样也会被干扰。
+  uint16_t newCal[5] = {0, 0, 0, 0, 0};
+  xSemaphoreTake(tftMutex, portMAX_DELAY);
+  tft.calibrateTouch(newCal, TFT_MAGENTA, TFT_BLACK, 15);
+  memcpy(touchCalData, newCal, sizeof(touchCalData));
+  tft.setTouch(touchCalData);
+  saveTouchConfig();
+
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextSize(2);
+  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  tft.drawString("Calibrated & saved", 10, 60);
+  xSemaphoreGive(tftMutex);
+
+  printTouchConfig();
+  delay(1000);
+
+  // 校准过程把界面画花了，按当前状态重画一次
+  forceClearDot = true;
+  if (!sdCardReady) {
+    drawSdErrorScreen();
+  } else if (currentView == MODE_LIST || currentSelectedIndex < 0) {
+    drawImageList();
+  } else {
+    showSelectedImage(currentSelectedIndex);
+  }
+}
+
+// 串口命令（115200）：实时开关 X/Y 对调、镜像，或跑四点校准
+//   c = 四点校准并保存      x = 交换/取消交换 X/Y
+//   h = 水平镜像开关        v = 垂直镜像开关
+//   p = 打印当前参数        r = 恢复出厂默认
+void handleTouchSerial() {
+  while (Serial.available()) {
+    int c = Serial.read();
+    switch (c) {
+      case 'c':
+        Serial.println("[触摸] 开始四点校准：请依次点屏幕四个角出现的箭头");
+        runTouchCalibration();
+        break;
+      case 'x':
+        touchCalData[4] ^= 0x01;   // bit0: 交换 X/Y
+        applyTouchConfig();
+        printTouchConfig();
+        break;
+      case 'h':
+        touchCalData[4] ^= 0x02;   // bit1: 水平镜像
+        applyTouchConfig();
+        printTouchConfig();
+        break;
+      case 'v':
+        touchCalData[4] ^= 0x04;   // bit2: 垂直镜像
+        applyTouchConfig();
+        printTouchConfig();
+        break;
+      case 'p':
+        printTouchConfig();
+        break;
+      case 'r':
+        memcpy(touchCalData, TOUCH_CAL_DEFAULT, sizeof(touchCalData));
+        applyTouchConfig();
+        Serial.println("[触摸] 已恢复默认参数");
+        printTouchConfig();
+        break;
+      default:
+        break;   // 换行、其它字符一律忽略
     }
   }
 }
@@ -669,8 +928,11 @@ void setup() {
   tft.fillScreen(TFT_BLACK);
 
   // 初始化触摸屏
+  // 说明：坐标读取现在统一走 TFT_eSPI（见 readScreenTouch()），ts.begin() 只负责
+  //       初始化 SPI 并把 TOUCH_CS 拉高，所以不再需要 ts.setRotation()。
   ts.begin();
-  ts.setRotation(2); // 与屏幕旋转方向一致
+  // 关键一步：装入触摸校准参数（NVS 优先），修正“触摸位置与显示位置 X/Y 对调”
+  initTouch();
 
   // 初始化 LittleFS 文件系统（存放图片）
   if (!LittleFS.begin()) {
@@ -1003,6 +1265,8 @@ void setup() {
 void loop() {
   
     static uint32_t lastPrint = 0;
+    // 串口命令：实时微调触摸方向 / 触发四点校准（'c' 'x' 'h' 'v' 'p' 'r'，见文件上部说明）
+    handleTouchSerial();
     // 处理触摸事件，状态机驱动
     handleTouch();
     // 触摸统一交给 TFT_eSPI 的 getTouch()（见 handleTouch()）。
